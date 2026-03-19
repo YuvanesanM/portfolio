@@ -862,7 +862,10 @@ function fetchWithTimeout(url, options = {}, ms = 45000) {
 
 async function fetchFromGitHub() {
   try {
-    const res = await fetchWithTimeout(`${PROXY_URL}/holdings`, {}, 6000);
+    const res = await fetchWithTimeout(`${PROXY_URL}/holdings`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    }, 45000);
     if(!res.ok) return null;
     const data = await res.json();
     if(data.content) {
@@ -876,10 +879,12 @@ async function fetchFromGitHub() {
 }
 
 async function saveToGitHub(payload) {
-  // Get current SHA first (with timeout)
   let sha = null;
   try {
-    const getRes = await fetchWithTimeout(`${PROXY_URL}/holdings`, {}, 6000);
+    const getRes = await fetchWithTimeout(`${PROXY_URL}/holdings`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    }, 45000);
     if(getRes.ok) {
       const existing = await getRes.json();
       sha = existing?.sha || null;
