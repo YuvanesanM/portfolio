@@ -851,18 +851,13 @@ function buildSummary(holdings) {
 //  PROXY — fetch and save via Render proxy (no token in browser)
 // ═══════════════════════════════════════════════════
 
-// Fetch with a hard timeout so we never hang forever
-async function fetchWithTimeout(url, options = {}, ms = 45000) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), ms);
-  try {
-    const res = await fetch(url, { ...options, signal: controller.signal });
-    clearTimeout(timer);
-    return res;
-  } catch(e) {
-    clearTimeout(timer);
-    throw e;
-  }
+// Fetch with timeout using Promise.race — works in all browsers
+function fetchWithTimeout(url, options = {}, ms = 45000) {
+  const fetchPromise = fetch(url, options);
+  const timeoutPromise = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error('Request timed out')), ms)
+  );
+  return Promise.race([fetchPromise, timeoutPromise]);
 }
 
 async function fetchFromGitHub() {
@@ -920,36 +915,35 @@ let captchaVerified      = false;
 // Auto-run v3 check as soon as recaptcha is ready
 function runCaptchaCheck() {
   if(typeof grecaptcha === 'undefined' || typeof grecaptcha.ready === 'undefined') {
-    // Script not yet loaded — retry after short delay
     setTimeout(runCaptchaCheck, 200);
     return;
   }
   grecaptcha.ready(() => {
     grecaptcha.execute('6LfskdwqAAAAAKFybSmhi2Zf3hAwCKuvxHNSA-NE', { action: 'portfolio_login' })
       .then(token => evaluateScore(token))
-      .catch(() => {
-        document.getElementById('captchaErr').textContent = '⚠ reCAPTCHA check skipped.';
-        setTimeout(showPasswordStep, 800);
+      .catch(err => {
+        console.warn('reCAPTCHA execute failed:', err);
+        showPasswordStep();
       });
   });
 }
 
 window.addEventListener('load', () => {
-  // Give async script up to 5s to load, then fail open
   let attempts = 0;
   const tryRun = () => {
     attempts++;
     if(typeof grecaptcha !== 'undefined') {
       runCaptchaCheck();
-    } else if(attempts < 25) {
-      setTimeout(tryRun, 200);
+    } else if(attempts < 20) {
+      setTimeout(tryRun, 300);
     } else {
-      // reCAPTCHA failed to load after 5s (ad blocker / network) — fail open
+      // Failed to load after 6s — skip and go straight to password
       console.warn('reCAPTCHA not loaded, skipping bot check.');
       showPasswordStep();
     }
   };
-  tryRun();
+  // Start trying after 500ms to let scripts load
+  setTimeout(tryRun, 500);
 });
 
 function evaluateScore(token) {
