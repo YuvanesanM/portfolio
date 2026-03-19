@@ -1106,6 +1106,25 @@ function renderAlloc() {
 }
 
 let chartsRendered = false;
+
+// Full dashboard refresh — destroys all Chart.js instances and rerenders everything
+function refreshDashboard() {
+  // Destroy all existing Chart.js instances
+  Object.values(Chart.instances).forEach(c => c.destroy());
+  chartsRendered = false;
+
+  // Update all text values
+  document.getElementById('heroTotal').textContent   = fmt(portfolio.total);
+  document.getElementById('heroDate').textContent    = portfolio.asOf;
+  document.getElementById('lastUpdated').textContent = 'Updated: ' + portfolio.asOf;
+
+  // Re-render everything
+  renderAlloc();
+  renderCharts();
+  renderHoldings();
+  renderSGB();
+  renderJourney();
+}
 function renderCharts() {
   if(chartsRendered) return;
   chartsRendered = true;
@@ -1421,12 +1440,11 @@ async function applyUpdate() {
   try {
     await saveToGitHub(payload);
     showModalSuccess(`✓ Saved to GitHub! Portfolio updated to ${fmt(portfolio.total)} as of ${asOf}`);
-    document.getElementById('heroTotal').textContent      = fmt(portfolio.total);
-    document.getElementById('lastUpdated').textContent    = 'Updated: '+asOf;
-    document.getElementById('heroDate').textContent       = asOf;
-    renderAlloc();
-    renderHoldings();
-    renderSGB();
+    // Full dashboard refresh — destroy charts and reinit everything
+    setTimeout(() => {
+      closeModal();
+      refreshDashboard();
+    }, 1800);
   } catch(e) {
     showModalError('GitHub save failed: '+e.message+'. Values updated locally only.');
   }
