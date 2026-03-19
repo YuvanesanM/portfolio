@@ -93,7 +93,7 @@
       "account": "ICICI",
       "type": "SGB",
       "sub": "SGB",
-      "value": 1129240,
+      "value": 1071000,
       "units": "70g",
       "remarks": "Matures 14-Aug-2027"
     },
@@ -101,7 +101,7 @@
       "account": "ICICI",
       "type": "SGB",
       "sub": "SGB",
-      "value": 806600,
+      "value": 765000,
       "units": "50g",
       "remarks": "Matures 10-Dec-2027"
     },
@@ -109,7 +109,7 @@
       "account": "ICICI",
       "type": "SGB",
       "sub": "SGB",
-      "value": 1613200,
+      "value": 1530000,
       "units": "100g",
       "remarks": "Matures 08-Sep-2028"
     },
@@ -117,7 +117,7 @@
       "account": "ICICI",
       "type": "SGB",
       "sub": "SGB",
-      "value": 483960,
+      "value": 459000,
       "units": "30g",
       "remarks": "Matures 05-Jan-2029"
     },
@@ -125,7 +125,7 @@
       "account": "ICICI",
       "type": "SGB",
       "sub": "SGB",
-      "value": 806600,
+      "value": 765000,
       "units": "50g",
       "remarks": "Matures 19-Jan-2029"
     },
@@ -133,7 +133,7 @@
       "account": "ICICI",
       "type": "SGB",
       "sub": "SGB",
-      "value": 1613200,
+      "value": 1530000,
       "units": "100g",
       "remarks": "Matures 09-Mar-2029"
     },
@@ -141,7 +141,7 @@
       "account": "ICICI",
       "type": "SGB",
       "sub": "SGB",
-      "value": 1613200,
+      "value": 1530000,
       "units": "100g",
       "remarks": "Matures 25-May-2029"
     },
@@ -298,6 +298,10 @@
     {
       "date": "2026-03-19",
       "value": 67936966
+    },
+    {
+      "date": "2026-03-19",
+      "value": 67520966
     }
   ],
   "sgbTranches": [
@@ -305,25 +309,25 @@
       "units": 70,
       "maturity": "14 Aug 2027",
       "cost": 244930,
-      "value": 1129240
+      "value": 1071000
     },
     {
       "units": 50,
       "maturity": "10 Dec 2027",
       "cost": 189750,
-      "value": 806600
+      "value": 765000
     },
     {
       "units": 100,
       "maturity": "08 Sep 2028",
       "cost": 511700,
-      "value": 1613200
+      "value": 1530000
     },
     {
       "units": 30,
       "maturity": "05 Jan 2029",
       "cost": 150000,
-      "value": 483960
+      "value": 459000
     },
     {
       "units": 50,
