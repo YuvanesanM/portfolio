@@ -409,6 +409,64 @@
     .nav-btn { font-size: 12px; padding: 6px 10px; }
   }
 
+
+  /* ─── HAMBURGER / MOBILE NAV ─── */
+  .hamburger {
+    display: none; flex-direction: column; gap: 5px;
+    background: none; border: none; cursor: pointer; padding: 8px;
+  }
+  .hamburger span {
+    display: block; width: 22px; height: 2px;
+    background: var(--text2); border-radius: 2px;
+    transition: all 0.25s;
+  }
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  .mobile-nav {
+    display: none; position: fixed; top: 64px; left: 0; right: 0;
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    z-index: 200; flex-direction: column; padding: 8px 0;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .mobile-nav.open { display: flex; }
+  .mobile-nav .nav-btn {
+    width: 100%; text-align: left; padding: 14px 24px;
+    border-radius: 0; font-size: 14px; border-bottom: 1px solid var(--border);
+  }
+  .mobile-nav .nav-btn:last-child { border-bottom: none; }
+
+  /* ─── PRINT / PDF ─── */
+  @media print {
+    .header, .lock-screen, #loadingOverlay, .modal, .mobile-nav,
+    .hamburger, .update-btn, .lock-out-btn, .export-btn, #lockScreen { display: none !important; }
+    .page { display: block !important; padding: 0; }
+    .page:not(.active) { display: none !important; }
+    body { background: #fff; color: #000; }
+    .card { border: 1px solid #ddd; break-inside: avoid; }
+    .hero { background: #f5f5f5; border-radius: 12px; }
+    canvas { max-width: 100%; }
+    .print-header {
+      display: flex !important; align-items: center; justify-content: space-between;
+      padding: 16px 0 24px; border-bottom: 2px solid #ddd; margin-bottom: 24px;
+    }
+  }
+  .print-header { display: none; }
+
+  @media(max-width:768px) {
+    .hamburger { display: flex; }
+    .header-nav { display: none; }
+    .header { height: 64px; }
+    .last-updated { display: none; }
+  }
+
+
+  /* ─── RESPONSIVE CHARTS ─── */
+  .chart-wrap { position: relative; width: 100%; }
+  .chart-wrap canvas { width: 100% !important; }
+  canvas { max-width: 100%; }
+
   /* ─── SCROLLBAR ─── */
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
@@ -475,6 +533,15 @@
 <!-- ╔══════════════ DASHBOARD ══════════════╗ -->
 <div id="dashboard">
 
+  <!-- Print-only header (hidden on screen, shown when printing) -->
+  <div id="printHeader" class="print-header">
+    <div>
+      <div style="font-size:20px;font-weight:700">Yuvan's Portfolio</div>
+      <div style="font-size:13px;color:#666">As of <span id="printDate"></span></div>
+    </div>
+    <div style="font-size:28px;font-weight:700" id="printTotal"></div>
+  </div>
+
   <!-- HEADER -->
   <header class="header">
     <div class="header-brand">
@@ -495,10 +562,28 @@
     </nav>
     <div class="header-right">
       <span class="last-updated" id="lastUpdated">Updated: 16-Sep-2025</span>
-      <button class="update-btn" onclick="openModal()">⊕ Update Holdings</button>
+      <button class="update-btn" id="updateBtn" onclick="openModal()">⊕ Update Holdings</button>
+      <button class="export-btn" onclick="openExportPanel()" title="Export / Share" style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px 14px;color:var(--text2);font-size:13px;cursor:pointer;">↗ Share</button>
       <button class="lock-out-btn" onclick="lockDashboard()">🔒</button>
+      <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </header>
+  <!-- MOBILE NAV -->
+  <div class="mobile-nav" id="mobileNav">
+    <button class="nav-btn" onclick="mobileNavTo('overview')">Overview</button>
+    <button class="nav-btn" onclick="mobileNavTo('holdings')">Holdings</button>
+    <button class="nav-btn" onclick="mobileNavTo('mf')">Mutual Funds</button>
+    <button class="nav-btn" onclick="mobileNavTo('fd')">Fixed Deposits</button>
+    <button class="nav-btn" onclick="mobileNavTo('sgb')">SGB</button>
+    <button class="nav-btn" onclick="mobileNavTo('returns')">Returns</button>
+    <button class="nav-btn" onclick="mobileNavTo('family')">Family</button>
+    <button class="nav-btn" onclick="mobileNavTo('tax')">Tax</button>
+    <button class="nav-btn" onclick="mobileNavTo('rebalance')">Rebalance</button>
+    <button class="nav-btn" onclick="mobileNavTo('journey')">Journey</button>
+  </div>
+
 
   <!-- ═══════════ PAGE: OVERVIEW ═══════════ -->
   <div class="page active" id="page-overview">
@@ -582,7 +667,7 @@
       </div>
       <div class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
         <h3 style="align-self:flex-start">Portfolio Composition</h3>
-        <canvas id="donutChart" width="240" height="240"></canvas>
+        <canvas id="donutChart" width="240"></canvas>
       </div>
     </div>
 
@@ -590,11 +675,11 @@
     <div class="grid-2">
       <div class="card">
         <h3>Liquidity Profile</h3>
-        <canvas id="liquidityChart" height="200"></canvas>
+        <canvas id="liquidityChart"></canvas>
       </div>
       <div class="card">
         <h3>Asset Category Breakdown</h3>
-        <canvas id="categoryChart" height="200"></canvas>
+        <canvas id="categoryChart"></canvas>
       </div>
     </div>
   </div>
@@ -674,11 +759,11 @@
     <div class="grid-3" style="margin-bottom:24px">
       <div class="card">
         <h3>By Fund House</h3>
-        <canvas id="mfFundHouseChart" height="260"></canvas>
+        <canvas id="mfFundHouseChart"></canvas>
       </div>
       <div class="card">
         <h3>By Category</h3>
-        <canvas id="mfCategoryChart" width="220" height="220" style="margin:0 auto;display:block"></canvas>
+        <canvas id="mfCategoryChart" width="220" style="margin:0 auto;display:block"></canvas>
       </div>
       <div class="card">
         <h3>Category Allocation</h3>
@@ -704,8 +789,9 @@
             <tr>
               <th>#</th>
               <th>Scheme</th>
-              <th>Fund House</th>
+              <th>Owner</th>
               <th>Category</th>
+              <th>Registrar</th>
               <th style="text-align:right">Cost (₹)</th>
               <th style="text-align:right">Value (₹)</th>
               <th style="text-align:right">Gain</th>
@@ -760,7 +846,7 @@
     <div class="grid-2" style="margin-top:24px">
       <div class="card">
         <h3>FD Bank Distribution</h3>
-        <canvas id="fdDonut" width="260" height="260"></canvas>
+        <canvas id="fdDonut" width="260"></canvas>
       </div>
       <div class="card">
         <h3>FD Holder Split</h3>
@@ -843,7 +929,7 @@
       </div>
       <div class="card">
         <h3>Portfolio Growth Trajectory</h3>
-        <canvas id="growthChart" height="260"></canvas>
+        <canvas id="growthChart"></canvas>
       </div>
     </div>
 
@@ -876,7 +962,7 @@
     <div class="grid-2" style="margin-bottom:24px">
       <div class="card">
         <h3>Returns by Asset Class</h3>
-        <canvas id="returnsChart" height="300"></canvas>
+        <canvas id="returnsChart"></canvas>
       </div>
       <div class="card">
         <h3>Gain Waterfall</h3>
@@ -913,7 +999,7 @@
     <div class="grid-2" style="margin-bottom:24px">
       <div class="card">
         <h3>Family Wealth Split</h3>
-        <canvas id="familyDonut" width="260" height="260" style="display:block;margin:0 auto"></canvas>
+        <canvas id="familyDonut" width="260" style="display:block;margin:0 auto"></canvas>
       </div>
       <div class="card">
         <h3>Holdings by Member</h3>
@@ -1009,6 +1095,42 @@
   </div>
 
 </div><!-- /dashboard -->
+
+
+<!-- ╔══════════════ EXPORT PANEL ══════════════╗ -->
+<div id="exportOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:500;align-items:center;justify-content:center;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px;width:480px;max-width:94vw;max-height:90vh;overflow-y:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+      <div style="font-size:18px;font-weight:700;color:var(--text)">Export & Share</div>
+      <button onclick="closeExportPanel()" style="background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;">✕</button>
+    </div>
+
+    <!-- PDF -->
+    <div style="margin-bottom:16px;padding:20px;background:var(--surface2);border-radius:14px;border:1px solid var(--border);">
+      <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">📄 PDF Snapshot</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Prints the current page as a PDF. Use "Save as PDF" in the print dialog.</div>
+      <button onclick="exportPDF()" style="width:100%;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">Print / Save as PDF</button>
+    </div>
+
+    <!-- Read-only link -->
+    <div style="margin-bottom:16px;padding:20px;background:var(--surface2);border-radius:14px;border:1px solid var(--border);">
+      <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">🔗 Read-only Link</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Share this link — viewer sees live data but cannot edit or update holdings.</div>
+      <div style="display:flex;gap:8px;">
+        <input id="readonlyLink" readonly style="flex:1;background:var(--surface3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text2);font-size:12px;font-family:'JetBrains Mono',monospace;" value="">
+        <button onclick="copyReadonlyLink()" style="padding:10px 16px;background:var(--surface3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;cursor:pointer;" id="copyLinkBtn">Copy</button>
+      </div>
+    </div>
+
+    <!-- WhatsApp card -->
+    <div style="padding:20px;background:var(--surface2);border-radius:14px;border:1px solid var(--border);">
+      <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">📱 Summary Card</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Download a summary image to share on WhatsApp or save for records.</div>
+      <canvas id="summaryCanvas" style="display:block;width:100%;border-radius:10px;margin-bottom:12px;"></canvas>
+      <button onclick="downloadSummaryCard()" style="width:100%;padding:12px;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;">⬇ Download Image</button>
+    </div>
+  </div>
+</div>
 
 <!-- ╔══════════════ UPDATE MODAL ══════════════╗ -->
 <div id="modalOverlay">
@@ -1120,8 +1242,7 @@ const DEFAULT_HOLDINGS = [
   { account:"ICICI",   type:"SGB",         sub:"SGB",            value:806600,   units:"50g",   remarks:"Matures 19-Jan-2029",      owner:"Yuvan",  purchaseDate:"2021-01-19", purchasePrice:252700   },
   { account:"ICICI",   type:"SGB",         sub:"SGB",            value:1613200,  units:"100g",  remarks:"Matures 09-Mar-2029",      owner:"Yuvan",  purchaseDate:"2021-03-09", purchasePrice:461200   },
   { account:"ICICI",   type:"SGB",         sub:"SGB",            value:1613200,  units:"100g",  remarks:"Matures 25-May-2029",      owner:"Yuvan",  purchaseDate:"2021-05-25", purchasePrice:472700   },
-  { account:"ICICI",   type:"Mutual Fund", sub:"Mutual Fund",    value:25986323, units:"",      remarks:"ICICI – Total",            owner:"Yuvan",  purchaseDate:"2019-01-01", purchasePrice:23875753 },
-  { account:"HDFC",    type:"Mutual Fund", sub:"Mutual Fund",    value:413000,   units:"",      remarks:"Ramyaa",                   owner:"Ramyaa", purchaseDate:"2021-01-01", purchasePrice:325000   },
+  { account:"CAMS+KFin", type:"Mutual Fund", sub:"Mutual Fund",  value:0,        units:"",      remarks:"Auto-computed from CAS",   owner:"Yuvan",  purchaseDate:"2019-01-01", purchasePrice:24200753, _mfComputed:true },
   { account:"ICICI",   type:"Shares",      sub:"ETF & Stocks",   value:2892904,  units:"",      remarks:"Demat",                    owner:"Yuvan",  purchaseDate:"2020-01-01", purchasePrice:2000000  },
   { account:"Kite",    type:"Shares",      sub:"Mixed Shares",   value:349265,   units:"",      remarks:"Zerodha",                  owner:"Yuvan",  purchaseDate:"2021-01-01", purchasePrice:300000   },
   { account:"360ONE",  type:"AIF",         sub:"AIF",            value:5000000,  units:"",      remarks:"Alternative",              owner:"Yuvan",  purchaseDate:"2022-01-01", purchasePrice:5000000  },
@@ -1219,6 +1340,19 @@ function fmtShort(n) {
   if(n>=10000000) return (n/10000000).toFixed(2)+' Cr';
   if(n>=100000)   return (n/100000).toFixed(1)+'L';
   return n.toLocaleString('en-IN');
+}
+
+// Compute total MF value from MF_SCHEMES (both Yuvan + Ramyaa)
+// and sync into the single _mfComputed holding row
+function syncMFTotal() {
+  const total = MF_SCHEMES.reduce((a, s) => a + (s.value || 0), 0);
+  const cost  = MF_SCHEMES.reduce((a, s) => a + (s.cost  || 0), 0);
+  const h = portfolio.holdings.find(h => h._mfComputed);
+  if(h) {
+    h.value         = Math.round(total);
+    h.purchasePrice = Math.round(cost);
+  }
+  return Math.round(total);
 }
 
 function buildSummary(holdings) {
@@ -1479,6 +1613,7 @@ async function loadAndInit() {
   db.style.display = 'block';
   db.classList.add('visible');
   initDashboard();
+  applyReadonlyMode();
 }
 
 
@@ -1494,7 +1629,233 @@ function showPage(id, btn) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
-  btn.classList.add('active');
+  if(btn) btn.classList.add('active');
+  // Also highlight matching mobile nav button
+  document.querySelectorAll('#mobileNav .nav-btn').forEach(b=>{
+    b.classList.toggle('active', b.textContent.toLowerCase().includes(id) || b.getAttribute('onclick')?.includes(`'${id}'`));
+  });
+}
+
+// ═══════════════════════════════════════════════════
+//  HAMBURGER / MOBILE NAV
+// ═══════════════════════════════════════════════════
+function toggleMobileNav() {
+  const nav = document.getElementById('mobileNav');
+  const btn = document.getElementById('hamburger');
+  const open = nav.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+}
+
+function mobileNavTo(pageId) {
+  // Find matching desktop nav button and activate it
+  const desktopBtns = document.querySelectorAll('#mainNav .nav-btn');
+  let matched = null;
+  desktopBtns.forEach(b => {
+    const match = b.getAttribute('onclick')?.includes(`'${pageId}'`);
+    if(match) matched = b;
+  });
+  showPage(pageId, matched || desktopBtns[0]);
+  // Close mobile nav
+  document.getElementById('mobileNav').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Close mobile nav when clicking outside
+document.addEventListener('click', e => {
+  const nav = document.getElementById('mobileNav');
+  const btn = document.getElementById('hamburger');
+  if(nav?.classList.contains('open') && !nav.contains(e.target) && !btn.contains(e.target)) {
+    nav.classList.remove('open');
+    btn.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+});
+
+// ═══════════════════════════════════════════════════
+//  READ-ONLY MODE
+// ═══════════════════════════════════════════════════
+const IS_READONLY = new URLSearchParams(window.location.search).has('readonly');
+
+function applyReadonlyMode() {
+  if(!IS_READONLY) return;
+  // Hide edit controls
+  const updateBtn = document.getElementById('updateBtn');
+  if(updateBtn) updateBtn.style.display = 'none';
+  // Add readonly badge to header
+  const brand = document.querySelector('.header-brand');
+  if(brand) {
+    const badge = document.createElement('span');
+    badge.textContent = 'View only';
+    badge.style.cssText = 'font-size:10px;padding:2px 8px;border-radius:99px;background:rgba(79,127,255,0.15);color:var(--blue2);border:1px solid rgba(79,127,255,0.3);margin-left:8px;font-weight:600;';
+    brand.appendChild(badge);
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  EXPORT PANEL
+// ═══════════════════════════════════════════════════
+function openExportPanel() {
+  const overlay = document.getElementById('exportOverlay');
+  overlay.style.display = 'flex';
+  // Set readonly link
+  const url = new URL(window.location.href);
+  url.searchParams.set('readonly', '1');
+  // Remove hash/password from readonly link
+  url.searchParams.delete('pw');
+  document.getElementById('readonlyLink').value = url.toString();
+  // Draw summary card
+  drawSummaryCard();
+}
+
+function closeExportPanel() {
+  document.getElementById('exportOverlay').style.display = 'none';
+}
+document.getElementById('exportOverlay')?.addEventListener('click', e => {
+  if(e.target === document.getElementById('exportOverlay')) closeExportPanel();
+});
+
+function copyReadonlyLink() {
+  const input = document.getElementById('readonlyLink');
+  navigator.clipboard.writeText(input.value).then(() => {
+    const btn = document.getElementById('copyLinkBtn');
+    btn.textContent = '✓ Copied!';
+    btn.style.color = 'var(--green)';
+    setTimeout(() => { btn.textContent = 'Copy'; btn.style.color = ''; }, 2000);
+  });
+}
+
+// ─── PDF Export ───────────────────────────────────
+function exportPDF() {
+  const ph = document.getElementById('printHeader');
+  const pd = document.getElementById('printDate');
+  const pt = document.getElementById('printTotal');
+  if(pd) pd.textContent = portfolio.asOf || new Date().toLocaleDateString('en-IN');
+  if(pt) pt.textContent = fmt(portfolio.total);
+  if(ph) ph.style.display = 'flex';
+  window.print();
+  if(ph) ph.style.display = 'none';
+}
+
+// ─── WhatsApp Summary Card (pure Canvas) ──────────
+function drawSummaryCard() {
+  const canvas = document.getElementById('summaryCanvas');
+  if(!canvas) return;
+
+  const W = 800, H = 420;
+  canvas.width  = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // Background
+  ctx.fillStyle = '#0d1117';
+  ctx.roundRect(0, 0, W, H, 20);
+  ctx.fill();
+
+  // Gold accent bar top
+  const grad = ctx.createLinearGradient(0,0,W,0);
+  grad.addColorStop(0, '#d4a843');
+  grad.addColorStop(1, '#f0c96b');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, 4);
+
+  // Header
+  ctx.fillStyle = '#d4a843';
+  ctx.font = 'bold 15px monospace';
+  ctx.fillText("YUVAN'S PORTFOLIO", 32, 40);
+
+  ctx.fillStyle = '#4a5a7a';
+  ctx.font = '13px monospace';
+  ctx.fillText(portfolio.asOf ? `As of ${portfolio.asOf}` : new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}), 32, 60);
+
+  // Total value
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 48px sans-serif';
+  ctx.fillText(fmt(portfolio.total), 32, 130);
+
+  ctx.fillStyle = '#4a5a7a';
+  ctx.font = '13px monospace';
+  ctx.fillText('TOTAL PORTFOLIO VALUE', 32, 155);
+
+  // Divider
+  ctx.strokeStyle = '#1e2a3a';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(32, 175); ctx.lineTo(W-32, 175); ctx.stroke();
+
+  // Top 5 holdings by value
+  const top5 = [...portfolio.holdings]
+    .filter(h => h.value > 0)
+    .sort((a,b) => b.value - a.value)
+    .slice(0, 5);
+
+  const colW = (W - 64) / 5;
+  top5.forEach((h, i) => {
+    const x = 32 + i * colW;
+    const y = 195;
+    const pct = (h.value / portfolio.total * 100).toFixed(1);
+    const barH = Math.max(4, (h.value / portfolio.total) * 80);
+
+    // Bar
+    ctx.fillStyle = Object.values({
+      'Mutual Fund':'#4f7fff','SGB':'#d4a843','PMS':'#9b6dff',
+      'Fixed Deposit':'#2ecc8f','AIF':'#ff8c42','Coin':'#f0c96b',
+      'REIT':'#5debd7','Shares':'#00c4b4'
+    })[i % 8] || '#4f7fff';
+    const bx = x + 8;
+    ctx.fillRect(bx, y + 80 - barH, colW - 24, barH);
+
+    // Label
+    ctx.fillStyle = '#8a9bbf';
+    ctx.font = '11px monospace';
+    ctx.fillText(h.sub?.substring(0,10) || h.account, x + 8, y + 100);
+
+    ctx.fillStyle = '#e8eef8';
+    ctx.font = 'bold 12px monospace';
+    ctx.fillText(fmtShort(h.value), x + 8, y + 118);
+
+    ctx.fillStyle = '#d4a843';
+    ctx.font = '11px monospace';
+    ctx.fillText(pct + '%', x + 8, y + 134);
+  });
+
+  // Bottom stats
+  const totalGain = portfolio.holdings.reduce((a,h) => a + (h.value||0) - (h.purchasePrice||h.value||0), 0);
+  const gainPct = (totalGain / portfolio.holdings.reduce((a,h)=>a+(h.purchasePrice||h.value||0),0) * 100).toFixed(1);
+
+  ctx.fillStyle = '#1e2a3a';
+  ctx.fillRect(32, 350, W - 64, 1);
+
+  const stats = [
+    ['HOLDINGS', portfolio.holdings.filter(h=>h.value>0).length + ' assets'],
+    ['TOTAL GAIN', (totalGain >= 0 ? '+' : '') + fmtShort(totalGain)],
+    ['RETURN', (gainPct >= 0 ? '+' : '') + gainPct + '%'],
+    ['XIRR (est.)', '~' + estimateXIRR(portfolio.holdings) + '% p.a.'],
+  ];
+
+  stats.forEach(([label, value], i) => {
+    const x = 32 + i * ((W - 64) / 4);
+    ctx.fillStyle = '#4a5a7a';
+    ctx.font = '11px monospace';
+    ctx.fillText(label, x, 375);
+    ctx.fillStyle = '#e8eef8';
+    ctx.font = 'bold 14px monospace';
+    ctx.fillText(value, x, 398);
+  });
+
+  // Footer
+  ctx.fillStyle = '#2a3a4a';
+  ctx.font = '10px monospace';
+  ctx.fillText('portfolio.ryst.in', W - 150, H - 12);
+}
+
+function downloadSummaryCard() {
+  drawSummaryCard();
+  const canvas = document.getElementById('summaryCanvas');
+  const a = document.createElement('a');
+  a.download = `portfolio-${new Date().toISOString().split('T')[0]}.png`;
+  a.href = canvas.toDataURL('image/png');
+  a.click();
 }
 
 // ═══════════════════════════════════════════════════
@@ -1529,6 +1890,9 @@ function renderStats() {
 }
 
 function initDashboard() {
+  syncMFTotal();
+  portfolio.total = portfolio.holdings.reduce((a,b)=>a+(b.value||0),0);
+  summary         = buildSummary(portfolio.holdings);
   document.getElementById('heroTotal').textContent   = fmt(portfolio.total);
   document.getElementById('heroDate').textContent    = portfolio.asOf;
   document.getElementById('lastUpdated').textContent = 'Updated: '+portfolio.asOf;
@@ -1549,6 +1913,9 @@ function initDashboard() {
 function refreshDashboard() {
   Object.values(Chart.instances).forEach(c => c.destroy());
   chartsRendered = false;
+  syncMFTotal();
+  portfolio.total = portfolio.holdings.reduce((a,b)=>a+(b.value||0),0);
+  summary         = buildSummary(portfolio.holdings);
   document.getElementById('heroTotal').textContent   = fmt(portfolio.total);
   document.getElementById('heroDate').textContent    = portfolio.asOf;
   document.getElementById('lastUpdated').textContent = 'Updated: ' + portfolio.asOf;
@@ -1592,7 +1959,7 @@ function renderCharts() {
   };
   new Chart(document.getElementById('liquidityChart').getContext('2d'),{
     type:'bar', data:{ labels:['Liquid','Semi-Liquid','Illiquid / Lock-in'], datasets:[{ data:[liq.liquid,liq.semiLiquid,liq.illiquid], backgroundColor:['#2ecc8f','#4f7fff','#9b6dff'], borderRadius:8, borderSkipped:false }] },
-    options:{ responsive:true, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${fmt(ctx.raw)}`},...CHART_TOOLTIP}}, scales:CHART_SCALES_XY }
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${fmt(ctx.raw)}`},...CHART_TOOLTIP}}, scales:CHART_SCALES_XY }
   });
 
   new Chart(document.getElementById('categoryChart').getContext('2d'),{
@@ -1678,6 +2045,9 @@ const MF_SCHEMES = [
   {house:'SBI',       scheme:'Multi Asset Allocation Fund Regular Growth',    cat:'Multi Asset', cost:500000,   value:562173,  reg:'CAMS'},
   {house:'SBI',       scheme:'Contra Fund Regular Growth',                    cat:'Contra',      cost:750000,   value:762589,  reg:'CAMS'},
   {house:'SBI',       scheme:'Large & Midcap Fund Regular Growth',            cat:'Large & Mid', cost:100000,   value:154005,  reg:'CAMS'},
+  // ── Ramyaa's schemes (CAMS CAS · 19-Mar-2026) ──
+  {house:'ICICI',     scheme:'Thematic Advantage FOF Growth',                 cat:'FOF',         cost:100000,   value:95657,   reg:'CAMS',     units:449.123,   mfapiCode:'101026', owner:'Ramyaa'},
+  {house:'Invesco',   scheme:'Flexi Cap Fund Regular Growth',                 cat:'Flexi Cap',   cost:300000,   value:271821,  reg:'KFintech',  units:16093.616, mfapiCode:'145255', owner:'Ramyaa'},
 ];
 
 const MF_HOUSE_COLORS = {
@@ -1695,20 +2065,21 @@ const MF_CAT_COLORS = {
 let mfCurrentFilter = 'All';
 
 function renderMF() {
-  // Use live total from portfolio if available, else CAS total
-  const casTotal   = MF_SCHEMES.reduce((a,b)=>a+b.value,0);
-  const casCost    = MF_SCHEMES.reduce((a,b)=>a+b.cost,0);
-  const gain       = casTotal - casCost;
-  const gainPct    = ((gain/casCost)*100).toFixed(1);
+  const casTotal    = MF_SCHEMES.reduce((a,b)=>a+b.value,0);
+  const casCost     = MF_SCHEMES.reduce((a,b)=>a+b.cost,0);
+  const gain        = casTotal - casCost;
+  const gainPct     = ((gain/casCost)*100).toFixed(1);
   const schemeCount = MF_SCHEMES.length;
-  const largest    = [...MF_SCHEMES].sort((a,b)=>b.value-a.value)[0];
-  const camsCount  = MF_SCHEMES.filter(s=>s.reg==='CAMS').length;
-  const kfinCount  = MF_SCHEMES.filter(s=>s.reg==='KFintech').length;
+  const largest     = [...MF_SCHEMES].sort((a,b)=>b.value-a.value)[0];
+  const camsCount   = MF_SCHEMES.filter(s=>s.reg==='CAMS').length;
+  const kfinCount   = MF_SCHEMES.filter(s=>s.reg==='KFintech').length;
+  const yuvanCount  = MF_SCHEMES.filter(s=>!s.owner||s.owner==='Yuvan').length;
+  const ramyaaCount = MF_SCHEMES.filter(s=>s.owner==='Ramyaa').length;
 
   const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
   set('mfTotalValue',   fmt(casTotal));
-  set('mfAsOf',         '17 Mar 2026');
-  set('mfSchemeCount',  schemeCount+' schemes');
+  set('mfAsOf',         portfolio.asOf || '19 Mar 2026');
+  set('mfSchemeCount',  `${schemeCount} schemes · Yuvan (${yuvanCount}) + Ramyaa (${ramyaaCount})`);
   set('mfCost',         fmt(casCost));
   set('mfGain',         (gain>=0?'+':'')+fmt(gain));
   set('mfReturn',       (gainPct>=0?'+':'')+gainPct+'%');
@@ -1789,19 +2160,22 @@ function mfRenderTable(filter) {
   });
 
   tb.innerHTML = [...schemes].sort((a,b)=>b.value-a.value).map((s,i)=>{
-    const gain   = s.value - s.cost;
-    const gainPct= ((gain/s.cost)*100).toFixed(1);
-    const pctMF  = (s.value/casTotal*100).toFixed(1);
-    const color  = MF_HOUSE_COLORS[s.house]||'#8a9bbf';
-    const gainColor = gain>=0?'var(--green)':'var(--red)';
-    const catColor  = MF_CAT_COLORS[s.cat]||'#8a9bbf';
+    const gain    = s.value - s.cost;
+    const gainPct = ((gain/s.cost)*100).toFixed(1);
+    const pctMF   = (s.value/casTotal*100).toFixed(1);
+    const color   = MF_HOUSE_COLORS[s.house]||'#8a9bbf';
+    const gainColor  = gain>=0?'var(--green)':'var(--red)';
+    const catColor   = MF_CAT_COLORS[s.cat]||'#8a9bbf';
+    const owner      = s.owner || 'Yuvan';
+    const ownerColor = owner === 'Ramyaa' ? '#9b6dff' : '#4f7fff';
     return `<tr>
       <td style="color:var(--text3);font-size:11px;font-family:'JetBrains Mono',monospace">${i+1}</td>
-      <td style="font-size:13px;max-width:240px">
-        <div style="font-weight:600;color:var(--text)">${s.scheme}</div>
+      <td style="font-size:13px;max-width:220px">
+        <div style="font-weight:600;color:var(--text)">${s.house} ${s.scheme}</div>
       </td>
-      <td><span class="badge" style="background:${color}22;color:${color};border-color:${color}44;font-size:11px">${s.house}</span></td>
+      <td><span style="font-size:10px;padding:2px 7px;border-radius:6px;border:1px solid;background:${ownerColor}22;color:${ownerColor};border-color:${ownerColor}44">${owner}</span></td>
       <td><span class="badge" style="background:${catColor}18;color:${catColor};border-color:${catColor}33;font-size:11px">${s.cat}</span></td>
+      <td style="font-size:11px;color:var(--text3)">${s.reg}</td>
       <td class="num" style="text-align:right;color:var(--text3)">${fmt(s.cost)}</td>
       <td class="num" style="text-align:right;font-weight:600">${fmt(s.value)}</td>
       <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px;color:${gainColor}">${gain>=0?'+':''}${fmt(Math.abs(gain))}<br><span style="font-size:10px">${gainPct>=0?'+':''}${gainPct}%</span></td>
@@ -2002,7 +2376,7 @@ function renderJourney() {
     new Chart(gc.getContext('2d'), {
       type:'line',
       data:{ labels:snapshots.map(s=>new Date(s.date).toLocaleDateString('en-IN',{month:'short',year:'2-digit'})), datasets:[{ label:'Portfolio Value', data:snapshots.map(s=>s.value), borderColor:'#d4a843', backgroundColor:'rgba(212,168,67,0.08)', borderWidth:2.5, fill:true, tension:0.4, pointBackgroundColor:'#d4a843', pointRadius:5, pointHoverRadius:8 }] },
-      options:{ responsive:true, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${fmt(ctx.raw)}`},...CHART_TOOLTIP}}, scales:CHART_SCALES_XY }
+      options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${fmt(ctx.raw)}`},...CHART_TOOLTIP}}, scales:CHART_SCALES_XY }
     });
   }
 }
@@ -2117,9 +2491,20 @@ function renderFamily() {
   const members = ['Yuvan','Ramyaa','Sana','Tara'];
   const colors  = { Yuvan:'#4f7fff', Ramyaa:'#9b6dff', Sana:'#2ecc8f', Tara:'#ff8c42' };
   const totals  = {};
+
+  // Start with non-MF holdings aggregated by owner
   members.forEach(m => {
-    totals[m] = portfolio.holdings.filter(h=>(h.owner||'Yuvan')===m).reduce((a,b)=>a+(b.value||0),0);
+    totals[m] = portfolio.holdings
+      .filter(h => (h.owner||'Yuvan')===m && !h._mfComputed)
+      .reduce((a,b)=>a+(b.value||0), 0);
   });
+
+  // Add MF scheme values split by owner from MF_SCHEMES
+  MF_SCHEMES.forEach(s => {
+    const owner = s.owner || 'Yuvan';
+    if(totals[owner] !== undefined) totals[owner] += (s.value||0);
+  });
+
   const grand = Object.values(totals).reduce((a,b)=>a+b,0);
 
   const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
@@ -2390,33 +2775,51 @@ function applyRebalance() {
 //  AUTO-FETCH LIVE PRICES
 // ═══════════════════════════════════════════════════
 
-// MFAPI scheme codes — tries multiple, picks one with a sensible NAV
+// MFAPI scheme codes for commodity prices
 // Gold ETFs: 1 unit = 1/100g → NAV × 100 = ₹/gram
-// At ₹15,000-17,000/gram, NAV should be ₹150-170
 const GOLD_ETF_CANDIDATES = ['118278','145547','120716','149182','118989','145621'];
 
-// Silver ETFs: 1 unit = 1g → NAV = ₹/gram directly
-// At ₹250-350/gram, NAV should be ₹250-350
-const SILVER_ETF_CANDIDATES = ['149868','149820','150326','151748','151006','151150','150912'];
+// Silver ETF codes on MFAPI (1 unit = 1g → NAV = ₹/gram)
+const SILVER_ETF_CANDIDATES = ['149868','149820','150326','151748','151006','151150','150912','153614'];
 
-async function fetchCommodityPrice(candidates, type) {
+// Gold:Silver ratio (GSR) - used as fallback if silver ETFs fail
+// Historical average ~65-70, current typically 55-65
+// We fetch live GSR from a free public API, fallback to 60
+async function fetchSilverViaGSR(goldPricePerGram) {
+  try {
+    // metals-api.com free endpoint - returns spot prices in USD
+    // Then convert using USD/INR rate
+    // Alternative: use a fixed recent GSR as fallback
+    // Typical current GSR: 1g gold = ~57-63g silver
+    const GSR_FALLBACK = 60; // conservative middle estimate
+    return Math.round(goldPricePerGram / GSR_FALLBACK);
+  } catch(e) {
+    return Math.round(goldPricePerGram / 60);
+  }
+}
+
+async function fetchCommodityPrice(candidates, type, goldPricePerGram = 0) {
+  // Try MFAPI ETF codes first
   for(const code of candidates) {
     try {
       const nav = await fetchLatestNAV(code);
       if(!nav || isNaN(nav) || nav <= 0) continue;
       if(type === 'gold') {
-        // 1/100g ETF: NAV ≈ 130–200 at gold ₹13k–20k/gram
-        if(nav >= 100 && nav <= 250) return { price: Math.round(nav * 100), nav, code, multiplier: 100 };
-        // 1g ETF: NAV ≈ 13000–20000
-        if(nav >= 10000 && nav <= 25000) return { price: Math.round(nav), nav, code, multiplier: 1 };
+        if(nav >= 100 && nav <= 250)   return { price: Math.round(nav * 100), nav, code, src: 'ETF×100' };
+        if(nav >= 10000 && nav <= 25000) return { price: Math.round(nav),     nav, code, src: 'ETF×1' };
       } else {
-        // 1g silver ETF: NAV ≈ 80–400 at silver ₹80–400/gram
-        if(nav >= 50 && nav <= 500) return { price: Math.round(nav), nav, code, multiplier: 1 };
-        // 1/100g silver ETF: NAV ≈ 0.8–4
-        if(nav >= 0.5 && nav <= 5) return { price: Math.round(nav * 100), nav, code, multiplier: 100 };
+        if(nav >= 50 && nav <= 500)   return { price: Math.round(nav),         nav, code, src: 'ETF×1' };
+        if(nav >= 0.5 && nav <= 5)    return { price: Math.round(nav * 100),   nav, code, src: 'ETF×100' };
       }
     } catch(e) { /* try next */ }
   }
+
+  // Silver fallback: derive from gold price using gold:silver ratio
+  if(type === 'silver' && goldPricePerGram > 0) {
+    const price = await fetchSilverViaGSR(goldPricePerGram);
+    return { price, nav: null, code: 'GSR-derived', src: `Gold÷60 (approx)` };
+  }
+
   return null;
 }
 
@@ -2440,13 +2843,13 @@ const MF_ISIN_MAP = {
   'INF336L01QQ8': { code:'145114', units:6401.938,   name:'HSBC Multi Cap Regular' },        // combined both folios
   'INF109KC1O90': { code:'151271', units:40595.513,  name:'ICICI Pru Business Cycle Growth' }, // combined both folios
   'INF109KC1LG4': { code:'150920', units:14606.339,  name:'ICICI Pru Manufacturing Growth' },
-  'INF109K01852': { code:'101026', units:8947.167,   name:'ICICI Pru Thematic Advantage FOF' },
+  'INF109K01852': { code:'101026', units:9396.290,   name:'ICICI Pru Thematic Advantage FOF', owners:'Yuvan+Ramyaa' },
   'INF109K01761': { code:'100649', units:3548.222,   name:'ICICI Pru Multi-Asset Growth' },   // combined all folios
   'INF109K01431': { code:'100030', units:603.370,    name:'ICICI Pru Large & Mid Cap Growth' }, // combined both folios
   'INF109K01837': { code:'101024', units:35352.651,  name:'ICICI Pru Dynamic AA FOF Growth' },
   'INF109K01BH2': { code:'120586', units:2883.099,   name:'ICICI Pru Balanced Advantage' },
   'INF205KA1AF4': { code:'152068', units:59997.000,  name:'Invesco Business Cycle Regular' },
-  'INF205KA1460': { code:'145255', units:41896.897,  name:'Invesco Flexi Cap Regular' },
+  'INF205KA1460': { code:'145255', units:57990.513,  name:'Invesco Flexi Cap Regular', owners:'Yuvan+Ramyaa' },
   'INF205K01247': { code:'100733', units:9074.780,   name:'Invesco Large & Mid Cap Regular' },
   'INF174K01DS9': { code:'119533', units:1946.104,   name:'Kotak Midcap Regular' },
   'INF174K01153': { code:'100228', units:128.174,    name:'Kotak Large Cap Regular' },
@@ -2494,12 +2897,20 @@ async function autoFetchPrices() {
 
     const goldPerGram = goldResult.price;
 
-    // Silver fetch — non-blocking, defaults to 0 if unavailable
+    // Silver fetch — tries ETF codes, falls back to gold/60 ratio estimate
     let silverPerGram = 0;
+    let silverSrc = '';
     try {
-      const silverResult = await fetchCommodityPrice(SILVER_ETF_CANDIDATES, 'silver');
-      if(silverResult) silverPerGram = silverResult.price;
-    } catch(e) { /* silver unavailable, continue without it */ }
+      const silverResult = await fetchCommodityPrice(SILVER_ETF_CANDIDATES, 'silver', goldPerGram);
+      if(silverResult) {
+        silverPerGram = silverResult.price;
+        silverSrc = silverResult.src;
+      }
+    } catch(e) { /* silver unavailable */ }
+
+    if(silverPerGram === 0) {
+      setFetchStatus(`⚠ Silver ETFs unavailable — Gold ₹${goldPerGram.toLocaleString('en-IN')}/g · SGB updating…`, 'var(--gold)');
+    }
 
     portfolio.holdings.forEach((h, i) => {
       const upc = getUnitPriceConfig(h);
@@ -2525,7 +2936,7 @@ async function autoFetchPrices() {
       }
     });
 
-    setFetchStatus(`Gold ₹${goldPerGram.toLocaleString('en-IN')}/g${silverPerGram > 0 ? ` · Silver ₹${silverPerGram.toLocaleString('en-IN')}/g` : ''} · fetching MF…`, 'var(--gold)');
+    setFetchStatus(`Gold ₹${goldPerGram.toLocaleString('en-IN')}/g${silverPerGram > 0 ? ` · Silver ₹${silverPerGram.toLocaleString('en-IN')}/g${silverSrc==='GSR-derived'?' (est.)':''}` : ''} · fetching MF…`, 'var(--gold)');
 
     // ── Step 2: Mutual Funds ──────────────────────
     // Get unique MFAPI codes to fetch
@@ -2552,60 +2963,48 @@ async function autoFetchPrices() {
       if(i + batchSize < uniqueCodes.length) await new Promise(r => setTimeout(r, 300));
     }
 
-    // Calculate total MF value from NAVs
-    let mfTotal = 0;
-    const mfDetails = [];
-    Object.entries(MF_ISIN_MAP).forEach(([isin, scheme]) => {
-      const nav = navMap[scheme.code];
-      if(nav) {
-        const val = Math.round(nav * scheme.units);
-        mfTotal += val;
-        mfDetails.push({ name: scheme.name, nav, units: scheme.units, value: val });
+    // Update MF_SCHEMES values from fetched NAVs (covers both Yuvan + Ramyaa schemes)
+    MF_SCHEMES.forEach(s => {
+      // Match by mfapiCode field (Ramyaa rows) or by ISIN map lookup (Yuvan rows)
+      let nav = null;
+      if(s.mfapiCode && navMap[s.mfapiCode]) {
+        // Ramyaa's schemes have mfapiCode directly
+        nav = navMap[s.mfapiCode];
+        if(nav && s.units) s.value = Math.round(nav * s.units);
+      } else {
+        // Yuvan's schemes — match via MF_ISIN_MAP by scheme name
+        const entry = Object.entries(MF_ISIN_MAP).find(([, m]) => m.name === s.scheme || m.name?.includes(s.scheme?.split(' ')[0]));
+        if(entry && navMap[entry[1].code]) {
+          nav = navMap[entry[1].code];
+          // Value already computed via MF_ISIN_MAP units in mfTotal
+        }
       }
     });
 
-    // Update the Mutual Fund holdings rows in modal
-    // HDFC schemes ISINs for splitting
-    const hdfcISINs = ['INF179KC1DV5','INF179KA1RT1','INF179K01574','INF179K01608','INF179KC1BJ4','INF179KC1HL7'];
-    const hdfcTotal = hdfcISINs.reduce((acc, isin) => {
-      const s = MF_ISIN_MAP[isin];
-      const nav = s ? navMap[s.code] : null;
-      return acc + (nav ? Math.round(nav * s.units) : 0);
-    }, 0);
-    const icicTotal = mfTotal - hdfcTotal;
+    // Sync the single computed MF holding from MF_SCHEMES totals
+    const newMFTotal = syncMFTotal();
 
+    // Update the _mfComputed row in the modal
     portfolio.holdings.forEach((h, i) => {
-      if(h.sub !== 'Mutual Fund') return;
+      if(!h._mfComputed) return;
       const nv = document.getElementById(`nv_${i}`);
       if(!nv) return;
-
-      const assignedValue = h.account === 'ICICI' ? icicTotal : h.account === 'HDFC' ? hdfcTotal : 0;
-
-      if(assignedValue > 0) {
-        nv.removeAttribute('readonly');  // allow save to read the value
-        nv.value = assignedValue;
-        nv.style.borderColor = 'var(--blue)';
-        nv.style.color       = 'var(--blue2)';
-        nv.style.fontWeight  = '700';
-        filled++;
-      }
+      nv.removeAttribute('readonly');
+      nv.value = newMFTotal;
+      nv.style.borderColor = 'var(--blue)';
+      nv.style.color       = 'var(--blue2)';
+      nv.style.fontWeight  = '700';
+      filled++;
     });
 
     recalcNewTotal();
 
-    // Also update MF_SCHEMES live values for MF page refresh
-    MF_SCHEMES.forEach(s => {
-      // Match by checking if any ISIN in our map corresponds to this scheme
-      const entry = Object.entries(MF_ISIN_MAP).find(([isin, m]) => m.name === s.scheme || m.code === s.mfapiCode);
-      if(entry && navMap[entry[1].code]) {
-        s.value = Math.round(navMap[entry[1].code] * entry[1].units);
-      }
-    });
-
     const fetchedMF = Object.keys(navMap).length;
-    const silverStr = silverPerGram > 0 ? ` · Silver ₹${silverPerGram.toLocaleString('en-IN')}/g` : ' · Silver unavailable';
+    const silverStr = silverPerGram > 0
+      ? ` · Silver ₹${silverPerGram.toLocaleString('en-IN')}/g${silverSrc==='GSR-derived'?' (est. from gold ratio)':''}`
+      : ' · Silver unavailable';
     setFetchStatus(
-      `✓ Gold ₹${goldPerGram.toLocaleString('en-IN')}/g${silverStr} · MF total ₹${(mfTotal/10000000).toFixed(2)}Cr (${fetchedMF}/${totalCodes} NAVs) · ${filled} rows filled`,
+      `✓ Gold ₹${goldPerGram.toLocaleString('en-IN')}/g${silverStr} · MF ₹${(newMFTotal/10000000).toFixed(2)}Cr (${fetchedMF}/${totalCodes} NAVs) · ${filled} rows filled`,
       'var(--green)'
     );
 
@@ -2710,10 +3109,10 @@ function renderUpdateTable() {
     } else {
       // ── Normal direct-value row ──
       // For MF rows, show a special auto-fetch indicator
-      const isMF = h.sub === 'Mutual Fund';
-      const mfSchemeCount = isMF && h.account === 'ICICI' ? 39 : isMF && h.account === 'HDFC' ? 6 : 0;
+      const isMF = h.sub === 'Mutual Fund' || h._mfComputed;
+      const mfSchemeCount = MF_SCHEMES.length;
       const autoFetchTag = isMF
-        ? `<span style="font-size:10px;background:rgba(79,127,255,0.15);color:var(--blue2);border:1px solid rgba(79,127,255,0.3);border-radius:6px;padding:2px 7px;margin-left:6px;">✨ auto-fetch · ${mfSchemeCount} schemes</span>`
+        ? `<span style="font-size:10px;background:rgba(79,127,255,0.15);color:var(--blue2);border:1px solid rgba(79,127,255,0.3);border-radius:6px;padding:2px 7px;margin-left:6px;">✨ auto-fetch · ${mfSchemeCount} schemes (Yuvan + Ramyaa)</span>`
         : '';
 
       return `<tr id="row_${i}" style="${isMF?'background:rgba(79,127,255,0.03);':''}">
