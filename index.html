@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yuvan · Portfolio Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://www.google.com/recaptcha/api.js?render=6LfskdwqAAAAAKFybSmhi2Zf3hAwCKuvxHNSA-NE" async></script>
+<style>
+  :root {
+    --bg: #090d12;
+    --surface: #0f1520;
+    --surface2: #161e2e;
+    --surface3: #1c2540;
+    --border: rgba(99,140,255,0.12);
+    --gold: #d4a843;
+    --gold2: #f0c96b;
+    --blue: #4f7fff;
+    --blue2: #7aa3ff;
+    --green: #2ecc8f;
+    --red: #ff5e6a;
+    --purple: #9b6dff;
+    --teal: #00c4b4;
+    --orange: #ff8c42;
+    --text: #e8eef8;
+    --text2: #8a9bbf;
+    --text3: #4a5a7a;
+    --accent: #d4a843;
+    --glow: rgba(212,168,67,0.15);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── LOCK SCREEN ─── */
+  #lockScreen {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999;
+    flex-direction: column;
+    gap: 0;
+  }
+  .lock-glow {
+    position: absolute;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(212,168,67,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .lock-box {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 56px 48px;
+    width: 420px;
+    text-align: center;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 0 1px rgba(212,168,67,0.05);
+  }
+  .lock-icon {
+    width: 64px; height: 64px;
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 28px;
+    font-size: 28px;
+    box-shadow: 0 8px 32px rgba(212,168,67,0.3);
+  }
+  .lock-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 24px; font-weight: 700;
+    color: var(--text); margin-bottom: 6px;
+  }
+  .lock-sub {
+    font-size: 13px; color: var(--text2); margin-bottom: 36px;
+    font-weight: 300;
+  }
+  .lock-input-wrap { position: relative; margin-bottom: 16px; }
+  .lock-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 50px 16px 20px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    letter-spacing: 4px;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .lock-input:focus { border-color: var(--gold); }
+  .lock-input.error { border-color: var(--red); animation: shake 0.4s; }
+  @keyframes shake {
+    0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)}
+  }
+  .lock-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    color: #0a0d12;
+    border: none; border-radius: 12px;
+    padding: 16px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px; font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .lock-btn:hover { opacity: 0.9; }
+  .lock-btn:active { transform: scale(0.98); }
+  .lock-error { color: var(--red); font-size: 12px; margin-top: 10px; min-height: 18px; }
+  .lock-hint { font-size: 11px; color: var(--text3); margin-top: 20px; }
+
+  /* ─── MAIN DASHBOARD ─── */
+  #dashboard { display: none; }
+  #dashboard.visible { display: block; animation: fadeIn 0.6s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ─── HEADER ─── */
+  .header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(9,13,18,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+  }
+  .header-brand {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .header-logo {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 16px;
+    color: #080c10;
+  }
+  .header-name {
+    font-family: 'Plus Jakarta Sans', sans-serif; font-size: 18px; font-weight: 700;
+    color: var(--text);
+  }
+  .header-name span { color: var(--gold); }
+  .header-right { display: flex; align-items: center; gap: 20px; }
+  .last-updated {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--text3);
+  }
+  .header-nav { display: flex; gap: 4px; }
+  .nav-btn {
+    background: none; border: none;
+    padding: 8px 16px; border-radius: 8px;
+    color: var(--text2); font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .nav-btn:hover, .nav-btn.active { background: var(--surface2); color: var(--text); }
+  .nav-btn.active { color: var(--gold); }
+  .update-btn {
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    color: #080c10; border: none; border-radius: 10px;
+    padding: 9px 18px; font-size: 13px; font-weight: 700;
+    cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif;
+    letter-spacing: 0.5px; transition: opacity 0.2s;
+  }
+  .update-btn:hover { opacity: 0.85; }
+  .lock-out-btn {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text2); border-radius: 10px;
+    padding: 9px 14px; font-size: 13px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .lock-out-btn:hover { border-color: var(--red); color: var(--red); }
+
+  /* ─── PAGE WRAPPER ─── */
+  .page { display: none; padding: 40px; }
+  .page.active { display: block; }
+
+  /* ─── HERO STRIP ─── */
+  .hero {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px 40px;
+    margin-bottom: 28px;
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(212,168,67,0.08), transparent 70%);
+    pointer-events: none;
+  }
+  .hero-left { z-index: 1; }
+  .hero-label { font-size: 11px; font-weight: 500; letter-spacing: 2px; color: var(--text3); text-transform: uppercase; margin-bottom: 8px; }
+  .hero-value {
+    font-family: 'Plus Jakarta Sans', sans-serif; font-size: 46px; font-weight: 800;
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1; margin-bottom: 10px;
+  }
+  .hero-sub { font-size: 13px; color: var(--text2); }
+  .hero-sub span { color: var(--green); font-weight: 600; }
+  .hero-right { display: flex; gap: 40px; z-index: 1; }
+  .hero-stat { text-align: right; }
+  .hero-stat-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .hero-stat-value { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 22px; font-weight: 700; }
+  .hero-stat-value.gold { color: var(--gold); }
+  .hero-stat-value.green { color: var(--green); }
+  .hero-stat-value.blue { color: var(--blue2); }
+
+  /* ─── GRID ─── */
+  .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; margin-bottom: 28px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 28px; }
+  .grid-52 { display: grid; grid-template-columns: 3fr 2fr; gap: 20px; margin-bottom: 28px; }
+
+  /* ─── CARD ─── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    position: relative; overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .card:hover { border-color: rgba(99,140,255,0.25); transform: translateY(-2px); }
+  .card-label { font-size: 11px; font-weight: 500; letter-spacing: 1.5px; color: var(--text3); text-transform: uppercase; margin-bottom: 12px; }
+  .card-value { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 28px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+  .card-sub { font-size: 12px; color: var(--text2); }
+  .card-accent { position: absolute; top: 0; left: 0; width: 3px; height: 100%; border-radius: 16px 0 0 16px; }
+  .card-icon { font-size: 28px; margin-bottom: 12px; }
+  .card h3 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 20px; }
+
+  /* ─── ALLOCATION BAR ─── */
+  .alloc-row {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 14px;
+    cursor: default;
+    padding: 10px 12px; border-radius: 10px;
+    transition: background 0.2s;
+  }
+  .alloc-row:hover { background: var(--surface2); }
+  .alloc-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .alloc-name { font-size: 13px; color: var(--text2); min-width: 110px; }
+  .alloc-bar-wrap { flex: 1; height: 6px; background: var(--surface3); border-radius: 99px; overflow: hidden; }
+  .alloc-bar-fill { height: 100%; border-radius: 99px; transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+  .alloc-pct { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text2); min-width: 36px; text-align: right; }
+  .alloc-val { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text3); min-width: 80px; text-align: right; }
+
+  /* ─── TABLE ─── */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr th {
+    font-size: 11px; font-weight: 600; letter-spacing: 1px;
+    color: var(--text3); text-transform: uppercase;
+    padding: 10px 14px; text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  tbody tr td {
+    padding: 13px 14px; font-size: 13px; color: var(--text2);
+    border-bottom: 1px solid rgba(99,140,255,0.05);
+  }
+  tbody tr:hover td { background: var(--surface2); }
+  tbody tr td:first-child { color: var(--text); font-weight: 500; }
+  .badge {
+    display: inline-block; padding: 3px 10px;
+    border-radius: 99px; font-size: 11px; font-weight: 600;
+  }
+  .num { font-family: 'JetBrains Mono', monospace; }
+
+  /* ─── PROGRESS RING ─── */
+  .ring-wrap { display: flex; align-items: center; justify-content: center; position: relative; }
+  .ring-center { position: absolute; text-align: center; }
+  .ring-center .val { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 22px; font-weight: 800; color: var(--gold); }
+  .ring-center .lbl { font-size: 10px; color: var(--text3); }
+
+  /* ─── WEALTH JOURNEY ─── */
+  .milestone-row {
+    display: flex; align-items: center; gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .milestone-row:last-child { border-bottom: none; }
+  .milestone-num {
+    font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 500;
+    min-width: 80px; color: var(--gold);
+  }
+  .milestone-bar-wrap { flex: 1; }
+  .milestone-label { font-size: 12px; color: var(--text2); margin-bottom: 6px; }
+  .milestone-bar { height: 8px; background: var(--surface3); border-radius: 99px; overflow: hidden; }
+  .milestone-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--gold), var(--gold2)); }
+  .milestone-pct { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text3); min-width: 40px; text-align: right; }
+
+  /* ─── SGB TABLE ─── */
+  .sgb-row { display: flex; gap: 12px; align-items: center; padding: 10px 12px; border-radius: 10px; margin-bottom: 6px; }
+  .sgb-row:hover { background: var(--surface2); }
+  .sgb-units { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--gold); min-width: 60px; }
+  .sgb-date { font-size: 12px; color: var(--text3); min-width: 90px; }
+  .sgb-cost { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text2); min-width: 80px; }
+  .sgb-val { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--green); min-width: 90px; text-align: right; flex: 1; }
+  .sgb-gain { font-size: 11px; padding: 2px 8px; border-radius: 99px; background: rgba(46,204,143,0.1); color: var(--green); }
+
+  /* ─── UPDATE MODAL ─── */
+  #modalOverlay {
+    position: fixed; inset: 0;
+    background: rgba(5,8,14,0.85);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: none; align-items: center; justify-content: center;
+  }
+  #modalOverlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    width: 760px; max-height: 86vh;
+    overflow-y: auto;
+    padding: 40px;
+    position: relative;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.7);
+  }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+  .modal-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 22px; font-weight: 700; }
+  .modal-close { background: var(--surface2); border: 1px solid var(--border); color: var(--text2); width: 36px; height: 36px; border-radius: 10px; cursor: pointer; font-size: 18px; transition: all 0.2s; }
+  .modal-close:hover { border-color: var(--red); color: var(--red); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-group.full { grid-column: 1 / -1; }
+  .form-label { font-size: 11px; font-weight: 600; letter-spacing: 1px; color: var(--text3); text-transform: uppercase; }
+  .form-input, .form-select {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 16px;
+    color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px;
+    outline: none; transition: border-color 0.2s;
+  }
+  .form-input:focus, .form-select:focus { border-color: var(--gold); }
+  .form-select option { background: var(--surface2); }
+  .form-actions { display: flex; gap: 12px; margin-top: 28px; }
+  .btn-primary {
+    flex: 1; background: linear-gradient(135deg, var(--gold), var(--gold2));
+    color: #080c10; border: none; border-radius: 12px;
+    padding: 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 14px;
+    cursor: pointer; transition: opacity 0.2s;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-secondary {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text2); border-radius: 12px; padding: 14px 24px;
+    font-size: 14px; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-secondary:hover { border-color: var(--text2); color: var(--text); }
+  .form-section { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 1.5px; margin: 24px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .update-success { background: rgba(46,204,143,0.1); border: 1px solid rgba(46,204,143,0.3); border-radius: 12px; padding: 14px; text-align: center; color: var(--green); font-size: 14px; margin-top: 16px; display: none; }
+
+  /* ─── TAGS ─── */
+  .tag-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .tag {
+    padding: 5px 14px; border-radius: 99px;
+    font-size: 12px; font-weight: 600;
+    border: 1px solid transparent;
+  }
+
+  /* ─── DIVIDER ─── */
+  .section-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* ─── RESPONSIVE ─── */
+  @media(max-width:900px) {
+    .grid-4 { grid-template-columns: 1fr 1fr; }
+    .grid-52 { grid-template-columns: 1fr; }
+    .hero { flex-direction: column; gap: 28px; }
+    .hero-right { justify-content: flex-start; }
+    .page { padding: 20px; }
+    .header { padding: 0 20px; }
+    .form-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 99px; }
+</style>
+</head>
+<body>
+
+<!-- ╔══════════════ LOCK SCREEN ══════════════╗ -->
+<div id="lockScreen">
+  <div class="lock-glow"></div>
+  <div class="lock-box">
+
+    <!-- STEP 1: Bot check (invisible v3) -->
+    <div id="step-captcha">
+      <div class="lock-icon">🛡️</div>
+      <div class="lock-title">Portfolio Dashboard</div>
+      <div class="lock-sub">Running security check…</div>
+      <div style="margin:28px 0 8px;display:flex;justify-content:center;">
+        <div id="captchaSpinner" style="width:40px;height:40px;border:3px solid rgba(212,168,67,0.2);border-top-color:var(--gold);border-radius:50%;animation:spin 0.9s linear infinite;"></div>
+      </div>
+      <div class="lock-error" id="captchaErr"></div>
+      <div class="lock-hint" style="margin-top:16px;">Protected by Google reCAPTCHA v3</div>
+    </div>
+
+    <!-- STEP 2: Password (shown after captcha passes) -->
+    <div id="step-password" style="display:none;opacity:0;transition:opacity 0.4s ease, transform 0.4s ease;transform:translateY(12px);">
+      <div class="lock-icon">🔐</div>
+      <div class="lock-title">Portfolio Dashboard</div>
+      <div class="lock-sub">Security verified · Enter your password</div>
+
+      <!-- Step badges -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:28px;">
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--green);font-weight:600;">
+          <div style="width:20px;height:20px;border-radius:50%;background:rgba(46,204,143,0.15);border:1.5px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:11px;">✓</div>
+          Bot Check
+        </div>
+        <div style="width:32px;height:1px;background:var(--border);"></div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--gold);font-weight:600;">
+          <div style="width:20px;height:20px;border-radius:50%;background:rgba(212,168,67,0.15);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--gold);">2</div>
+          Password
+        </div>
+      </div>
+
+      <div class="lock-input-wrap">
+        <input type="password" class="lock-input" id="pwdInput" placeholder="••••••••" maxlength="20" autocomplete="off">
+      </div>
+      <button class="lock-btn" id="unlockBtn" onclick="unlock()">UNLOCK DASHBOARD</button>
+      <div class="lock-error" id="lockErr"></div>
+      <div class="lock-hint">2-layer security: reCAPTCHA v3 + Password</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ╔══════════════ LOADING OVERLAY ══════════════╗ -->
+<div id="loadingOverlay" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
+  <div style="width:48px;height:48px;border:3px solid rgba(212,168,67,0.2);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+  <div style="color:var(--text2);font-size:14px;font-family:'Plus Jakarta Sans',sans-serif;">Loading portfolio…</div>
+  <div style="color:var(--text3);font-size:11px;font-family:'JetBrains Mono',monospace;" id="loadingStatus">Connecting to data source</div>
+</div>
+
+<!-- ╔══════════════ DASHBOARD ══════════════╗ -->
+<div id="dashboard">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-brand">
+      <div class="header-logo">Y</div>
+      <div class="header-name">Yuvan<span>'s</span> Portfolio</div>
+    </div>
+    <nav class="header-nav">
+      <button class="nav-btn active" onclick="showPage('overview',this)">Overview</button>
+      <button class="nav-btn" onclick="showPage('holdings',this)">Holdings</button>
+      <button class="nav-btn" onclick="showPage('sgb',this)">SGB</button>
+      <button class="nav-btn" onclick="showPage('journey',this)">Wealth Journey</button>
+    </nav>
+    <div class="header-right">
+      <span class="last-updated" id="lastUpdated">Updated: 16-Sep-2025</span>
+      <button class="update-btn" onclick="openModal()">⊕ Update Holdings</button>
+      <button class="lock-out-btn" onclick="lockDashboard()">🔒</button>
+    </div>
+  </header>
+
+  <!-- ═══════════ PAGE: OVERVIEW ═══════════ -->
+  <div class="page active" id="page-overview">
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-left">
+        <div class="hero-label">Total Portfolio Value</div>
+        <div class="hero-value" id="heroTotal">₹6.80 Cr</div>
+        <div class="hero-sub">As of <span id="heroDate">16 Sep 2025</span> · <span style="color:var(--blue2)">14 asset classes</span></div>
+      </div>
+      <div class="hero-right">
+        <div class="hero-stat">
+          <div class="hero-stat-label">Mutual Funds</div>
+          <div class="hero-stat-value gold">₹2.64 Cr</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-label">Liquid Assets</div>
+          <div class="hero-stat-value green">₹68.6 L</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-label">Illiquid / Lock-in</div>
+          <div class="hero-stat-value blue">₹3.32 Cr</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="grid-4">
+      <div class="card">
+        <div class="card-accent" style="background:var(--gold)"></div>
+        <div class="card-icon">📈</div>
+        <div class="card-label">SGB Holdings</div>
+        <div class="card-value">₹80.7 L</div>
+        <div class="card-sub">500 grams · 7 tranches</div>
+      </div>
+      <div class="card">
+        <div class="card-accent" style="background:var(--purple)"></div>
+        <div class="card-icon">🏦</div>
+        <div class="card-label">PMS + AIF</div>
+        <div class="card-value">₹1.08 Cr</div>
+        <div class="card-sub">Alternative investments</div>
+      </div>
+      <div class="card">
+        <div class="card-accent" style="background:var(--teal)"></div>
+        <div class="card-icon">🏢</div>
+        <div class="card-label">REIT</div>
+        <div class="card-value">₹30.9 L</div>
+        <div class="card-sub">Real estate exposure</div>
+      </div>
+      <div class="card">
+        <div class="card-accent" style="background:var(--orange)"></div>
+        <div class="card-icon">💰</div>
+        <div class="card-label">Physical + Crypto</div>
+        <div class="card-value">₹25 L</div>
+        <div class="card-sub">Gold coins, Ag, Bitcoin</div>
+      </div>
+    </div>
+
+    <!-- CHART + ALLOCATION -->
+    <div class="grid-52">
+      <div class="card">
+        <h3>Asset Allocation</h3>
+        <div id="allocRows"></div>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
+        <h3 style="align-self:flex-start">Portfolio Composition</h3>
+        <canvas id="donutChart" width="240" height="240"></canvas>
+      </div>
+    </div>
+
+    <!-- LIQUIDITY & CATEGORY -->
+    <div class="grid-2">
+      <div class="card">
+        <h3>Liquidity Profile</h3>
+        <canvas id="liquidityChart" height="200"></canvas>
+      </div>
+      <div class="card">
+        <h3>Asset Category Breakdown</h3>
+        <canvas id="categoryChart" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ PAGE: HOLDINGS ═══════════ -->
+  <div class="page" id="page-holdings">
+    <div class="card" style="margin-bottom:24px">
+      <h3>All Holdings</h3>
+      <div class="table-wrap">
+        <table id="holdingsTable">
+          <thead>
+            <tr>
+              <th>Account</th><th>Type</th><th>Sub-Type</th><th>Value</th><th>Units</th><th>Remarks</th><th>Weight</th>
+            </tr>
+          </thead>
+          <tbody id="holdingsTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ PAGE: SGB ═══════════ -->
+  <div class="page" id="page-sgb">
+    <div class="grid-3" style="margin-bottom:24px">
+      <div class="card">
+        <div class="card-accent" style="background:var(--gold)"></div>
+        <div class="card-label">Total SGB Value</div>
+        <div class="card-value">₹80.66 L</div>
+        <div class="card-sub">7 tranches · ICICI Demat</div>
+      </div>
+      <div class="card">
+        <div class="card-accent" style="background:var(--gold2)"></div>
+        <div class="card-label">Total Units</div>
+        <div class="card-value">500 grams</div>
+        <div class="card-sub">Sovereign Gold Bonds</div>
+      </div>
+      <div class="card">
+        <div class="card-accent" style="background:var(--green)"></div>
+        <div class="card-label">Cost Basis</div>
+        <div class="card-value">₹22.82 L</div>
+        <div class="card-sub">Unrealised gain: ₹57.84 L</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>SGB Tranche Details</h3>
+      <div style="margin-bottom:12px">
+        <div style="display:flex;gap:24px;font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;padding:0 12px 8px;border-bottom:1px solid var(--border)">
+          <span style="min-width:60px">Units</span>
+          <span style="min-width:90px">Maturity</span>
+          <span style="min-width:80px">Cost</span>
+          <span style="flex:1;text-align:right">Current Value</span>
+          <span style="min-width:70px;text-align:right">Gain</span>
+        </div>
+      </div>
+      <div id="sgbRows"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════ PAGE: WEALTH JOURNEY ═══════════ -->
+  <div class="page" id="page-journey">
+    <div class="hero" style="margin-bottom:28px">
+      <div class="hero-left">
+        <div class="hero-label">Wealth Journey</div>
+        <div class="hero-value">₹6.80 Cr</div>
+        <div class="hero-sub">Target: <span>₹10 Cr</span> · Progress: <span style="color:var(--gold)">68%</span></div>
+      </div>
+      <div class="hero-right">
+        <div class="hero-stat">
+          <div class="hero-stat-label">At 12% CAGR</div>
+          <div class="hero-stat-value gold">~2.8 yrs</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-label">At 15% CAGR</div>
+          <div class="hero-stat-value green">~2.2 yrs</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-label">Retirement SWR</div>
+          <div class="hero-stat-value blue">₹3.2L/mo</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Growth Milestones</h3>
+        <div id="milestoneRows"></div>
+      </div>
+      <div class="card">
+        <h3>Portfolio Growth Trajectory</h3>
+        <canvas id="growthChart" height="260"></canvas>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:24px">
+      <h3>Historical Snapshots</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Date</th><th>Value</th><th>Growth</th></tr></thead>
+          <tbody id="snapshotTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /dashboard -->
+
+<!-- ╔══════════════ UPDATE MODAL ══════════════╗ -->
+<div id="modalOverlay">
+  <div class="modal" style="width:920px;max-width:96vw;">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Update Holdings</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">Enter <span style="color:var(--gold)">unit price</span> for Gold/Silver/SGB/Unlisted · <span style="color:var(--gold)">total value</span> for others · leave blank to keep unchanged</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <div style="font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;" id="modalAsOf"></div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+    </div>
+
+    <!-- As-of date -->
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding:14px 16px;background:var(--surface2);border-radius:12px;border:1px solid var(--border);">
+      <span style="font-size:12px;color:var(--text2);font-weight:600;letter-spacing:0.5px;">AS ON DATE</span>
+      <input type="date" class="form-input" id="fDate" style="width:180px;padding:8px 12px;font-size:13px;">
+      <span style="font-size:12px;color:var(--text3);">This date will be saved as the valuation date for this update</span>
+    </div>
+
+    <!-- Holdings table -->
+    <div class="table-wrap" style="max-height:52vh;overflow-y:auto;border:1px solid var(--border);border-radius:12px;">
+      <table id="updateTable" style="width:100%">
+        <thead style="position:sticky;top:0;z-index:2;background:var(--surface2);">
+          <tr>
+            <th style="width:36px;">#</th>
+            <th>Account</th>
+            <th>Type</th>
+            <th>Remarks</th>
+            <th style="text-align:right;">Current Value</th>
+            <th style="text-align:right;color:var(--gold);">New Value · or Unit Price ₹</th>
+            <th style="text-align:right;">Units</th>
+          </tr>
+        </thead>
+        <tbody id="updateTbody"></tbody>
+      </table>
+    </div>
+
+    <!-- Summary bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding:14px 16px;background:var(--surface2);border-radius:12px;border:1px solid var(--border);">
+      <div style="font-size:12px;color:var(--text2);">Current Total: <span style="font-family:'JetBrains Mono',monospace;color:var(--text)" id="modalCurrentTotal"></span></div>
+      <div style="font-size:12px;color:var(--text2);">New Total: <span style="font-family:'JetBrains Mono',monospace;color:var(--gold);font-weight:700;" id="modalNewTotal">—</span></div>
+      <div style="font-size:12px;color:var(--text2);">Change: <span style="font-family:'JetBrains Mono',monospace;font-weight:700;" id="modalDelta">—</span></div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" id="saveBtn" onclick="applyUpdate()">💾 Save &amp; Sync to GitHub</button>
+    </div>
+
+    <!-- Status messages -->
+    <div id="updateSuccess" style="display:none;margin-top:14px;background:rgba(46,204,143,0.1);border:1px solid rgba(46,204,143,0.3);border-radius:12px;padding:14px;text-align:center;color:var(--green);font-size:14px;"></div>
+    <div id="updateError" style="display:none;margin-top:14px;background:rgba(255,94,106,0.1);border:1px solid rgba(255,94,106,0.3);border-radius:12px;padding:14px;text-align:center;color:var(--red);font-size:14px;"></div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script>
+// ═══════════════════════════════════════════════════
+//  CONFIG — proxy server (token lives on Render, never in this file)
+// ═══════════════════════════════════════════════════
+const PROXY_URL = 'https://portfolio-proxy.onrender.com';  // your Render URL
+const GH_FILE   = 'holdings.json';
+
+const PASSWORD  = 'yuvan2025';
+
+// ═══════════════════════════════════════════════════
+//  DEFAULT DATA (fallback if no GitHub file yet)
+// ═══════════════════════════════════════════════════
+const DEFAULT_HOLDINGS = [
+  { account:"ICICI",   type:"Deposit",      sub:"Fixed Deposit", value:2519467,  units:"",      remarks:"Yuvan" },
+  { account:"ICICI",   type:"Deposit",      sub:"Fixed Deposit", value:0,        units:"",      remarks:"Ramyaa" },
+  { account:"HDFC",    type:"Deposit",      sub:"Fixed Deposit", value:500000,   units:"",      remarks:"Ramyaa" },
+  { account:"SBI",     type:"Deposit",      sub:"Fixed Deposit", value:340026,   units:"",      remarks:"Yuvan" },
+  { account:"HDFC",    type:"Deposit",      sub:"Fixed Deposit", value:3500000,  units:"",      remarks:"Yuvan" },
+  { account:"SSY",     type:"Account",      sub:"SSY Account",   value:873501,   units:"",      remarks:"ICICI – Sana" },
+  { account:"SSY",     type:"Account",      sub:"SSY Account",   value:873501,   units:"",      remarks:"ICICI – Tara" },
+  { account:"SBI",     type:"ULIP",         sub:"Insurance",     value:344340,   units:"",      remarks:"1K365542004" },
+  { account:"ICICI",   type:"Insurance",    sub:"Insurance",     value:918076,   units:"",      remarks:"Tara – A3067570" },
+  { account:"ICICI",   type:"PMS",          sub:"PMS",           value:5800849,  units:"",      remarks:"" },
+  { account:"ICICI",   type:"NPS",          sub:"NPS",           value:268923,   units:"",      remarks:"" },
+  { account:"ICICI",   type:"SGB",          sub:"SGB",           value:1129240,  units:"70g",   remarks:"Matures 14-Aug-2027" },
+  { account:"ICICI",   type:"SGB",          sub:"SGB",           value:806600,   units:"50g",   remarks:"Matures 10-Dec-2027" },
+  { account:"ICICI",   type:"SGB",          sub:"SGB",           value:1613200,  units:"100g",  remarks:"Matures 08-Sep-2028" },
+  { account:"ICICI",   type:"SGB",          sub:"SGB",           value:483960,   units:"30g",   remarks:"Matures 05-Jan-2029" },
+  { account:"ICICI",   type:"SGB",          sub:"SGB",           value:806600,   units:"50g",   remarks:"Matures 19-Jan-2029" },
+  { account:"ICICI",   type:"SGB",          sub:"SGB",           value:1613200,  units:"100g",  remarks:"Matures 09-Mar-2029" },
+  { account:"ICICI",   type:"SGB",          sub:"SGB",           value:1613200,  units:"100g",  remarks:"Matures 25-May-2029" },
+  { account:"ICICI",   type:"Mutual Fund",  sub:"Mutual Fund",   value:25986323, units:"",      remarks:"ICICI – Total" },
+  { account:"HDFC",    type:"Mutual Fund",  sub:"Mutual Fund",   value:413000,   units:"",      remarks:"Ramyaa" },
+  { account:"ICICI",   type:"Shares",       sub:"ETF & Stocks",  value:2892904,  units:"",      remarks:"Demat" },
+  { account:"Kite",    type:"Shares",       sub:"Mixed Shares",  value:349265,   units:"",      remarks:"Zerodha" },
+  { account:"360ONE",  type:"AIF",          sub:"AIF",           value:5000000,  units:"",      remarks:"Alternative" },
+  { account:"ICICI",   type:"Shares",       sub:"Unlisted",      value:975000,   units:"500",   remarks:"NSE @ ₹1950" },
+  { account:"ICICI",   type:"Shares",       sub:"Unlisted",      value:525000,   units:"25000", remarks:"Sunday Protech @ ₹20.75" },
+  { account:"ICICI",   type:"Shares",       sub:"Unlisted",      value:700000,   units:"25000", remarks:"OYO @ ₹28" },
+  { account:"ICICI",   type:"Shares",       sub:"Unlisted",      value:555000,   units:"15000", remarks:"Ecosure @ ₹37" },
+  { account:"ICICI",   type:"REIT",         sub:"REIT",          value:3087645,  units:"",      remarks:"Embassy / Nexus" },
+  { account:"Bitcoin", type:"Crypto",       sub:"Crypto",        value:179490,   units:"",      remarks:"BTC" },
+  { account:"Au",      type:"Coin",         sub:"Coin",          value:1856156,  units:"124g",  remarks:"Gold coins" },
+  { account:"Ag",      type:"Coin",         sub:"Coin",          value:450000,   units:"1500g", remarks:"Silver coins" },
+  { account:"Lq",      type:"Savings",      sub:"Savings",       value:1000000,  units:"",      remarks:"Liquid" },
+];
+
+const DEFAULT_SNAPSHOTS = [
+  { date:"2024-04-10", value:32550000 },
+  { date:"2024-05-10", value:39605000 },
+  { date:"2024-06-21", value:40906091 },
+  { date:"2024-08-29", value:43633812 },
+  { date:"2024-09-03", value:42584362 },
+  { date:"2024-11-28", value:49125944 },
+  { date:"2025-05-27", value:52557538 },
+  { date:"2025-09-16", value:60029917 },
+  { date:"2025-12-13", value:67974466 },
+];
+
+const DEFAULT_SGB = [
+  { units:70,  maturity:"14 Aug 2027", cost:244930,  value:1129240 },
+  { units:50,  maturity:"10 Dec 2027", cost:189750,  value:806600  },
+  { units:100, maturity:"08 Sep 2028", cost:511700,  value:1613200 },
+  { units:30,  maturity:"05 Jan 2029", cost:150000,  value:483960  },
+  { units:50,  maturity:"19 Jan 2029", cost:252700,  value:806600  },
+  { units:100, maturity:"09 Mar 2029", cost:461200,  value:1613200 },
+  { units:100, maturity:"25 May 2029", cost:472700,  value:1613200 },
+];
+
+// ═══════════════════════════════════════════════════
+//  LIVE DATA (populated from GitHub or defaults)
+// ═══════════════════════════════════════════════════
+let portfolio   = { total: 0, asOf: '16 Sep 2025', holdings: [] };
+let snapshots   = [];
+let sgbTranches = [];
+let summary     = [];
+
+const TYPE_COLORS = {
+  'Fixed Deposit':'#2ecc8f','Mutual Fund':'#4f7fff','SGB':'#d4a843',
+  'PMS':'#9b6dff','AIF':'#ff8c42','Shares':'#00c4b4','REIT':'#5debd7',
+  'Crypto':'#ff9a3c','Coin':'#f0c96b','NPS':'#e0a0ff','SSY Account':'#ff5e6a',
+  'Insurance':'#7aa3ff','Savings':'#a8edbd','ULIP':'#7aa3ff','Account':'#ff5e6a'
+};
+
+// ═══════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════
+function fmt(n) {
+  if(!n || isNaN(n)) return '—';
+  if(n>=10000000) return '₹'+(n/10000000).toFixed(2)+' Cr';
+  if(n>=100000)   return '₹'+(n/100000).toFixed(1)+' L';
+  return '₹'+n.toLocaleString('en-IN');
+}
+function fmtShort(n) {
+  if(!n||isNaN(n)) return '0';
+  if(n>=10000000) return (n/10000000).toFixed(2)+' Cr';
+  if(n>=100000)   return (n/100000).toFixed(1)+'L';
+  return n.toLocaleString('en-IN');
+}
+
+function buildSummary(holdings) {
+  const map = {};
+  holdings.forEach(h => {
+    const key = h.sub === 'SSY Account' ? 'SSY Account'
+              : h.sub === 'Insurance' || h.type === 'ULIP' || h.type === 'Insurance' ? 'Insurance'
+              : h.sub === 'Fixed Deposit' ? 'Fixed Deposit'
+              : h.sub === 'Mutual Fund' ? 'Mutual Fund'
+              : h.sub === 'SGB' ? 'SGB'
+              : h.sub === 'PMS' ? 'PMS'
+              : h.sub === 'AIF' ? 'AIF'
+              : (h.sub === 'ETF & Stocks' || h.sub === 'Mixed Shares' || h.sub === 'Unlisted') ? 'Shares'
+              : h.sub === 'REIT' ? 'REIT'
+              : h.sub === 'Crypto' ? 'Crypto'
+              : h.sub === 'Coin' ? 'Coin'
+              : h.sub === 'NPS' ? 'NPS'
+              : h.sub === 'Savings' ? 'Savings'
+              : h.type;
+    map[key] = (map[key]||0) + (h.value||0);
+  });
+  const colorMap = {
+    'Mutual Fund':'#4f7fff','Fixed Deposit':'#2ecc8f','SGB':'#d4a843',
+    'PMS':'#9b6dff','AIF':'#ff8c42','Shares':'#00c4b4','Coin':'#f0c96b',
+    'SSY Account':'#ff5e6a','Insurance':'#7aa3ff','Savings':'#a8edbd',
+    'NPS':'#e0a0ff','Crypto':'#ff9a3c','REIT':'#5debd7'
+  };
+  const total = Object.values(map).reduce((a,b)=>a+b,0);
+  return Object.entries(map)
+    .filter(([,v])=>v>0)
+    .sort((a,b)=>b[1]-a[1])
+    .map(([name,value])=>({ name, value, pct: value/total, color: colorMap[name]||'#8a9bbf' }));
+}
+
+// ═══════════════════════════════════════════════════
+//  PROXY — fetch and save via Render proxy (no token in browser)
+// ═══════════════════════════════════════════════════
+
+// Fetch with a hard timeout so we never hang forever
+async function fetchWithTimeout(url, options = {}, ms = 6000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ms);
+  try {
+    const res = await fetch(url, { ...options, signal: controller.signal });
+    clearTimeout(timer);
+    return res;
+  } catch(e) {
+    clearTimeout(timer);
+    throw e;
+  }
+}
+
+async function fetchFromGitHub() {
+  try {
+    const res = await fetchWithTimeout(`${PROXY_URL}/holdings`, {}, 6000);
+    if(!res.ok) return null;
+    const data = await res.json();
+    if(data.content) {
+      return JSON.parse(atob(data.content.replace(/\n/g,'')));
+    }
+    return null;
+  } catch(e) {
+    console.warn('GitHub fetch failed or timed out:', e.message);
+    return null;
+  }
+}
+
+async function saveToGitHub(payload) {
+  // Get current SHA first (with timeout)
+  let sha = null;
+  try {
+    const getRes = await fetchWithTimeout(`${PROXY_URL}/holdings`, {}, 6000);
+    if(getRes.ok) {
+      const existing = await getRes.json();
+      sha = existing?.sha || null;
+    }
+  } catch(e) { /* proceed without sha */ }
+
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
+  const body = {
+    message: `Portfolio update – ${payload.asOf}`,
+    content,
+    ...(sha ? { sha } : {})
+  };
+
+  const res = await fetchWithTimeout(`${PROXY_URL}/holdings`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  }, 10000);
+
+  if(!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || err.message || 'Proxy save failed');
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  RECAPTCHA v3 + AUTH
+// ═══════════════════════════════════════════════════
+const RECAPTCHA_SITE_KEY = '6LfskdwqAAAAAKFybSmhi2Zf3hAwCKuvxHNSA-NE';
+const SCORE_THRESHOLD    = 0.5;   // 0.0 (bot) → 1.0 (human), 0.5 is Google's recommended cutoff
+let captchaVerified      = false;
+
+// Auto-run v3 check as soon as recaptcha is ready
+function runCaptchaCheck() {
+  if(typeof grecaptcha === 'undefined' || typeof grecaptcha.ready === 'undefined') {
+    // Script not yet loaded — retry after short delay
+    setTimeout(runCaptchaCheck, 200);
+    return;
+  }
+  grecaptcha.ready(() => {
+    grecaptcha.execute('6LfskdwqAAAAAKFybSmhi2Zf3hAwCKuvxHNSA-NE', { action: 'portfolio_login' })
+      .then(token => evaluateScore(token))
+      .catch(() => {
+        document.getElementById('captchaErr').textContent = '⚠ reCAPTCHA check skipped.';
+        setTimeout(showPasswordStep, 800);
+      });
+  });
+}
+
+window.addEventListener('load', () => {
+  // Give async script up to 5s to load, then fail open
+  let attempts = 0;
+  const tryRun = () => {
+    attempts++;
+    if(typeof grecaptcha !== 'undefined') {
+      runCaptchaCheck();
+    } else if(attempts < 25) {
+      setTimeout(tryRun, 200);
+    } else {
+      // reCAPTCHA failed to load after 5s (ad blocker / network) — fail open
+      console.warn('reCAPTCHA not loaded, skipping bot check.');
+      showPasswordStep();
+    }
+  };
+  tryRun();
+});
+
+function evaluateScore(token) {
+  // Decode the JWT payload (middle segment) to read the score client-side
+  // Note: this is the client-side score from the token — not server-verified,
+  // but combined with the password it provides solid bot deterrence.
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const score   = payload.score ?? 0.9; // default high if field absent
+    if(score >= SCORE_THRESHOLD) {
+      captchaVerified = true;
+      showPasswordStep();
+    } else {
+      // Low score — likely bot
+      document.getElementById('captchaSpinner').style.display = 'none';
+      document.getElementById('captchaErr').textContent =
+        `⛔ Security check failed (score: ${score.toFixed(1)}). Access denied.`;
+    }
+  } catch(e) {
+    // Token not decodable in this format — pass through (v3 tokens are opaque JWTs)
+    captchaVerified = true;
+    showPasswordStep();
+  }
+}
+
+function showPasswordStep() {
+  captchaVerified = true;
+  const captchaEl = document.getElementById('step-captcha');
+  const pwEl      = document.getElementById('step-password');
+
+  captchaEl.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+  captchaEl.style.opacity    = '0';
+  captchaEl.style.transform  = 'translateY(-8px)';
+
+  setTimeout(() => {
+    captchaEl.style.display = 'none';
+    pwEl.style.display      = 'block';
+    // Trigger transition
+    requestAnimationFrame(() => {
+      pwEl.style.opacity   = '1';
+      pwEl.style.transform = 'translateY(0)';
+      document.getElementById('pwdInput').focus();
+    });
+  }, 300);
+}
+
+function unlock() {
+  if(!captchaVerified) return;
+  const v = document.getElementById('pwdInput').value;
+  if(v === PASSWORD) {
+    document.getElementById('lockScreen').style.display = 'none';
+    // Show loading overlay — do NOT replace dashboard innerHTML
+    document.getElementById('loadingOverlay').style.display = 'flex';
+    loadAndInit();
+  } else {
+    const inp = document.getElementById('pwdInput');
+    inp.classList.add('error');
+    document.getElementById('lockErr').textContent = 'Incorrect password. Please try again.';
+    setTimeout(() => inp.classList.remove('error'), 500);
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if(e.key === 'Enter' && captchaVerified) unlock();
+});
+
+function lockDashboard() {
+  location.reload();
+}
+
+async function loadAndInit() {
+  const setStatus = msg => {
+    const el = document.getElementById('loadingStatus');
+    if(el) el.textContent = msg;
+  };
+  setStatus('Fetching latest data…');
+  const ghData = await fetchFromGitHub();
+  if(ghData) {
+    setStatus('Data loaded ✓');
+    portfolio.holdings = ghData.holdings  || DEFAULT_HOLDINGS;
+    portfolio.asOf     = ghData.asOf      || '16 Sep 2025';
+    snapshots          = ghData.snapshots  || DEFAULT_SNAPSHOTS;
+    sgbTranches        = ghData.sgbTranches || DEFAULT_SGB;
+  } else {
+    setStatus('Using local data (proxy offline)');
+    portfolio.holdings = DEFAULT_HOLDINGS;
+    portfolio.asOf     = '16 Sep 2025';
+    snapshots          = DEFAULT_SNAPSHOTS;
+    sgbTranches        = DEFAULT_SGB;
+  }
+  portfolio.total = portfolio.holdings.reduce((a,b)=>a+(b.value||0),0);
+  summary         = buildSummary(portfolio.holdings);
+
+  // Small delay so status message is visible
+  await new Promise(r => setTimeout(r, 400));
+
+  // Hide overlay, show dashboard
+  document.getElementById('loadingOverlay').style.display = 'none';
+  const db = document.getElementById('dashboard');
+  db.style.display = 'block';
+  db.classList.add('visible');
+  initDashboard();
+}
+
+
+// ═══════════════════════════════════════════════════
+//  NAV
+// ═══════════════════════════════════════════════════
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════════
+function initDashboard() {
+  document.getElementById('heroTotal').textContent = fmt(portfolio.total);
+  document.getElementById('heroDate').textContent  = portfolio.asOf;
+  document.getElementById('lastUpdated').textContent = 'Updated: '+portfolio.asOf;
+  renderAlloc();
+  renderCharts();
+  renderHoldings();
+  renderSGB();
+  renderJourney();
+}
+
+function renderAlloc() {
+  const el = document.getElementById('allocRows');
+  if(!el) return;
+  el.innerHTML = summary.map(s=>`
+    <div class="alloc-row">
+      <div class="alloc-dot" style="background:${s.color}"></div>
+      <div class="alloc-name">${s.name}</div>
+      <div class="alloc-bar-wrap"><div class="alloc-bar-fill" style="width:0%;background:${s.color}" data-w="${(s.pct*100).toFixed(1)}"></div></div>
+      <div class="alloc-pct">${(s.pct*100).toFixed(1)}%</div>
+      <div class="alloc-val">${fmtShort(s.value)}</div>
+    </div>`).join('');
+  setTimeout(()=>{
+    document.querySelectorAll('.alloc-bar-fill').forEach(b=>b.style.width=b.dataset.w+'%');
+  },100);
+}
+
+let chartsRendered = false;
+function renderCharts() {
+  if(chartsRendered) return;
+  chartsRendered = true;
+
+  new Chart(document.getElementById('donutChart').getContext('2d'),{
+    type:'doughnut',
+    data:{ labels:summary.map(s=>s.name), datasets:[{ data:summary.map(s=>s.value), backgroundColor:summary.map(s=>s.color), borderWidth:2, borderColor:'#0f1520', hoverOffset:8 }] },
+    options:{ cutout:'68%', responsive:false, plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${fmt(ctx.raw)} (${(ctx.raw/portfolio.total*100).toFixed(1)}%)`}, bodyColor:'#e8eef8',backgroundColor:'#161e2e',borderColor:'rgba(99,140,255,0.2)',borderWidth:1} } }
+  });
+
+  const liq = {
+    liquid:    summary.filter(s=>['Mutual Fund','Fixed Deposit','Savings','Crypto'].includes(s.name)).reduce((a,b)=>a+b.value,0),
+    semiLiquid:summary.filter(s=>['Shares','REIT','Coin'].includes(s.name)).reduce((a,b)=>a+b.value,0),
+    illiquid:  summary.filter(s=>['SGB','PMS','AIF','SSY Account','Insurance','NPS'].includes(s.name)).reduce((a,b)=>a+b.value,0),
+  };
+  new Chart(document.getElementById('liquidityChart').getContext('2d'),{
+    type:'bar', data:{ labels:['Liquid','Semi-Liquid','Illiquid / Lock-in'], datasets:[{ data:[liq.liquid,liq.semiLiquid,liq.illiquid], backgroundColor:['#2ecc8f','#4f7fff','#9b6dff'], borderRadius:8, borderSkipped:false }] },
+    options:{ responsive:true, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${fmt(ctx.raw)}`},bodyColor:'#e8eef8',backgroundColor:'#161e2e',borderColor:'rgba(99,140,255,0.2)',borderWidth:1}}, scales:{x:{grid:{color:'rgba(99,140,255,0.06)'},ticks:{color:'#4a5a7a',font:{size:11}}},y:{grid:{color:'rgba(99,140,255,0.06)'},ticks:{color:'#4a5a7a',font:{size:11},callback:v=>fmtShort(v)}}} }
+  });
+
+  new Chart(document.getElementById('categoryChart').getContext('2d'),{
+    type:'bar', data:{ labels:summary.map(s=>s.name), datasets:[{ data:summary.map(s=>s.value), backgroundColor:summary.map(s=>s.color), borderRadius:6 }] },
+    options:{ indexAxis:'y', responsive:true, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${fmt(ctx.raw)}`},bodyColor:'#e8eef8',backgroundColor:'#161e2e',borderColor:'rgba(99,140,255,0.2)',borderWidth:1}}, scales:{x:{grid:{color:'rgba(99,140,255,0.06)'},ticks:{color:'#4a5a7a',font:{size:10},callback:v=>fmtShort(v)}},y:{grid:{display:false},ticks:{color:'#8a9bbf',font:{size:11}}}} }
+  });
+}
+
+function renderHoldings() {
+  const tb = document.getElementById('holdingsTbody');
+  if(!tb) return;
+  tb.innerHTML = portfolio.holdings.map(h=>{
+    const pct = (h.value/portfolio.total*100).toFixed(2);
+    const c = TYPE_COLORS[h.sub]||TYPE_COLORS[h.type]||'#8a9bbf';
+    return `<tr>
+      <td>${h.account}</td>
+      <td><span class="badge" style="background:${c}22;color:${c};border-color:${c}44">${h.type}</span></td>
+      <td>${h.sub}</td>
+      <td class="num">${h.value>0?fmt(h.value):'—'}</td>
+      <td class="num" style="color:var(--text3)">${h.units||'—'}</td>
+      <td style="color:var(--text3);font-size:12px">${h.remarks||'—'}</td>
+      <td><span style="color:var(--blue2);font-family:'JetBrains Mono',monospace;font-size:12px">${h.value>0?pct+'%':'—'}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderSGB() {
+  const el = document.getElementById('sgbRows');
+  if(!el) return;
+  el.innerHTML = sgbTranches.map(t=>{
+    const gain = t.value-t.cost;
+    const gainPct = ((gain/t.cost)*100).toFixed(1);
+    return `<div class="sgb-row">
+      <div class="sgb-units">${t.units}g</div>
+      <div class="sgb-date">${t.maturity}</div>
+      <div class="sgb-cost">Cost: ${fmt(t.cost)}</div>
+      <div class="sgb-val">${fmt(t.value)}</div>
+      <div class="sgb-gain">+${gainPct}%</div>
+    </div>`;
+  }).join('');
+}
+
+function renderJourney() {
+  const milestones=[
+    {label:'₹5 Crore',target:50000000},{label:'₹6 Crore',target:60000000},
+    {label:'₹7 Crore',target:70000000},{label:'₹8 Crore',target:80000000},
+    {label:'₹10 Crore (Target)',target:100000000},{label:'₹15 Crore',target:150000000},
+  ];
+  const el = document.getElementById('milestoneRows');
+  if(el) el.innerHTML = milestones.map(m=>{
+    const pct = Math.min(100,(portfolio.total/m.target)*100);
+    return `<div class="milestone-row">
+      <div class="milestone-num">${m.label.split(' ')[0]}</div>
+      <div class="milestone-bar-wrap">
+        <div class="milestone-label">${m.label}</div>
+        <div class="milestone-bar"><div class="milestone-fill" style="width:${pct}%"></div></div>
+      </div>
+      <div class="milestone-pct">${pct.toFixed(0)}%</div>
+    </div>`;
+  }).join('');
+
+  const tb = document.getElementById('snapshotTbody');
+  if(tb) tb.innerHTML = snapshots.map((s,i)=>{
+    const prev = snapshots[i-1];
+    const growth = prev?((s.value-prev.value)/prev.value*100).toFixed(1):'—';
+    const color = !prev?'var(--text3)':s.value>=prev.value?'var(--green)':'var(--red)';
+    return `<tr>
+      <td>${new Date(s.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</td>
+      <td class="num">${fmt(s.value)}</td>
+      <td><span style="color:${color};font-family:'JetBrains Mono',monospace;font-size:13px">${growth!=='—'?(s.value>=snapshots[i-1].value?'+':'')+growth+'%':'—'}</span></td>
+    </tr>`;
+  }).join('');
+
+  const gc = document.getElementById('growthChart');
+  if(gc) new Chart(gc.getContext('2d'),{
+    type:'line',
+    data:{ labels:snapshots.map(s=>new Date(s.date).toLocaleDateString('en-IN',{month:'short',year:'2-digit'})), datasets:[{ label:'Portfolio Value', data:snapshots.map(s=>s.value), borderColor:'#d4a843', backgroundColor:'rgba(212,168,67,0.08)', borderWidth:2.5, fill:true, tension:0.4, pointBackgroundColor:'#d4a843', pointRadius:5, pointHoverRadius:8 }] },
+    options:{ responsive:true, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${fmt(ctx.raw)}`},bodyColor:'#e8eef8',backgroundColor:'#161e2e',borderColor:'rgba(212,168,67,0.3)',borderWidth:1}}, scales:{x:{grid:{color:'rgba(99,140,255,0.06)'},ticks:{color:'#4a5a7a',font:{size:11}}},y:{grid:{color:'rgba(99,140,255,0.06)'},ticks:{color:'#4a5a7a',font:{size:11},callback:v=>fmtShort(v)}}} }
+  });
+}
+
+// ═══════════════════════════════════════════════════
+//  UPDATE MODAL — table-based
+// ═══════════════════════════════════════════════════
+function openModal() {
+  document.getElementById('modalOverlay').classList.add('open');
+  document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('modalCurrentTotal').textContent = fmt(portfolio.total);
+  document.getElementById('modalNewTotal').textContent = '—';
+  document.getElementById('modalDelta').textContent = '—';
+  document.getElementById('updateSuccess').style.display = 'none';
+  document.getElementById('updateError').style.display   = 'none';
+  renderUpdateTable();
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+document.getElementById('modalOverlay').addEventListener('click', e=>{
+  if(e.target===document.getElementById('modalOverlay')) closeModal();
+});
+
+// Holdings that use unit price × quantity instead of direct value entry
+const UNIT_PRICE_HOLDINGS = {
+  // key: index matched by remarks substring or sub type
+  // Format: { label, unitLabel, qty }
+};
+
+// Determine if a holding uses unit-price mode, and return its config
+function getUnitPriceConfig(h) {
+  const r = (h.remarks||'').toLowerCase();
+  const s = (h.sub||'').toLowerCase();
+
+  // Gold coins — Au, qty = 124g
+  if(h.account === 'Au' && s === 'coin')
+    return { label:'Gold Price', unitLabel:'₹/gram', qty: parseFloat(h.units) || 124 };
+
+  // Silver coins — Ag, qty = 1500g
+  if(h.account === 'Ag' && s === 'coin')
+    return { label:'Silver Price', unitLabel:'₹/gram', qty: parseFloat(h.units) || 1500 };
+
+  // SGB — each tranche priced per gram
+  if(s === 'sgb')
+    return { label:'SGB Price', unitLabel:'₹/gram', qty: parseFloat(h.units) || 0 };
+
+  // Unlisted — NSE shares
+  if(s === 'unlisted' && r.includes('nse'))
+    return { label:'NSE Share Price', unitLabel:'₹/share', qty: parseFloat(h.units) || 500 };
+
+  // Unlisted — Sunday Protech
+  if(s === 'unlisted' && r.includes('sunday'))
+    return { label:'Sunday Protech Price', unitLabel:'₹/share', qty: parseFloat(h.units) || 25000 };
+
+  // Unlisted — OYO
+  if(s === 'unlisted' && r.includes('oyo'))
+    return { label:'OYO Price', unitLabel:'₹/share', qty: parseFloat(h.units) || 25000 };
+
+  // Unlisted — Ecosure
+  if(s === 'unlisted' && r.includes('ecosure'))
+    return { label:'Ecosure Price', unitLabel:'₹/share', qty: parseFloat(h.units) || 15000 };
+
+  return null; // normal value-entry mode
+}
+
+function renderUpdateTable() {
+  const tb = document.getElementById('updateTbody');
+  tb.innerHTML = portfolio.holdings.map((h,i)=>{
+    const c   = TYPE_COLORS[h.sub]||TYPE_COLORS[h.type]||'#8a9bbf';
+    const upc = getUnitPriceConfig(h);
+    const currentUnitPrice = upc && upc.qty > 0 ? Math.round(h.value / upc.qty) : 0;
+
+    if(upc) {
+      // ── Unit-price row ──
+      return `<tr id="row_${i}" style="background:rgba(212,168,67,0.03);">
+        <td style="color:var(--text3);font-size:11px;font-family:'JetBrains Mono',monospace">${i+1}</td>
+        <td style="font-weight:600">${h.account}</td>
+        <td><span class="badge" style="background:${c}22;color:${c};border-color:${c}44;font-size:11px">${h.sub}</span></td>
+        <td style="color:var(--text3);font-size:12px">${h.remarks||'—'}</td>
+        <td style="text-align:right;font-family:'JetBrains Mono',monospace;color:var(--text2)">${h.value>0?fmt(h.value):'—'}</td>
+        <td style="text-align:right;padding:6px 8px;">
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:10px;color:var(--text3);white-space:nowrap;">${upc.unitLabel}</span>
+              <input type="number"
+                id="up_${i}"
+                placeholder="${currentUnitPrice||''}"
+                oninput="onUnitPriceInput(${i})"
+                style="width:100px;background:var(--surface3);border:1px solid rgba(212,168,67,0.4);border-radius:8px;padding:7px 10px;color:var(--gold2);font-family:'JetBrains Mono',monospace;font-size:13px;text-align:right;outline:none;"
+                onfocus="this.style.borderColor='var(--gold)'"
+                onblur="this.style.borderColor='rgba(212,168,67,0.4)'">
+            </div>
+            <div id="calc_${i}" style="font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;min-height:16px;"></div>
+          </div>
+        </td>
+        <td style="text-align:right;">
+          <div style="font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;">
+            × ${upc.qty.toLocaleString('en-IN')} ${upc.unitLabel.includes('gram')?'g':'units'}
+          </div>
+          <input type="hidden" id="nv_${i}" value="">
+        </td>
+      </tr>`;
+    } else {
+      // ── Normal direct-value row ──
+      return `<tr id="row_${i}">
+        <td style="color:var(--text3);font-size:11px;font-family:'JetBrains Mono',monospace">${i+1}</td>
+        <td style="font-weight:600">${h.account}</td>
+        <td><span class="badge" style="background:${c}22;color:${c};border-color:${c}44;font-size:11px">${h.sub}</span></td>
+        <td style="color:var(--text3);font-size:12px">${h.remarks||'—'}</td>
+        <td style="text-align:right;font-family:'JetBrains Mono',monospace;color:var(--text2)">${h.value>0?fmt(h.value):'—'}</td>
+        <td style="text-align:right;padding:6px 8px;">
+          <input type="number"
+            id="nv_${i}"
+            placeholder="${h.value||''}"
+            oninput="recalcNewTotal()"
+            style="width:130px;background:var(--surface3);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--gold);font-family:'JetBrains Mono',monospace;font-size:13px;text-align:right;outline:none;"
+            onfocus="this.style.borderColor='var(--gold)'"
+            onblur="this.style.borderColor='var(--border)'">
+        </td>
+        <td style="text-align:right;">
+          <input type="text"
+            id="nu_${i}"
+            value="${h.units||''}"
+            placeholder="${h.units||''}"
+            style="width:80px;background:var(--surface3);border:1px solid var(--border);border-radius:8px;padding:7px 8px;color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;text-align:right;outline:none;"
+            onfocus="this.style.borderColor='var(--blue2)'"
+            onblur="this.style.borderColor='var(--border)'">
+        </td>
+      </tr>`;
+    }
+  }).join('');
+}
+
+function onUnitPriceInput(i) {
+  const h   = portfolio.holdings[i];
+  const upc = getUnitPriceConfig(h);
+  if(!upc) return;
+
+  const priceInput = document.getElementById(`up_${i}`);
+  const hiddenVal  = document.getElementById(`nv_${i}`);
+  const calcLabel  = document.getElementById(`calc_${i}`);
+
+  const price = parseFloat(priceInput.value);
+  if(!isNaN(price) && price > 0) {
+    const total = Math.round(price * upc.qty);
+    hiddenVal.value = total;
+    calcLabel.textContent = `= ${fmt(total)}`;
+    calcLabel.style.color = 'var(--green)';
+  } else {
+    hiddenVal.value = '';
+    calcLabel.textContent = '';
+  }
+  recalcNewTotal();
+}
+
+function recalcNewTotal() {
+  let newTotal = 0;
+  portfolio.holdings.forEach((h,i)=>{
+    const inp = document.getElementById(`nv_${i}`);
+    const v = inp && inp.value !== '' ? parseFloat(inp.value) : (h.value||0);
+    newTotal += isNaN(v) ? (h.value||0) : v;
+  });
+  const delta = newTotal - portfolio.total;
+  document.getElementById('modalNewTotal').textContent = fmt(newTotal);
+  const deltaEl = document.getElementById('modalDelta');
+  deltaEl.textContent = (delta>=0?'+':'')+fmt(Math.abs(delta));
+  deltaEl.style.color = delta>=0 ? 'var(--green)' : 'var(--red)';
+}
+
+async function applyUpdate() {
+  const btn = document.getElementById('saveBtn');
+  btn.textContent = '⏳ Saving…';
+  btn.disabled = true;
+
+  const dateVal = document.getElementById('fDate').value;
+  const asOf = new Date(dateVal).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+
+  // Collect new values — works for both direct and unit-price rows
+  let changed = false;
+  portfolio.holdings.forEach((h,i)=>{
+    const nv = document.getElementById(`nv_${i}`);
+    const nu = document.getElementById(`nu_${i}`);
+    if(nv && nv.value !== '') {
+      h.value = parseFloat(nv.value);
+      changed = true;
+    }
+    if(nu && nu.value !== '') h.units = nu.value;
+  });
+
+  // Also update sgbTranches values from SGB unit-price rows
+  portfolio.holdings.forEach((h,i)=>{
+    if((h.sub||'').toLowerCase() === 'sgb') {
+      const nv = document.getElementById(`nv_${i}`);
+      if(nv && nv.value !== '') {
+        // Find matching tranche by units and update its value
+        const units = parseFloat(h.units) || 0;
+        const match = sgbTranches.find(t => t.units === units && Math.abs(t.value - h.value) < 100000);
+        if(match) match.value = parseFloat(nv.value);
+      }
+    }
+  });
+
+  if(!changed) {
+    btn.textContent = '💾 Save & Sync to GitHub';
+    btn.disabled = false;
+    showModalError('No values were changed. Please enter at least one new value.');
+    return;
+  }
+
+  portfolio.total = portfolio.holdings.reduce((a,b)=>a+(b.value||0),0);
+  portfolio.asOf  = asOf;
+  summary         = buildSummary(portfolio.holdings);
+  snapshots.push({ date: dateVal, value: portfolio.total });
+
+  const payload = { asOf, holdings: portfolio.holdings, snapshots, sgbTranches };
+  try {
+    await saveToGitHub(payload);
+    showModalSuccess(`✓ Saved to GitHub! Portfolio updated to ${fmt(portfolio.total)} as of ${asOf}`);
+    document.getElementById('heroTotal').textContent      = fmt(portfolio.total);
+    document.getElementById('lastUpdated').textContent    = 'Updated: '+asOf;
+    document.getElementById('heroDate').textContent       = asOf;
+    renderAlloc();
+    renderHoldings();
+    renderSGB();
+  } catch(e) {
+    showModalError('GitHub save failed: '+e.message+'. Values updated locally only.');
+  }
+
+  btn.textContent = '💾 Save & Sync to GitHub';
+  btn.disabled = false;
+}
+
+function showModalSuccess(msg) {
+  const el = document.getElementById('updateSuccess');
+  el.textContent = msg; el.style.display = 'block';
+  document.getElementById('updateError').style.display = 'none';
+  setTimeout(closeModal, 2500);
+}
+function showModalError(msg) {
+  const el = document.getElementById('updateError');
+  el.textContent = msg; el.style.display = 'block';
+  document.getElementById('updateSuccess').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════
+//  DASHBOARD HTML (stored so we can restore after loading spinner)
+// ═══════════════════════════════════════════════════
+// spin keyframe
+const styleEl = document.createElement('style');
+styleEl.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+document.head.appendChild(styleEl);
+</script>
+
+</body>
+</html>

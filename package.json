@@ -1,0 +1,12 @@
+{
+  "name": "portfolio-proxy",
+  "version": "1.0.0",
+  "description": "Proxy server for Yuvan portfolio dashboard — keeps GitHub token off the browser",
+  "main": "proxy-server.js",
+  "scripts": {
+    "start": "node proxy-server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
