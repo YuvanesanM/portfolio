@@ -10,7 +10,8 @@
       "remarks": "Yuvan",
       "owner": "Yuvan",
       "purchaseDate": "2023-01-01",
-      "purchasePrice": 2519467
+      "purchasePrice": 2519467,
+      "_mfComputed": false
     },
     {
       "account": "ICICI",
@@ -21,7 +22,8 @@
       "remarks": "Ramyaa",
       "owner": "Ramyaa",
       "purchaseDate": "2023-01-01",
-      "purchasePrice": 0
+      "purchasePrice": 0,
+      "_mfComputed": false
     },
     {
       "account": "HDFC",
@@ -32,7 +34,8 @@
       "remarks": "Ramyaa",
       "owner": "Ramyaa",
       "purchaseDate": "2023-06-01",
-      "purchasePrice": 500000
+      "purchasePrice": 500000,
+      "_mfComputed": false
     },
     {
       "account": "SBI",
@@ -43,7 +46,8 @@
       "remarks": "Yuvan",
       "owner": "Yuvan",
       "purchaseDate": "2023-03-01",
-      "purchasePrice": 340026
+      "purchasePrice": 340026,
+      "_mfComputed": false
     },
     {
       "account": "HDFC",
@@ -54,7 +58,8 @@
       "remarks": "Yuvan",
       "owner": "Yuvan",
       "purchaseDate": "2024-01-01",
-      "purchasePrice": 3500000
+      "purchasePrice": 3500000,
+      "_mfComputed": false
     },
     {
       "account": "SSY",
@@ -65,7 +70,8 @@
       "remarks": "ICICI - Sana",
       "owner": "Sana",
       "purchaseDate": "2017-04-17",
-      "purchasePrice": 873501
+      "purchasePrice": 873501,
+      "_mfComputed": false
     },
     {
       "account": "SSY",
@@ -76,7 +82,8 @@
       "remarks": "ICICI - Tara",
       "owner": "Tara",
       "purchaseDate": "2020-01-11",
-      "purchasePrice": 873501
+      "purchasePrice": 873501,
+      "_mfComputed": false
     },
     {
       "account": "SBI",
@@ -87,7 +94,8 @@
       "remarks": "1K365542004",
       "owner": "Yuvan",
       "purchaseDate": "2018-01-01",
-      "purchasePrice": 200000
+      "purchasePrice": 200000,
+      "_mfComputed": false
     },
     {
       "account": "ICICI",
@@ -98,7 +106,8 @@
       "remarks": "Tara - A3067570",
       "owner": "Tara",
       "purchaseDate": "2021-01-11",
-      "purchasePrice": 500000
+      "purchasePrice": 500000,
+      "_mfComputed": false
     },
     {
       "account": "ICICI",
@@ -109,7 +118,8 @@
       "remarks": "",
       "owner": "Yuvan",
       "purchaseDate": "2022-04-01",
-      "purchasePrice": 5000000
+      "purchasePrice": 5000000,
+      "_mfComputed": false
     },
     {
       "account": "ICICI",
@@ -120,7 +130,8 @@
       "remarks": "",
       "owner": "Yuvan",
       "purchaseDate": "2018-01-01",
-      "purchasePrice": 200000
+      "purchasePrice": 200000,
+      "_mfComputed": false
     },
     {
       "account": "ICICI",
@@ -131,7 +142,8 @@
       "remarks": "Matures 14-Aug-2027",
       "owner": "Yuvan",
       "purchaseDate": "2019-08-14",
-      "purchasePrice": 244930
+      "purchasePrice": 244930,
+      "_mfComputed": false
     },
     {
       "account": "ICICI",
@@ -142,7 +154,8 @@
       "remarks": "Matures 10-Dec-2027",
       "owner": "Yuvan",
       "purchaseDate": "2019-12-10",
-      "purchasePrice": 189750
+      "purchasePrice": 189750,
+      "_mfComputed": false
     },
     {
       "account": "ICICI",
@@ -153,7 +166,8 @@
       "remarks": "Matures 08-Sep-2028",
       "owner": "Yuvan",
       "purchaseDate": "2020-09-08",
-      "purchasePrice": 511700
+      "purchasePrice": 511700,
+      "_mfComputed": false
     },
     {
       "account": "ICICI",
@@ -164,7 +178,8 @@
       "remarks": "Matures 05-Jan-2029",
       "owner": "Yuvan",
       "purchaseDate": "2021-01-05",
-      "purchasePrice": 150000
+      "purchasePrice": 150000,
+      "_mfComputed": false
     },
     {
       "account": "ICICI",
@@ -175,7 +190,8 @@
       "remarks": "Matures 19-Jan-2029",
       "owner": "Yuvan",
       "purchaseDate": "2021-01-19",
-      "purchasePrice": 252700
+      "purchasePrice": 252700,
+      "_mfComputed": false
     },
     {
       "account": "ICICI",
@@ -186,7 +202,8 @@
       "remarks": "Matures 09-Mar-2029",
       "owner": "Yuvan",
       "purchaseDate": "2021-03-09",
-      "purchasePrice": 461200
+      "purchasePrice": 461200,
+      "_mfComputed": false
     },
     {
       "account": "ICICI",
@@ -197,29 +214,34 @@
       "remarks": "Matures 25-May-2029",
       "owner": "Yuvan",
       "purchaseDate": "2021-05-25",
-      "purchasePrice": 472700
+      "purchasePrice": 472700,
+      "_mfComputed": false
     },
     {
-      "account": "ICICI",
+      "account": "CAMS+KFin",
       "type": "Mutual Fund",
       "sub": "Mutual Fund",
-      "value": 25986323,
+      "value": 24767637,
       "units": "",
-      "remarks": "ICICI - Total",
+      "remarks": "Yuvan · 45 schemes",
       "owner": "Yuvan",
       "purchaseDate": "2019-01-01",
-      "purchasePrice": 23875753
+      "purchasePrice": 23875755,
+      "_mfComputed": true,
+      "_mfOwner": "Yuvan"
     },
     {
-      "account": "HDFC",
+      "account": "CAMS+KFin",
       "type": "Mutual Fund",
       "sub": "Mutual Fund",
-      "value": 413000,
+      "value": 367478,
       "units": "",
-      "remarks": "Ramyaa",
+      "remarks": "Ramyaa · 2 schemes",
       "owner": "Ramyaa",
       "purchaseDate": "2021-01-01",
-      "purchasePrice": 325000
+      "purchasePrice": 400000,
+      "_mfComputed": true,
+      "_mfOwner": "Ramyaa"
     },
     {
       "account": "ICICI",
@@ -230,7 +252,8 @@
       "remarks": "Demat",
       "owner": "Yuvan",
       "purchaseDate": "2020-01-01",
-      "purchasePrice": 2000000
+      "purchasePrice": 2000000,
+      "_mfComputed": false
     },
     {
       "account": "Kite",
@@ -241,7 +264,8 @@
       "remarks": "Zerodha",
       "owner": "Yuvan",
       "purchaseDate": "2021-01-01",
-      "purchasePrice": 300000
+      "purchasePrice": 300000,
+      "_mfComputed": false
     },
     {
       "account": "360ONE",
@@ -252,7 +276,8 @@
       "remarks": "Alternative",
       "owner": "Yuvan",
       "purchaseDate": "2022-01-01",
-      "purchasePrice": 5000000
+      "purchasePrice": 5000000,
+      "_mfComputed": false
     },
     {
       "account": "ICICI",
@@ -263,7 +288,8 @@
       "remarks": "NSE @ 1950",
       "owner": "Yuvan",
       "purchaseDate": "2022-01-01",
-      "purchasePrice": 975000
+      "purchasePrice": 975000,
+      "_mfComputed": false
     },
     {
       "account": "ICICI",
@@ -274,7 +300,8 @@
       "remarks": "Sunday Protech @ 20.75",
       "owner": "Yuvan",
       "purchaseDate": "2022-01-01",
-      "purchasePrice": 518750
+      "purchasePrice": 518750,
+      "_mfComputed": false
     },
     {
       "account": "ICICI",
@@ -285,7 +312,8 @@
       "remarks": "OYO @ 28",
       "owner": "Yuvan",
       "purchaseDate": "2022-01-01",
-      "purchasePrice": 700000
+      "purchasePrice": 700000,
+      "_mfComputed": false
     },
     {
       "account": "ICICI",
@@ -296,7 +324,8 @@
       "remarks": "Ecosure @ 37",
       "owner": "Yuvan",
       "purchaseDate": "2023-01-01",
-      "purchasePrice": 555000
+      "purchasePrice": 555000,
+      "_mfComputed": false
     },
     {
       "account": "ICICI",
@@ -307,7 +336,8 @@
       "remarks": "Embassy / Nexus",
       "owner": "Yuvan",
       "purchaseDate": "2024-01-01",
-      "purchasePrice": 240000
+      "purchasePrice": 240000,
+      "_mfComputed": false
     },
     {
       "account": "Bitcoin",
@@ -318,7 +348,8 @@
       "remarks": "BTC",
       "owner": "Yuvan",
       "purchaseDate": "2021-01-01",
-      "purchasePrice": 2500000
+      "purchasePrice": 2500000,
+      "_mfComputed": false
     },
     {
       "account": "Au",
@@ -329,18 +360,20 @@
       "remarks": "Gold coins",
       "owner": "Yuvan",
       "purchaseDate": "2021-01-01",
-      "purchasePrice": 100000
+      "purchasePrice": 100000,
+      "_mfComputed": false
     },
     {
       "account": "Ag",
       "type": "Coin",
       "sub": "Coin",
-      "value": 412500,
+      "value": 415500,
       "units": "1500g",
       "remarks": "Silver coins",
       "owner": "Yuvan",
       "purchaseDate": "2020-01-01",
-      "purchasePrice": 620000
+      "purchasePrice": 620000,
+      "_mfComputed": false
     },
     {
       "account": "Lq",
@@ -351,7 +384,8 @@
       "remarks": "Liquid",
       "owner": "Yuvan",
       "purchaseDate": "2021-01-01",
-      "purchasePrice": 225000
+      "purchasePrice": 225000,
+      "_mfComputed": false
     }
   ],
   "snapshots": [
@@ -406,6 +440,10 @@
     {
       "date": "2026-03-19",
       "value": 68388810
+    },
+    {
+      "date": "2026-03-19",
+      "value": 67127602
     }
   ],
   "sgbTranches": [
