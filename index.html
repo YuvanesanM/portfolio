@@ -602,51 +602,102 @@
 
   <!-- ═══════════ PAGE: MUTUAL FUNDS ═══════════ -->
   <div class="page" id="page-mf">
-    <div class="grid-3" style="margin-bottom:24px">
+
+    <!-- Hero strip -->
+    <div class="hero" style="margin-bottom:24px">
+      <div class="hero-left">
+        <div class="hero-label">Mutual Fund Portfolio</div>
+        <div class="hero-value" id="mfTotalValue">₹2.48 Cr</div>
+        <div class="hero-sub">As of <span id="mfAsOf">17 Mar 2026</span> · <span style="color:var(--blue2)" id="mfSchemeCount">40 schemes</span></div>
+      </div>
+      <div class="hero-right">
+        <div class="hero-stat">
+          <div class="hero-stat-label">Cost Basis</div>
+          <div class="hero-stat-value gold" id="mfCost">₹2.39 Cr</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-label">Unrealised Gain</div>
+          <div class="hero-stat-value green" id="mfGain">+₹8.92 L</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-label">Returns</div>
+          <div class="hero-stat-value blue" id="mfReturn">+3.7%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="grid-4" style="margin-bottom:24px">
       <div class="card">
         <div class="card-accent" style="background:var(--blue)"></div>
-        <div class="card-label">Total MF Value</div>
-        <div class="card-value" id="mfTotalValue">—</div>
-        <div class="card-sub" id="mfTotalSub">—</div>
+        <div class="card-label">Total Schemes</div>
+        <div class="card-value" id="mfTotalSchemes">40</div>
+        <div class="card-sub" id="mfTotalSub">Across 10 fund houses</div>
       </div>
       <div class="card">
-        <div class="card-accent" style="background:var(--blue2)"></div>
-        <div class="card-label">ICICI Folios</div>
-        <div class="card-value" id="mfICICI">—</div>
-        <div class="card-sub">Primary MF account</div>
+        <div class="card-accent" style="background:var(--gold)"></div>
+        <div class="card-label">Largest Holding</div>
+        <div class="card-value" id="mfLargest">₹41.7 L</div>
+        <div class="card-sub" id="mfLargestName">ICICI Pru Dynamic AA</div>
+      </div>
+      <div class="card">
+        <div class="card-accent" style="background:var(--green)"></div>
+        <div class="card-label">CAMS Schemes</div>
+        <div class="card-value" id="mfCAMS">—</div>
+        <div class="card-sub">CAMS registrar</div>
       </div>
       <div class="card">
         <div class="card-accent" style="background:var(--purple)"></div>
-        <div class="card-label">HDFC Folios</div>
-        <div class="card-value" id="mfHDFC">—</div>
-        <div class="card-sub">Ramyaa's account</div>
+        <div class="card-label">KFintech Schemes</div>
+        <div class="card-value" id="mfKFIN">—</div>
+        <div class="card-sub">KFintech registrar</div>
       </div>
     </div>
-    <div class="card">
-      <h3>Mutual Fund Holdings</h3>
+
+    <!-- Charts row -->
+    <div class="grid-3" style="margin-bottom:24px">
+      <div class="card">
+        <h3>By Fund House</h3>
+        <canvas id="mfFundHouseChart" height="260"></canvas>
+      </div>
+      <div class="card">
+        <h3>By Category</h3>
+        <canvas id="mfCategoryChart" width="220" height="220" style="margin:0 auto;display:block"></canvas>
+      </div>
+      <div class="card">
+        <h3>Category Allocation</h3>
+        <div id="mfCategoryRows" style="margin-top:8px"></div>
+      </div>
+    </div>
+
+    <!-- Full scheme table -->
+    <div class="card" style="margin-bottom:24px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <h3 style="margin-bottom:0">All Schemes</h3>
+        <div style="display:flex;gap:8px">
+          <button onclick="mfFilterAll()" id="mfBtnAll" style="padding:6px 14px;border-radius:8px;border:1px solid var(--gold);background:var(--gold);color:#080c10;font-size:12px;font-weight:700;cursor:pointer;">All</button>
+          <button onclick="mfFilter('ICICI')" id="mfBtnICICI" style="padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer;">ICICI</button>
+          <button onclick="mfFilter('SBI')" id="mfBtnSBI" style="padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer;">SBI</button>
+          <button onclick="mfFilter('Nippon')" id="mfBtnNippon" style="padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer;">Nippon</button>
+          <button onclick="mfFilter('Motilal')" id="mfBtnMotilal" style="padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer;">Motilal</button>
+        </div>
+      </div>
       <div class="table-wrap">
-        <table>
+        <table id="mfTable">
           <thead>
             <tr>
-              <th>Account</th>
-              <th>Holder</th>
-              <th style="text-align:right">Current Value</th>
+              <th>#</th>
+              <th>Scheme</th>
+              <th>Fund House</th>
+              <th>Category</th>
+              <th style="text-align:right">Cost (₹)</th>
+              <th style="text-align:right">Value (₹)</th>
+              <th style="text-align:right">Gain</th>
               <th style="text-align:right">% of MF</th>
-              <th style="text-align:right">% of Portfolio</th>
             </tr>
           </thead>
-          <tbody id="mfTbody"></tbody>
+          <tbody id="mfSchemeTbody"></tbody>
         </table>
-      </div>
-    </div>
-    <div class="grid-2" style="margin-top:24px">
-      <div class="card">
-        <h3>MF Account Split</h3>
-        <canvas id="mfDonut" width="260" height="260"></canvas>
-      </div>
-      <div class="card">
-        <h3>MF as % of Total Portfolio</h3>
-        <div id="mfAllocRows"></div>
       </div>
     </div>
   </div>
@@ -1337,64 +1388,210 @@ function renderHoldings() {
   }).join('');
 }
 
+// ─── MF SCHEME DATA from CAS Statement 17-Mar-2026 ───────────────────────────
+const MF_SCHEMES = [
+  // Axis
+  {house:'Axis',      scheme:'NIFTY Next 50 Index Fund Direct Growth',       cat:'Index',       cost:250000,   value:219908,  reg:'KFintech'},
+  {house:'Axis',      scheme:'Greater China Equity FOF Direct Growth',        cat:'FOF',         cost:100000,   value:129170,  reg:'KFintech'},
+  // Bajaj Finserv
+  {house:'Bajaj',     scheme:'Consumption Fund Regular Growth',               cat:'Thematic',    cost:1082957,  value:935601,  reg:'KFintech'},
+  {house:'Bajaj',     scheme:'Flexi Cap Fund Regular Growth',                 cat:'Flexi Cap',   cost:100000,   value:96512,   reg:'KFintech'},
+  // Bandhan
+  {house:'Bandhan',   scheme:'Large & Mid Cap Fund Regular Growth',           cat:'Large & Mid', cost:1253982,  value:1205429, reg:'CAMS'},
+  // Franklin
+  {house:'Franklin',  scheme:'Small Cap Fund Growth',                         cat:'Small Cap',   cost:100000,   value:102106,  reg:'CAMS'},
+  {house:'Franklin',  scheme:'Focused Equity Fund Growth',                    cat:'Focused',     cost:200000,   value:177750,  reg:'CAMS'},
+  {house:'Franklin',  scheme:'Flexi Cap Fund Growth',                         cat:'Flexi Cap',   cost:275000,   value:253340,  reg:'CAMS'},
+  // HDFC
+  {house:'HDFC',      scheme:'Silver ETF Fund of Fund Regular Growth',        cat:'Commodity',   cost:200000,   value:524768,  reg:'CAMS'},
+  {house:'HDFC',      scheme:'Large and Mid Cap Fund Regular Growth',         cat:'Large & Mid', cost:325000,   value:369833,  reg:'CAMS'},
+  {house:'HDFC',      scheme:'Focused Fund Regular Growth',                   cat:'Focused',     cost:50000,    value:83037,   reg:'CAMS'},
+  {house:'HDFC',      scheme:'Flexi Cap Fund Regular Growth (F1)',            cat:'Flexi Cap',   cost:75000,    value:89698,   reg:'CAMS'},
+  {house:'HDFC',      scheme:'Banking & Financial Services Regular Growth',   cat:'Sectoral',    cost:25000,    value:29559,   reg:'CAMS'},
+  {house:'HDFC',      scheme:'Flexi Cap Fund Regular Growth (F2)',            cat:'Flexi Cap',   cost:75000,    value:88793,   reg:'CAMS'},
+  {house:'HDFC',      scheme:'Pharma and Healthcare Regular Growth',          cat:'Sectoral',    cost:575000,   value:591498,  reg:'CAMS'},
+  // HSBC
+  {house:'HSBC',      scheme:'Multi Cap Fund Regular Growth (F1)',            cat:'Multi Cap',   cost:50000,    value:53906,   reg:'CAMS'},
+  {house:'HSBC',      scheme:'Multi Cap Fund Regular Growth (F2)',            cat:'Multi Cap',   cost:50000,    value:56459,   reg:'CAMS'},
+  // ICICI Prudential
+  {house:'ICICI',     scheme:'Business Cycle Fund Growth (F1)',               cat:'Thematic',    cost:300000,   value:363050,  reg:'CAMS'},
+  {house:'ICICI',     scheme:'Manufacturing Fund Growth',                     cat:'Thematic',    cost:500000,   value:497784,  reg:'CAMS'},
+  {house:'ICICI',     scheme:'Thematic Advantage FOF Growth',                 cat:'FOF',         cost:2011685,  value:1877424, reg:'CAMS'},
+  {house:'ICICI',     scheme:'Multi-Asset Fund Growth (F1)',                  cat:'Multi Asset', cost:800000,   value:1012804, reg:'CAMS'},
+  {house:'ICICI',     scheme:'Large & Mid Cap Fund Growth (F1)',              cat:'Large & Mid', cost:425000,   value:489966,  reg:'CAMS'},
+  {house:'ICICI',     scheme:'Dynamic Asset Allocation Active FOF Growth',    cat:'FOF',         cost:4000000,  value:4171185, reg:'CAMS'},
+  {house:'ICICI',     scheme:'Business Cycle Fund Growth (F2)',               cat:'Thematic',    cost:500000,   value:588103,  reg:'CAMS'},
+  {house:'ICICI',     scheme:'Multi-Asset Fund Growth (F2)',                  cat:'Multi Asset', cost:700000,   value:877856,  reg:'CAMS'},
+  {house:'ICICI',     scheme:'Large & Mid Cap Fund Growth (F2)',              cat:'Large & Mid', cost:75000,    value:87085,   reg:'CAMS'},
+  {house:'ICICI',     scheme:'Balanced Advantage Fund Growth',                cat:'Hybrid',      cost:210160,   value:212283,  reg:'CAMS'},
+  {house:'ICICI',     scheme:'Multi-Asset Fund Growth (F3)',                  cat:'Multi Asset', cost:750000,   value:884277,  reg:'CAMS'},
+  // Invesco
+  {house:'Invesco',   scheme:'Business Cycle Fund Regular Growth',            cat:'Thematic',    cost:600000,   value:681566,  reg:'KFintech'},
+  {house:'Invesco',   scheme:'Flexi Cap Fund Regular Growth',                 cat:'Flexi Cap',   cost:800000,   value:688366,  reg:'KFintech'},
+  {house:'Invesco',   scheme:'Large & Mid Cap Fund Regular Growth',           cat:'Large & Mid', cost:900000,   value:818727,  reg:'KFintech'},
+  // Kotak
+  {house:'Kotak',     scheme:'Midcap Fund Growth Regular',                    cat:'Mid Cap',     cost:150000,   value:244425,  reg:'CAMS'},
+  {house:'Kotak',     scheme:'Large Cap Fund Growth Regular',                 cat:'Large Cap',   cost:50000,    value:69113,   reg:'CAMS'},
+  {house:'Kotak',     scheme:'Large & Midcap Fund Growth Regular',            cat:'Large & Mid', cost:75000,    value:86729,   reg:'CAMS'},
+  // Motilal Oswal
+  {house:'Motilal',   scheme:'Midcap Fund Regular Growth (F1)',               cat:'Mid Cap',     cost:100000,   value:110343,  reg:'KFintech'},
+  {house:'Motilal',   scheme:'Large and Midcap Fund Regular Growth',          cat:'Large & Mid', cost:501030,   value:439879,  reg:'KFintech'},
+  {house:'Motilal',   scheme:'Midcap Fund Regular Growth (F2)',               cat:'Mid Cap',     cost:725000,   value:590797,  reg:'KFintech'},
+  {house:'Motilal',   scheme:'Gold and Silver Passive FOF Direct Growth',     cat:'Commodity',   cost:300000,   value:311760,  reg:'KFintech'},
+  // Nippon
+  {house:'Nippon',    scheme:'Multi Cap Fund Growth (F1)',                     cat:'Multi Cap',   cost:75000,    value:86502,   reg:'KFintech'},
+  {house:'Nippon',    scheme:'Large Cap Fund Direct Growth',                  cat:'Large Cap',   cost:2115941,  value:2060828, reg:'KFintech'},
+  {house:'Nippon',    scheme:'Banking & Financial Services Fund Growth',      cat:'Sectoral',    cost:200000,   value:217135,  reg:'KFintech'},
+  {house:'Nippon',    scheme:'Multi Cap Fund Growth (F2)',                    cat:'Multi Cap',   cost:875000,   value:813516,  reg:'KFintech'},
+  // SBI
+  {house:'SBI',       scheme:'Multi Asset Allocation Fund Regular Growth',    cat:'Multi Asset', cost:500000,   value:562173,  reg:'CAMS'},
+  {house:'SBI',       scheme:'Contra Fund Regular Growth',                    cat:'Contra',      cost:750000,   value:762589,  reg:'CAMS'},
+  {house:'SBI',       scheme:'Large & Midcap Fund Regular Growth',            cat:'Large & Mid', cost:100000,   value:154005,  reg:'CAMS'},
+];
+
+const MF_HOUSE_COLORS = {
+  'ICICI':'#4f7fff','SBI':'#2ecc8f','Nippon':'#ff5e6a','Motilal':'#9b6dff',
+  'HDFC':'#d4a843','Invesco':'#00c4b4','Bajaj':'#ff8c42','Kotak':'#7aa3ff',
+  'Franklin':'#e0a0ff','Axis':'#f0c96b','Bandhan':'#5debd7','HSBC':'#a8edbd'
+};
+const MF_CAT_COLORS = {
+  'FOF':'#4f7fff','Multi Asset':'#d4a843','Thematic':'#ff8c42','Large & Mid':'#2ecc8f',
+  'Flexi Cap':'#9b6dff','Sectoral':'#ff5e6a','Mid Cap':'#00c4b4','Multi Cap':'#7aa3ff',
+  'Large Cap':'#f0c96b','Commodity':'#e0a0ff','Index':'#5debd7','Hybrid':'#a8edbd',
+  'Focused':'#ffb347','Small Cap':'#ff6b9d','Contra':'#b8f0b0'
+};
+
+let mfCurrentFilter = 'All';
+
 function renderMF() {
-  const mfHoldings = portfolio.holdings.filter(h => h.sub === 'Mutual Fund');
-  const total = mfHoldings.reduce((a,b) => a+(b.value||0), 0);
-  const icicTotal = mfHoldings.filter(h=>h.account==='ICICI').reduce((a,b)=>a+(b.value||0),0);
-  const hdfcTotal = mfHoldings.filter(h=>h.account==='HDFC').reduce((a,b)=>a+(b.value||0),0);
+  // Use live total from portfolio if available, else CAS total
+  const casTotal   = MF_SCHEMES.reduce((a,b)=>a+b.value,0);
+  const casCost    = MF_SCHEMES.reduce((a,b)=>a+b.cost,0);
+  const gain       = casTotal - casCost;
+  const gainPct    = ((gain/casCost)*100).toFixed(1);
+  const schemeCount = MF_SCHEMES.length;
+  const largest    = [...MF_SCHEMES].sort((a,b)=>b.value-a.value)[0];
+  const camsCount  = MF_SCHEMES.filter(s=>s.reg==='CAMS').length;
+  const kfinCount  = MF_SCHEMES.filter(s=>s.reg==='KFintech').length;
 
-  const set = (id,val) => { const e=document.getElementById(id); if(e) e.textContent=val; };
-  set('mfTotalValue', fmt(total));
-  set('mfTotalSub',   `${mfHoldings.length} folios · ${(total/portfolio.total*100).toFixed(1)}% of portfolio`);
-  set('mfICICI',      fmt(icicTotal));
-  set('mfHDFC',       hdfcTotal > 0 ? fmt(hdfcTotal) : '—');
+  const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  set('mfTotalValue',   fmt(casTotal));
+  set('mfAsOf',         '17 Mar 2026');
+  set('mfSchemeCount',  schemeCount+' schemes');
+  set('mfCost',         fmt(casCost));
+  set('mfGain',         (gain>=0?'+':'')+fmt(gain));
+  set('mfReturn',       (gainPct>=0?'+':'')+gainPct+'%');
+  set('mfTotalSchemes', schemeCount);
+  set('mfTotalSub',     `Across ${new Set(MF_SCHEMES.map(s=>s.house)).size} fund houses`);
+  set('mfLargest',      fmt(largest.value));
+  set('mfLargestName',  largest.scheme.substring(0,22)+'…');
+  set('mfCAMS',         camsCount);
+  set('mfKFIN',         kfinCount);
 
-  // Table
-  const tb = document.getElementById('mfTbody');
-  if(tb) tb.innerHTML = mfHoldings.map(h => {
-    const pctMF   = total > 0 ? (h.value/total*100).toFixed(1)+'%' : '—';
-    const pctPort = (h.value/portfolio.total*100).toFixed(2)+'%';
-    const holder  = h.remarks || h.account;
+  // Colour gain
+  const gainEl = document.getElementById('mfGain');
+  if(gainEl) gainEl.style.color = gain>=0 ? 'var(--green)' : 'var(--red)';
+  const retEl = document.getElementById('mfReturn');
+  if(retEl) retEl.style.color = gainPct>=0 ? 'var(--blue2)' : 'var(--red)';
+
+  // Build fund-house aggregation
+  const houseMap = {};
+  MF_SCHEMES.forEach(s=>{
+    houseMap[s.house] = (houseMap[s.house]||0)+s.value;
+  });
+  const houses = Object.entries(houseMap).sort((a,b)=>b[1]-a[1]);
+
+  // Fund house bar chart
+  const fhCanvas = document.getElementById('mfFundHouseChart');
+  if(fhCanvas) {
+    const ex = Chart.getChart(fhCanvas); if(ex) ex.destroy();
+    new Chart(fhCanvas.getContext('2d'), {
+      type:'bar',
+      data:{ labels:houses.map(h=>h[0]), datasets:[{ data:houses.map(h=>h[1]), backgroundColor:houses.map(h=>MF_HOUSE_COLORS[h[0]]||'#4f7fff'), borderRadius:6 }] },
+      options:{ indexAxis:'y', responsive:true, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${fmt(ctx.raw)} (${(ctx.raw/casTotal*100).toFixed(1)}%)`},bodyColor:'#e8eef8',backgroundColor:'#161e2e',borderColor:'rgba(99,140,255,0.2)',borderWidth:1}}, scales:{x:{grid:{color:'rgba(99,140,255,0.06)'},ticks:{color:'#4a5a7a',font:{size:10},callback:v=>fmtShort(v)}},y:{grid:{display:false},ticks:{color:'#8a9bbf',font:{size:11}}}} }
+    });
+  }
+
+  // Category donut
+  const catMap = {};
+  MF_SCHEMES.forEach(s=>{ catMap[s.cat]=(catMap[s.cat]||0)+s.value; });
+  const cats = Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
+
+  const catCanvas = document.getElementById('mfCategoryChart');
+  if(catCanvas) {
+    const ex = Chart.getChart(catCanvas); if(ex) ex.destroy();
+    new Chart(catCanvas.getContext('2d'), {
+      type:'doughnut',
+      data:{ labels:cats.map(c=>c[0]), datasets:[{ data:cats.map(c=>c[1]), backgroundColor:cats.map(c=>MF_CAT_COLORS[c[0]]||'#8a9bbf'), borderWidth:2, borderColor:'#0f1520', hoverOffset:6 }] },
+      options:{ cutout:'62%', responsive:false, plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${fmt(ctx.raw)} (${(ctx.raw/casTotal*100).toFixed(1)}%)`},bodyColor:'#e8eef8',backgroundColor:'#161e2e',borderColor:'rgba(99,140,255,0.2)',borderWidth:1}} }
+    });
+  }
+
+  // Category alloc rows
+  const catEl = document.getElementById('mfCategoryRows');
+  if(catEl) catEl.innerHTML = cats.map(c=>`
+    <div class="alloc-row">
+      <div class="alloc-dot" style="background:${MF_CAT_COLORS[c[0]]||'#8a9bbf'}"></div>
+      <div class="alloc-name" style="min-width:100px;font-size:12px">${c[0]}</div>
+      <div class="alloc-bar-wrap"><div class="alloc-bar-fill" style="width:${(c[1]/casTotal*100).toFixed(1)}%;background:${MF_CAT_COLORS[c[0]]||'#8a9bbf'}"></div></div>
+      <div class="alloc-pct">${(c[1]/casTotal*100).toFixed(1)}%</div>
+      <div class="alloc-val">${fmtShort(c[1])}</div>
+    </div>`).join('');
+
+  mfRenderTable('All');
+}
+
+function mfRenderTable(filter) {
+  mfCurrentFilter = filter;
+  const casTotal = MF_SCHEMES.reduce((a,b)=>a+b.value,0);
+  const schemes  = filter==='All' ? MF_SCHEMES : MF_SCHEMES.filter(s=>s.house===filter);
+  const tb = document.getElementById('mfSchemeTbody');
+  if(!tb) return;
+
+  // Update filter button styles
+  ['All','ICICI','SBI','Nippon','Motilal'].forEach(f=>{
+    const btn = document.getElementById('mfBtn'+f);
+    if(!btn) return;
+    if(f===filter) {
+      btn.style.background='var(--gold)'; btn.style.color='#080c10'; btn.style.borderColor='var(--gold)';
+    } else {
+      btn.style.background='none'; btn.style.color='var(--text2)'; btn.style.borderColor='var(--border)';
+    }
+  });
+
+  tb.innerHTML = [...schemes].sort((a,b)=>b.value-a.value).map((s,i)=>{
+    const gain   = s.value - s.cost;
+    const gainPct= ((gain/s.cost)*100).toFixed(1);
+    const pctMF  = (s.value/casTotal*100).toFixed(1);
+    const color  = MF_HOUSE_COLORS[s.house]||'#8a9bbf';
+    const gainColor = gain>=0?'var(--green)':'var(--red)';
+    const catColor  = MF_CAT_COLORS[s.cat]||'#8a9bbf';
     return `<tr>
-      <td><span class="badge" style="background:rgba(79,127,255,0.15);color:var(--blue2);border-color:rgba(79,127,255,0.3)">${h.account}</span></td>
-      <td style="color:var(--text2);font-size:13px">${holder}</td>
-      <td class="num" style="text-align:right">${fmt(h.value)}</td>
-      <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold)">${pctMF}</td>
-      <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text3)">${pctPort}</td>
+      <td style="color:var(--text3);font-size:11px;font-family:'JetBrains Mono',monospace">${i+1}</td>
+      <td style="font-size:13px;max-width:240px">
+        <div style="font-weight:600;color:var(--text)">${s.scheme}</div>
+      </td>
+      <td><span class="badge" style="background:${color}22;color:${color};border-color:${color}44;font-size:11px">${s.house}</span></td>
+      <td><span class="badge" style="background:${catColor}18;color:${catColor};border-color:${catColor}33;font-size:11px">${s.cat}</span></td>
+      <td class="num" style="text-align:right;color:var(--text3)">${fmt(s.cost)}</td>
+      <td class="num" style="text-align:right;font-weight:600">${fmt(s.value)}</td>
+      <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px;color:${gainColor}">${gain>=0?'+':''}${fmt(Math.abs(gain))}<br><span style="font-size:10px">${gainPct>=0?'+':''}${gainPct}%</span></td>
+      <td style="text-align:right">
+        <div style="display:flex;align-items:center;gap:8px;justify-content:flex-end">
+          <div style="width:40px;height:4px;background:var(--surface3);border-radius:99px;overflow:hidden">
+            <div style="width:${Math.min(100,parseFloat(pctMF)*5)}%;height:100%;background:${color};border-radius:99px"></div>
+          </div>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--blue2)">${pctMF}%</span>
+        </div>
+      </td>
     </tr>`;
   }).join('');
-
-  // Alloc rows
-  const allocEl = document.getElementById('mfAllocRows');
-  if(allocEl) {
-    const rows = [
-      { label:'Mutual Funds', value:total, color:'var(--blue)' },
-      { label:'Rest of Portfolio', value:portfolio.total-total, color:'var(--surface3)' },
-    ];
-    allocEl.innerHTML = rows.map(r => `
-      <div class="alloc-row">
-        <div class="alloc-dot" style="background:${r.color}"></div>
-        <div class="alloc-name">${r.label}</div>
-        <div class="alloc-bar-wrap"><div class="alloc-bar-fill" style="width:${(r.value/portfolio.total*100).toFixed(1)}%;background:${r.color}"></div></div>
-        <div class="alloc-pct">${(r.value/portfolio.total*100).toFixed(1)}%</div>
-        <div class="alloc-val">${fmtShort(r.value)}</div>
-      </div>`).join('');
-  }
-
-  // Donut
-  const canvas = document.getElementById('mfDonut');
-  if(canvas) {
-    const existing = Chart.getChart(canvas);
-    if(existing) existing.destroy();
-    if(total > 0) {
-      new Chart(canvas.getContext('2d'), {
-        type:'doughnut',
-        data:{ labels:mfHoldings.map(h=>h.account+' – '+h.remarks), datasets:[{ data:mfHoldings.map(h=>h.value), backgroundColor:['#4f7fff','#9b6dff','#00c4b4','#ff8c42'], borderWidth:2, borderColor:'#0f1520', hoverOffset:6 }] },
-        options:{ cutout:'65%', responsive:false, plugins:{ legend:{display:true, position:'bottom', labels:{color:'#8a9bbf',font:{size:11},boxWidth:12}}, tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${fmt(ctx.raw)}`},bodyColor:'#e8eef8',backgroundColor:'#161e2e',borderColor:'rgba(99,140,255,0.2)',borderWidth:1} } }
-      });
-    }
-  }
 }
+
+function mfFilterAll() { mfRenderTable('All'); }
+function mfFilter(h)   { mfRenderTable(h); }
+
+
 
 function renderFD() {
   const fdHoldings = portfolio.holdings.filter(h => h.sub === 'Fixed Deposit' && h.value > 0);
