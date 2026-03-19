@@ -2390,29 +2390,30 @@ function applyRebalance() {
 //  AUTO-FETCH LIVE PRICES
 // ═══════════════════════════════════════════════════
 
-// MFAPI scheme codes — we try multiple and pick the one that gives a sensible price
-// Gold ETF candidates (1 unit = 1/100th gram → NAV × 100 = ₹/gram)
-// At current gold prices (₹15,000-16,000/gram), NAV should be ₹150-160
-const GOLD_ETF_CANDIDATES   = ['118278','145547','120716','149182'];
-// Silver ETF candidates (1 unit = 1 gram → NAV = ₹/gram directly)
-// At current silver prices (₹250-300/gram), NAV should be ₹250-300
-const SILVER_ETF_CANDIDATES = ['149868','149820','150326','150760'];
+// MFAPI scheme codes — tries multiple, picks one with a sensible NAV
+// Gold ETFs: 1 unit = 1/100g → NAV × 100 = ₹/gram
+// At ₹15,000-17,000/gram, NAV should be ₹150-170
+const GOLD_ETF_CANDIDATES = ['118278','145547','120716','149182','118989','145621'];
+
+// Silver ETFs: 1 unit = 1g → NAV = ₹/gram directly
+// At ₹250-350/gram, NAV should be ₹250-350
+const SILVER_ETF_CANDIDATES = ['149868','149820','150326','151748','151006','151150','150912'];
 
 async function fetchCommodityPrice(candidates, type) {
-  // Try each candidate code until we get a sensible NAV
   for(const code of candidates) {
     try {
       const nav = await fetchLatestNAV(code);
+      if(!nav || isNaN(nav) || nav <= 0) continue;
       if(type === 'gold') {
-        // Gold NAV should be ~₹150-165 per unit (1/100g at ₹15000-16500/gram)
-        // OR ~₹15000-16500 if 1 unit = 1g
-        if(nav >= 130 && nav <= 200)   return { price: Math.round(nav * 100), nav, code, multiplier: 100 };
-        if(nav >= 12000 && nav <= 20000) return { price: Math.round(nav),       nav, code, multiplier: 1 };
+        // 1/100g ETF: NAV ≈ 130–200 at gold ₹13k–20k/gram
+        if(nav >= 100 && nav <= 250) return { price: Math.round(nav * 100), nav, code, multiplier: 100 };
+        // 1g ETF: NAV ≈ 13000–20000
+        if(nav >= 10000 && nav <= 25000) return { price: Math.round(nav), nav, code, multiplier: 1 };
       } else {
-        // Silver NAV should be ~₹250-300 per unit (1g at ₹250-300/gram)
-        // OR ~₹2.5-3 if 1 unit = 1/100g
-        if(nav >= 200 && nav <= 400)   return { price: Math.round(nav),         nav, code, multiplier: 1 };
-        if(nav >= 2 && nav <= 5)       return { price: Math.round(nav * 100),   nav, code, multiplier: 100 };
+        // 1g silver ETF: NAV ≈ 80–400 at silver ₹80–400/gram
+        if(nav >= 50 && nav <= 500) return { price: Math.round(nav), nav, code, multiplier: 1 };
+        // 1/100g silver ETF: NAV ≈ 0.8–4
+        if(nav >= 0.5 && nav <= 5) return { price: Math.round(nav * 100), nav, code, multiplier: 100 };
       }
     } catch(e) { /* try next */ }
   }
@@ -2492,10 +2493,13 @@ async function autoFetchPrices() {
     ]);
 
     if(!goldResult)   throw new Error('Could not fetch gold price — all ETF codes failed');
-    if(!silverResult) throw new Error('Could not fetch silver price — all ETF codes failed');
 
     const goldPerGram   = goldResult.price;
-    const silverPerGram = silverResult.price;
+    const silverPerGram = silverResult ? silverResult.price : null;
+
+    if(!silverResult) {
+      setFetchStatus(`⚠ Silver fetch failed — Gold ₹${goldPerGram.toLocaleString('en-IN')}/g · SGB updating…`, 'var(--gold)');
+    }
 
     portfolio.holdings.forEach((h, i) => {
       const upc = getUnitPriceConfig(h);
@@ -2507,7 +2511,7 @@ async function autoFetchPrices() {
 
       let price = null;
       if(h.account === 'Au')                            price = goldPerGram;
-      else if(h.account === 'Ag')                       price = silverPerGram;
+      else if(h.account === 'Ag' && silverPerGram)      price = silverPerGram;
       else if((h.sub||'').toLowerCase() === 'sgb')      price = goldPerGram;
 
       if(price !== null) {
@@ -2599,8 +2603,9 @@ async function autoFetchPrices() {
     });
 
     const fetchedMF = Object.keys(navMap).length;
+    const silverStr = silverPerGram ? ` · Silver ₹${silverPerGram.toLocaleString('en-IN')}/g` : ' · Silver: retry later';
     setFetchStatus(
-      `✓ Gold ₹${goldPerGram.toLocaleString('en-IN')}/g · Silver ₹${silverPerGram.toLocaleString('en-IN')}/g · MF total ₹${(mfTotal/10000000).toFixed(2)}Cr (${fetchedMF}/${totalCodes} NAVs) · ${filled} rows filled`,
+      `✓ Gold ₹${goldPerGram.toLocaleString('en-IN')}/g${silverStr} · MF total ₹${(mfTotal/10000000).toFixed(2)}Cr (${fetchedMF}/${totalCodes} NAVs) · ${filled} rows filled`,
       'var(--green)'
     );
 
