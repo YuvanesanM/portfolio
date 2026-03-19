@@ -7,7 +7,10 @@
       "sub": "Fixed Deposit",
       "value": 2519467,
       "units": "",
-      "remarks": "Yuvan"
+      "remarks": "Yuvan",
+      "owner": "Yuvan",
+      "purchaseDate": "2023-01-01",
+      "purchasePrice": 2519467
     },
     {
       "account": "ICICI",
@@ -15,7 +18,10 @@
       "sub": "Fixed Deposit",
       "value": 0,
       "units": "",
-      "remarks": "Ramyaa"
+      "remarks": "Ramyaa",
+      "owner": "Ramyaa",
+      "purchaseDate": "2023-01-01",
+      "purchasePrice": 0
     },
     {
       "account": "HDFC",
@@ -23,7 +29,10 @@
       "sub": "Fixed Deposit",
       "value": 500000,
       "units": "",
-      "remarks": "Ramyaa"
+      "remarks": "Ramyaa",
+      "owner": "Ramyaa",
+      "purchaseDate": "2023-06-01",
+      "purchasePrice": 500000
     },
     {
       "account": "SBI",
@@ -31,7 +40,10 @@
       "sub": "Fixed Deposit",
       "value": 340026,
       "units": "",
-      "remarks": "Yuvan"
+      "remarks": "Yuvan",
+      "owner": "Yuvan",
+      "purchaseDate": "2023-03-01",
+      "purchasePrice": 340026
     },
     {
       "account": "HDFC",
@@ -39,7 +51,10 @@
       "sub": "Fixed Deposit",
       "value": 3500000,
       "units": "",
-      "remarks": "Yuvan"
+      "remarks": "Yuvan",
+      "owner": "Yuvan",
+      "purchaseDate": "2024-01-01",
+      "purchasePrice": 3500000
     },
     {
       "account": "SSY",
@@ -47,7 +62,10 @@
       "sub": "SSY Account",
       "value": 873501,
       "units": "",
-      "remarks": "ICICI - Sana"
+      "remarks": "ICICI - Sana",
+      "owner": "Sana",
+      "purchaseDate": "2017-04-17",
+      "purchasePrice": 873501
     },
     {
       "account": "SSY",
@@ -55,7 +73,10 @@
       "sub": "SSY Account",
       "value": 873501,
       "units": "",
-      "remarks": "ICICI - Tara"
+      "remarks": "ICICI - Tara",
+      "owner": "Tara",
+      "purchaseDate": "2020-01-11",
+      "purchasePrice": 873501
     },
     {
       "account": "SBI",
@@ -63,7 +84,10 @@
       "sub": "Insurance",
       "value": 344340,
       "units": "",
-      "remarks": "1K365542004"
+      "remarks": "1K365542004",
+      "owner": "Yuvan",
+      "purchaseDate": "2018-01-01",
+      "purchasePrice": 200000
     },
     {
       "account": "ICICI",
@@ -71,7 +95,10 @@
       "sub": "Insurance",
       "value": 918076,
       "units": "",
-      "remarks": "Tara - A3067570"
+      "remarks": "Tara - A3067570",
+      "owner": "Tara",
+      "purchaseDate": "2021-01-11",
+      "purchasePrice": 500000
     },
     {
       "account": "ICICI",
@@ -79,7 +106,10 @@
       "sub": "PMS",
       "value": 5800849,
       "units": "",
-      "remarks": ""
+      "remarks": "",
+      "owner": "Yuvan",
+      "purchaseDate": "2022-04-01",
+      "purchasePrice": 5000000
     },
     {
       "account": "ICICI",
@@ -87,63 +117,87 @@
       "sub": "NPS",
       "value": 268923,
       "units": "",
-      "remarks": ""
+      "remarks": "",
+      "owner": "Yuvan",
+      "purchaseDate": "2018-01-01",
+      "purchasePrice": 200000
     },
     {
       "account": "ICICI",
       "type": "SGB",
       "sub": "SGB",
-      "value": 1078000,
+      "value": 1163750,
       "units": "70g",
-      "remarks": "Matures 14-Aug-2027"
+      "remarks": "Matures 14-Aug-2027",
+      "owner": "Yuvan",
+      "purchaseDate": "2019-08-14",
+      "purchasePrice": 244930
     },
     {
       "account": "ICICI",
       "type": "SGB",
       "sub": "SGB",
-      "value": 770000,
+      "value": 831250,
       "units": "50g",
-      "remarks": "Matures 10-Dec-2027"
+      "remarks": "Matures 10-Dec-2027",
+      "owner": "Yuvan",
+      "purchaseDate": "2019-12-10",
+      "purchasePrice": 189750
     },
     {
       "account": "ICICI",
       "type": "SGB",
       "sub": "SGB",
-      "value": 1540000,
+      "value": 1662500,
       "units": "100g",
-      "remarks": "Matures 08-Sep-2028"
+      "remarks": "Matures 08-Sep-2028",
+      "owner": "Yuvan",
+      "purchaseDate": "2020-09-08",
+      "purchasePrice": 511700
     },
     {
       "account": "ICICI",
       "type": "SGB",
       "sub": "SGB",
-      "value": 462000,
+      "value": 498750,
       "units": "30g",
-      "remarks": "Matures 05-Jan-2029"
+      "remarks": "Matures 05-Jan-2029",
+      "owner": "Yuvan",
+      "purchaseDate": "2021-01-05",
+      "purchasePrice": 150000
     },
     {
       "account": "ICICI",
       "type": "SGB",
       "sub": "SGB",
-      "value": 770000,
+      "value": 831250,
       "units": "50g",
-      "remarks": "Matures 19-Jan-2029"
+      "remarks": "Matures 19-Jan-2029",
+      "owner": "Yuvan",
+      "purchaseDate": "2021-01-19",
+      "purchasePrice": 252700
     },
     {
       "account": "ICICI",
       "type": "SGB",
       "sub": "SGB",
-      "value": 1540000,
+      "value": 1662500,
       "units": "100g",
-      "remarks": "Matures 09-Mar-2029"
+      "remarks": "Matures 09-Mar-2029",
+      "owner": "Yuvan",
+      "purchaseDate": "2021-03-09",
+      "purchasePrice": 461200
     },
     {
       "account": "ICICI",
       "type": "SGB",
       "sub": "SGB",
-      "value": 1540000,
+      "value": 1662500,
       "units": "100g",
-      "remarks": "Matures 25-May-2029"
+      "remarks": "Matures 25-May-2029",
+      "owner": "Yuvan",
+      "purchaseDate": "2021-05-25",
+      "purchasePrice": 472700
     },
     {
       "account": "ICICI",
@@ -151,7 +205,10 @@
       "sub": "Mutual Fund",
       "value": 25986323,
       "units": "",
-      "remarks": "ICICI - Total"
+      "remarks": "ICICI - Total",
+      "owner": "Yuvan",
+      "purchaseDate": "2019-01-01",
+      "purchasePrice": 23875753
     },
     {
       "account": "HDFC",
@@ -159,7 +216,10 @@
       "sub": "Mutual Fund",
       "value": 413000,
       "units": "",
-      "remarks": "Ramyaa"
+      "remarks": "Ramyaa",
+      "owner": "Ramyaa",
+      "purchaseDate": "2021-01-01",
+      "purchasePrice": 325000
     },
     {
       "account": "ICICI",
@@ -167,7 +227,10 @@
       "sub": "ETF & Stocks",
       "value": 2892904,
       "units": "",
-      "remarks": "Demat"
+      "remarks": "Demat",
+      "owner": "Yuvan",
+      "purchaseDate": "2020-01-01",
+      "purchasePrice": 2000000
     },
     {
       "account": "Kite",
@@ -175,7 +238,10 @@
       "sub": "Mixed Shares",
       "value": 349265,
       "units": "",
-      "remarks": "Zerodha"
+      "remarks": "Zerodha",
+      "owner": "Yuvan",
+      "purchaseDate": "2021-01-01",
+      "purchasePrice": 300000
     },
     {
       "account": "360ONE",
@@ -183,7 +249,10 @@
       "sub": "AIF",
       "value": 5000000,
       "units": "",
-      "remarks": "Alternative"
+      "remarks": "Alternative",
+      "owner": "Yuvan",
+      "purchaseDate": "2022-01-01",
+      "purchasePrice": 5000000
     },
     {
       "account": "ICICI",
@@ -191,7 +260,10 @@
       "sub": "Unlisted",
       "value": 975000,
       "units": "500",
-      "remarks": "NSE @ 1950"
+      "remarks": "NSE @ 1950",
+      "owner": "Yuvan",
+      "purchaseDate": "2022-01-01",
+      "purchasePrice": 975000
     },
     {
       "account": "ICICI",
@@ -199,7 +271,10 @@
       "sub": "Unlisted",
       "value": 525000,
       "units": "25000",
-      "remarks": "Sunday Protech @ 20.75"
+      "remarks": "Sunday Protech @ 20.75",
+      "owner": "Yuvan",
+      "purchaseDate": "2022-01-01",
+      "purchasePrice": 518750
     },
     {
       "account": "ICICI",
@@ -207,7 +282,10 @@
       "sub": "Unlisted",
       "value": 700000,
       "units": "25000",
-      "remarks": "OYO @ 28"
+      "remarks": "OYO @ 28",
+      "owner": "Yuvan",
+      "purchaseDate": "2022-01-01",
+      "purchasePrice": 700000
     },
     {
       "account": "ICICI",
@@ -215,7 +293,10 @@
       "sub": "Unlisted",
       "value": 555000,
       "units": "15000",
-      "remarks": "Ecosure @ 37"
+      "remarks": "Ecosure @ 37",
+      "owner": "Yuvan",
+      "purchaseDate": "2023-01-01",
+      "purchasePrice": 555000
     },
     {
       "account": "ICICI",
@@ -223,7 +304,10 @@
       "sub": "REIT",
       "value": 3087645,
       "units": "",
-      "remarks": "Embassy / Nexus"
+      "remarks": "Embassy / Nexus",
+      "owner": "Yuvan",
+      "purchaseDate": "2024-01-01",
+      "purchasePrice": 240000
     },
     {
       "account": "Bitcoin",
@@ -231,15 +315,21 @@
       "sub": "Crypto",
       "value": 179490,
       "units": "",
-      "remarks": "BTC"
+      "remarks": "BTC",
+      "owner": "Yuvan",
+      "purchaseDate": "2021-01-01",
+      "purchasePrice": 2500000
     },
     {
       "account": "Au",
       "type": "Coin",
       "sub": "Coin",
-      "value": 1856156,
+      "value": 2061500,
       "units": "124g",
-      "remarks": "Gold coins"
+      "remarks": "Gold coins",
+      "owner": "Yuvan",
+      "purchaseDate": "2021-01-01",
+      "purchasePrice": 100000
     },
     {
       "account": "Ag",
@@ -247,7 +337,10 @@
       "sub": "Coin",
       "value": 412500,
       "units": "1500g",
-      "remarks": "Silver coins"
+      "remarks": "Silver coins",
+      "owner": "Yuvan",
+      "purchaseDate": "2020-01-01",
+      "purchasePrice": 620000
     },
     {
       "account": "Lq",
@@ -255,7 +348,10 @@
       "sub": "Savings",
       "value": 1000000,
       "units": "",
-      "remarks": "Liquid"
+      "remarks": "Liquid",
+      "owner": "Yuvan",
+      "purchaseDate": "2021-01-01",
+      "purchasePrice": 225000
     }
   ],
   "snapshots": [
@@ -306,6 +402,10 @@
     {
       "date": "2026-03-19",
       "value": 67570966
+    },
+    {
+      "date": "2026-03-19",
+      "value": 68388810
     }
   ],
   "sgbTranches": [
@@ -313,43 +413,43 @@
       "units": 70,
       "maturity": "14 Aug 2027",
       "cost": 244930,
-      "value": 1078000
+      "value": 1163750
     },
     {
       "units": 50,
       "maturity": "10 Dec 2027",
       "cost": 189750,
-      "value": 770000
+      "value": 831250
     },
     {
       "units": 100,
       "maturity": "08 Sep 2028",
       "cost": 511700,
-      "value": 1540000
+      "value": 1662500
     },
     {
       "units": 30,
       "maturity": "05 Jan 2029",
       "cost": 150000,
-      "value": 462000
+      "value": 498750
     },
     {
       "units": 50,
       "maturity": "19 Jan 2029",
       "cost": 252700,
-      "value": 806600
+      "value": 831250
     },
     {
       "units": 100,
       "maturity": "09 Mar 2029",
       "cost": 461200,
-      "value": 1613200
+      "value": 1662500
     },
     {
       "units": 100,
       "maturity": "25 May 2029",
       "cost": 472700,
-      "value": 1613200
+      "value": 1662500
     }
   ]
 }
