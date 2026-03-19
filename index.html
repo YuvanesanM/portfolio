@@ -1218,7 +1218,12 @@
 const PROXY_URL = 'https://portfolio-proxy-6ezf.onrender.com';
 const GH_FILE   = 'holdings.json';
 
-const PASSWORD  = 'yuvan2025';
+// PASSWORD should be defined in config.js (git-ignored)
+// Fallback in case config.js is missing (e.g. GitHub Pages)
+if(typeof PASSWORD === 'undefined') {
+  console.warn('config.js not loaded — using fallback password');
+  window.PASSWORD = 'yuvan2025';
+}
 
 // ═══════════════════════════════════════════════════
 //  DEFAULT DATA (fallback if no GitHub file yet)
@@ -1584,13 +1589,36 @@ async function loadAndInit() {
     // Merge new fields (owner, purchaseDate, purchasePrice) from DEFAULT_HOLDINGS
     // into any GitHub-loaded holdings that are missing them (backwards compatibility)
     const loaded = ghData.holdings || DEFAULT_HOLDINGS;
-    portfolio.holdings = loaded.map((h, i) => {
+
+    // Detect old structure: had 2 separate MF rows (ICICI + HDFC)
+    // New structure: 1 _mfComputed row. Migrate on load.
+    const mfRows = loaded.filter(h => h.sub === 'Mutual Fund');
+    const hasTwoMFRows = mfRows.length >= 2 && !loaded.some(h => h._mfComputed);
+
+    let normalized = loaded;
+    if(hasTwoMFRows) {
+      // Remove old separate MF rows, insert single _mfComputed row at same position
+      const firstMFIdx = loaded.findIndex(h => h.sub === 'Mutual Fund');
+      const combinedCost = mfRows.reduce((a,h) => a+(h.purchasePrice||h.value||0), 0);
+      normalized = loaded.filter(h => h.sub !== 'Mutual Fund');
+      const newMFRow = {
+        account:'CAMS+KFin', type:'Mutual Fund', sub:'Mutual Fund',
+        value:0, units:'', remarks:'Auto-computed from CAS',
+        owner:'Yuvan', purchaseDate:'2019-01-01',
+        purchasePrice: combinedCost, _mfComputed:true
+      };
+      normalized.splice(firstMFIdx, 0, newMFRow);
+    }
+
+    portfolio.holdings = normalized.map((h, i) => {
       const def = DEFAULT_HOLDINGS[i] || {};
       return {
         ...h,
         owner:         h.owner         || def.owner         || 'Yuvan',
         purchaseDate:  h.purchaseDate  || def.purchaseDate  || '2020-01-01',
         purchasePrice: h.purchasePrice || def.purchasePrice || h.value,
+        // _mfComputed only comes from the data itself, never from index-based def
+        _mfComputed:   h._mfComputed   || false,
       };
     });
     portfolio.asOf      = ghData.asOf        || '16 Sep 2025';
@@ -3020,6 +3048,7 @@ async function autoFetchPrices() {
 //  UPDATE MODAL — table-based
 // ═══════════════════════════════════════════════════
 function openModal() {
+  syncMFTotal(); // ensure MF value is current before rendering table
   document.getElementById('modalOverlay').classList.add('open');
   document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
   document.getElementById('modalCurrentTotal').textContent = fmt(portfolio.total);
@@ -3108,32 +3137,33 @@ function renderUpdateTable() {
       </tr>`;
     } else {
       // ── Normal direct-value row ──
-      // For MF rows, show a special auto-fetch indicator
-      const isMF = h.sub === 'Mutual Fund' || h._mfComputed;
+      // Only the _mfComputed row is readonly (auto-computed from CAS)
+      const isMF = !!h._mfComputed;
       const mfSchemeCount = MF_SCHEMES.length;
+      const accountLabel = isMF ? 'CAMS+KFin' : h.account;
       const autoFetchTag = isMF
-        ? `<span style="font-size:10px;background:rgba(79,127,255,0.15);color:var(--blue2);border:1px solid rgba(79,127,255,0.3);border-radius:6px;padding:2px 7px;margin-left:6px;">✨ auto-fetch · ${mfSchemeCount} schemes (Yuvan + Ramyaa)</span>`
+        ? `<span style="font-size:10px;background:rgba(79,127,255,0.15);color:var(--blue2);border:1px solid rgba(79,127,255,0.3);border-radius:6px;padding:2px 7px;margin-left:6px;">✨ auto-fetch · ${mfSchemeCount} schemes</span>`
         : '';
 
       return `<tr id="row_${i}" style="${isMF?'background:rgba(79,127,255,0.03);':''}">
         <td style="color:var(--text3);font-size:11px;font-family:'JetBrains Mono',monospace">${i+1}</td>
-        <td style="font-weight:600">${h.account}${autoFetchTag}</td>
+        <td style="font-weight:600">${accountLabel}${autoFetchTag}</td>
         <td><span class="badge" style="background:${c}22;color:${c};border-color:${c}44;font-size:11px">${h.sub}</span></td>
         <td style="color:var(--text3);font-size:12px">${h.remarks||'—'}</td>
         <td style="text-align:right;font-family:'JetBrains Mono',monospace;color:var(--text2)">${h.value>0?fmt(h.value):'—'}</td>
         <td style="text-align:right;padding:6px 8px;">
           <input type="number"
             id="nv_${i}"
-            placeholder="${h.value||''}"
+            placeholder="${isMF ? 'auto-fetched' : (h.value||'')}"
             oninput="recalcNewTotal()"
-            style="width:130px;background:var(--surface3);border:1px solid ${isMF?'rgba(79,127,255,0.4)':' var(--border)'};border-radius:8px;padding:7px 10px;color:${isMF?'var(--blue2)':'var(--gold)'};font-family:'JetBrains Mono',monospace;font-size:13px;text-align:right;outline:none;"
+            style="width:130px;background:var(--surface3);border:1px solid ${isMF?'rgba(79,127,255,0.4)':'var(--border)'};border-radius:8px;padding:7px 10px;color:${isMF?'var(--blue2)':'var(--gold)'};font-family:'JetBrains Mono',monospace;font-size:13px;text-align:right;outline:none;"
             onfocus="this.style.borderColor='${isMF?'var(--blue)':'var(--gold)'}'"
             onblur="this.style.borderColor='${isMF?'rgba(79,127,255,0.4)':'var(--border)'}'"
-            ${isMF?'readonly title="Auto-fetched via Fetch Prices button"':''}>
+            ${isMF?'readonly title="Auto-computed from CAS — use Fetch Prices to update"':''}>
         </td>
         <td style="text-align:right;">
           ${isMF
-            ? `<div style="font-size:11px;color:var(--text3);text-align:right;line-height:1.6">Consolidated<br>from ${mfSchemeCount} schemes</div>`
+            ? `<div style="font-size:11px;color:var(--text3);text-align:right;line-height:1.6">Yuvan + Ramyaa<br>${mfSchemeCount} schemes</div>`
             : `<input type="text" id="nu_${i}" value="${h.units||''}" placeholder="${h.units||''}"
                 style="width:80px;background:var(--surface3);border:1px solid var(--border);border-radius:8px;padding:7px 8px;color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;text-align:right;outline:none;"
                 onfocus="this.style.borderColor='var(--blue2)'"
@@ -3168,17 +3198,30 @@ function onUnitPriceInput(i) {
 }
 
 function recalcNewTotal() {
-  let newTotal = 0;
-  portfolio.holdings.forEach((h,i)=>{
-    const inp = document.getElementById(`nv_${i}`);
-    const v = inp && inp.value !== '' ? parseFloat(inp.value) : (h.value||0);
-    newTotal += isNaN(v) ? (h.value||0) : v;
-  });
-  const delta = newTotal - portfolio.total;
-  document.getElementById('modalNewTotal').textContent = fmt(newTotal);
-  const deltaEl = document.getElementById('modalDelta');
-  deltaEl.textContent = (delta>=0?'+':'')+fmt(Math.abs(delta));
-  deltaEl.style.color = delta>=0 ? 'var(--green)' : 'var(--red)';
+  try {
+    let newTotal = 0;
+    portfolio.holdings.forEach((h,i) => {
+      const inp = document.getElementById(`nv_${i}`);
+      let v;
+      if(inp && inp.value !== '') {
+        v = parseFloat(inp.value);
+      } else if(h._mfComputed) {
+        // Always use live MF total for computed row
+        v = MF_SCHEMES.reduce((a,s) => a+(s.value||0), 0);
+      } else {
+        v = h.value || 0;
+      }
+      newTotal += isNaN(v) ? (h.value||0) : v;
+    });
+    const delta = newTotal - portfolio.total;
+    const ntEl = document.getElementById('modalNewTotal');
+    const dtEl = document.getElementById('modalDelta');
+    if(ntEl) ntEl.textContent = fmt(newTotal);
+    if(dtEl) {
+      dtEl.textContent = (delta>=0?'+':'')+fmt(Math.abs(delta));
+      dtEl.style.color = delta>=0 ? 'var(--green)' : 'var(--red)';
+    }
+  } catch(e) { /* never block input */ }
 }
 
 async function applyUpdate() {
