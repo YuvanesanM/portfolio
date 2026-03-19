@@ -447,7 +447,8 @@
 <div id="loadingOverlay" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
   <div style="width:48px;height:48px;border:3px solid rgba(212,168,67,0.2);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;"></div>
   <div style="color:var(--text2);font-size:14px;font-family:'Plus Jakarta Sans',sans-serif;">Loading portfolio…</div>
-  <div style="color:var(--text3);font-size:11px;font-family:'JetBrains Mono',monospace;" id="loadingStatus">Connecting to data source</div>
+  <div style="color:var(--text3);font-size:11px;font-family:'JetBrains Mono',monospace;max-width:280px;text-align:center;line-height:1.6;" id="loadingStatus">Connecting to data server…</div>
+  <div style="font-size:11px;color:var(--text3);margin-top:4px;">First load may take ~30s to wake the server</div>
 </div>
 
 <!-- ╔══════════════ DASHBOARD ══════════════╗ -->
@@ -851,7 +852,7 @@ function buildSummary(holdings) {
 // ═══════════════════════════════════════════════════
 
 // Fetch with a hard timeout so we never hang forever
-async function fetchWithTimeout(url, options = {}, ms = 6000) {
+async function fetchWithTimeout(url, options = {}, ms = 45000) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), ms);
   try {
@@ -901,7 +902,7 @@ async function saveToGitHub(payload) {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
-  }, 10000);
+  }, 45000);
 
   if(!res.ok) {
     const err = await res.json().catch(() => ({}));
@@ -1024,28 +1025,39 @@ async function loadAndInit() {
     const el = document.getElementById('loadingStatus');
     if(el) el.textContent = msg;
   };
-  setStatus('Fetching latest data…');
+
+  // Warm up the Render server in background while showing status
+  setStatus('Connecting to data server…');
+
+  // Show escalating messages so user knows to wait
+  const msgTimer1 = setTimeout(() => setStatus('Waking up server (free tier, ~30s)…'), 4000);
+  const msgTimer2 = setTimeout(() => setStatus('Almost there, server is starting up…'), 15000);
+  const msgTimer3 = setTimeout(() => setStatus('Taking longer than usual, please wait…'), 28000);
+
   const ghData = await fetchFromGitHub();
+
+  clearTimeout(msgTimer1);
+  clearTimeout(msgTimer2);
+  clearTimeout(msgTimer3);
+
   if(ghData) {
     setStatus('Data loaded ✓');
-    portfolio.holdings = ghData.holdings  || DEFAULT_HOLDINGS;
-    portfolio.asOf     = ghData.asOf      || '16 Sep 2025';
-    snapshots          = ghData.snapshots  || DEFAULT_SNAPSHOTS;
-    sgbTranches        = ghData.sgbTranches || DEFAULT_SGB;
+    portfolio.holdings  = ghData.holdings    || DEFAULT_HOLDINGS;
+    portfolio.asOf      = ghData.asOf        || '16 Sep 2025';
+    snapshots           = ghData.snapshots   || DEFAULT_SNAPSHOTS;
+    sgbTranches         = ghData.sgbTranches || DEFAULT_SGB;
   } else {
-    setStatus('Using local data (proxy offline)');
-    portfolio.holdings = DEFAULT_HOLDINGS;
-    portfolio.asOf     = '16 Sep 2025';
-    snapshots          = DEFAULT_SNAPSHOTS;
-    sgbTranches        = DEFAULT_SGB;
+    setStatus('Server offline — using local data');
+    portfolio.holdings  = DEFAULT_HOLDINGS;
+    portfolio.asOf      = '16 Sep 2025';
+    snapshots           = DEFAULT_SNAPSHOTS;
+    sgbTranches         = DEFAULT_SGB;
   }
   portfolio.total = portfolio.holdings.reduce((a,b)=>a+(b.value||0),0);
   summary         = buildSummary(portfolio.holdings);
 
-  // Small delay so status message is visible
   await new Promise(r => setTimeout(r, 400));
 
-  // Hide overlay, show dashboard
   document.getElementById('loadingOverlay').style.display = 'none';
   const db = document.getElementById('dashboard');
   db.style.display = 'block';
