@@ -1105,32 +1105,82 @@
 
   <!-- ═══════════ PAGE: REBALANCE ═══════════ -->
   <div class="page" id="page-rebalance">
+    <!-- Hero -->
     <div class="hero" style="margin-bottom:24px">
       <div class="hero-left">
         <div class="hero-label">Portfolio Rebalancer</div>
         <div class="hero-value" id="rebTotal">—</div>
-        <div class="hero-sub">Set your target allocation below · see what to buy / sell</div>
+        <div class="hero-sub">Drag sliders to set targets · current allocation shown in blue · target in gold</div>
       </div>
       <div class="hero-right">
         <div class="hero-stat"><div class="hero-stat-label">Overweight</div><div class="hero-stat-value red" id="rebOverCount">—</div></div>
         <div class="hero-stat"><div class="hero-stat-label">Underweight</div><div class="hero-stat-value blue" id="rebUnderCount">—</div></div>
         <div class="hero-stat"><div class="hero-stat-label">On Target</div><div class="hero-stat-value green" id="rebOnCount">—</div></div>
+        <div class="hero-stat"><div class="hero-stat-label">To Rebalance</div><div class="hero-stat-value gold" id="rebToMove">—</div></div>
       </div>
     </div>
-    <div class="card" style="margin-bottom:24px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-        <h3 style="margin-bottom:0">Target Allocation</h3>
-        <div style="display:flex;gap:10px;align-items:center">
-          <span id="rebTotalPct" style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text3)">Total: 0%</span>
-          <button onclick="resetTargets()" style="padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer">Reset</button>
-          <button onclick="applyRebalance()" style="padding:7px 16px;border-radius:8px;background:var(--blue);color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer">Calculate</button>
+
+    <div class="grid-2" style="margin-bottom:24px">
+      <!-- Target allocation sliders -->
+      <div class="card" style="grid-column:1/3">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+          <div>
+            <h3 style="margin-bottom:4px">Target Allocation</h3>
+            <div style="font-size:12px;color:var(--text3)">
+              <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--blue2);margin-right:4px"></span>Current &nbsp;
+              <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--gold);margin-right:4px"></span>Target
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <span id="rebTotalPct" style="font-family:'JetBrains Mono',monospace;font-size:13px;padding:6px 12px;border-radius:8px;background:var(--surface2);border:1px solid var(--border)">Total: 0%</span>
+            <button onclick="setTargetsFromCurrent()" style="padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer">Match Current</button>
+            <button onclick="resetTargets()" style="padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer">Reset Defaults</button>
+            <button onclick="applyRebalance()" style="padding:8px 20px;border-radius:8px;background:var(--blue);color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">⚖ Calculate</button>
+          </div>
         </div>
+        <div id="rebSliders"></div>
       </div>
-      <div id="rebSliders"></div>
     </div>
+
+    <!-- Actions + SIP calculator -->
+    <div class="grid-2" style="margin-bottom:24px">
+      <div class="card">
+        <h3>Rebalancing Actions</h3>
+        <div id="rebActions"><div style="text-align:center;padding:32px;color:var(--text3);font-size:13px">Click ⚖ Calculate to see actions</div></div>
+      </div>
+      <div class="card">
+        <h3>SIP Allocation Calculator</h3>
+        <div style="margin-bottom:16px;padding:14px 16px;background:var(--surface2);border-radius:10px;border:1px solid var(--border)">
+          <div style="font-size:12px;color:var(--text3);margin-bottom:8px">Monthly SIP amount</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span style="color:var(--text2);font-size:16px;font-weight:600">₹</span>
+            <input type="number" id="sipAmount" value="50000" min="1000" step="1000"
+              oninput="renderSIPAlloc()"
+              style="flex:1;background:var(--surface3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--gold);font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;outline:none;">
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:10px">Split based on target allocation (BUY-only assets):</div>
+        <div id="sipAllocRows"></div>
+      </div>
+    </div>
+
+    <!-- Rebalance summary table -->
     <div class="card">
-      <h3>Rebalancing Actions</h3>
-      <div id="rebActions"></div>
+      <h3>Full Allocation Comparison</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Asset Class</th>
+            <th style="text-align:right">Current (₹)</th>
+            <th style="text-align:right">Current %</th>
+            <th style="text-align:right">Target %</th>
+            <th style="text-align:right">Target (₹)</th>
+            <th style="text-align:right">Difference</th>
+            <th style="text-align:center">Status</th>
+          </tr></thead>
+          <tbody id="rebTableBody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -2795,11 +2845,13 @@ function renderTax() {
 //  REBALANCE PAGE
 // ═══════════════════════════════════════════════════
 const DEFAULT_TARGETS = {
-  'Mutual Fund':50, 'Fixed Deposit':8, 'SGB':10, 'PMS':7, 'AIF':6,
-  'Shares':8, 'Coin':3, 'SSY Account':2, 'Insurance':2,
-  'Savings':1, 'NPS':0, 'Crypto':0, 'REIT':3
+  'Mutual Fund':38, 'Fixed Deposit':10, 'SGB':12, 'PMS':8, 'AIF':7,
+  'Shares':5, 'Unlisted':4, 'REIT':5, 'Coin':3, 'SSY Account':3,
+  'Insurance':2, 'Savings':1, 'NPS':1, 'Crypto':1
 };
 let userTargets = { ...DEFAULT_TARGETS };
+
+function set_(id,v) { const e=document.getElementById(id); if(e) e.textContent=v; }
 
 function renderRebalance() {
   const total = portfolio.total;
@@ -2808,66 +2860,180 @@ function renderRebalance() {
   const currentMap = {};
   summary.forEach(s => { currentMap[s.name] = s.value; });
 
-  // Sliders
   const sl = document.getElementById('rebSliders');
-  if(sl) {
-    sl.innerHTML = Object.entries(DEFAULT_TARGETS).map(([name, defPct]) => {
-      const current = currentMap[name]||0;
-      const currentPct = (current/total*100).toFixed(1);
-      const target = userTargets[name]||0;
-      const diff   = current - (target/100*total);
-      const diffLabel = diff === 0 ? 'on target' : diff > 0 ? `Sell ${fmtShort(Math.abs(diff))}` : `Buy ${fmtShort(Math.abs(diff))}`;
-      const diffColor = diff === 0 ? 'var(--green)' : diff > 0 ? 'var(--gold)' : 'var(--blue2)';
-      return `<div style="display:grid;grid-template-columns:130px 1fr 60px 60px 120px;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
-        <div style="font-size:13px;font-weight:600">${name}</div>
-        <div style="display:flex;flex-direction:column;gap:4px">
-          <div style="display:flex;gap:0;height:6px;border-radius:99px;overflow:hidden;background:var(--surface3)">
-            <div style="width:${currentPct}%;background:var(--blue2);border-radius:99px"></div>
-          </div>
-          <input type="range" min="0" max="60" value="${target}" step="1"
-            oninput="updateTarget('${name}',+this.value)"
-            style="width:100%;accent-color:var(--gold);height:4px;cursor:pointer">
-        </div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);text-align:right">${currentPct}%<br><span style="color:var(--text3)">now</span></div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);text-align:right" id="reb_${name.replace(/\s/g,'_')}_tgt">${target}%<br><span style="color:var(--text3)">target</span></div>
-        <div style="font-size:11px;color:${diffColor};text-align:right" id="reb_${name.replace(/\s/g,'_')}_act">${diffLabel}</div>
-      </div>`;
-    }).join('');
-    updateRebalanceTotals();
-  }
-}
+  if(!sl) return;
 
-function set_(id,v) { const e=document.getElementById(id); if(e) e.textContent=v; }
+  const assetColors = {
+    'Mutual Fund':'#4f7fff','Fixed Deposit':'#2ecc8f','SGB':'#d4a843',
+    'PMS':'#9b6dff','AIF':'#ff8c42','Shares':'#00c4b4','Unlisted':'#9b59b6',
+    'REIT':'#5debd7','Coin':'#f0c96b','SSY Account':'#ff5e6a',
+    'Insurance':'#7aa3ff','Savings':'#a8edbd','NPS':'#e0a0ff','Crypto':'#f39c12'
+  };
+
+  sl.innerHTML = Object.entries(DEFAULT_TARGETS).map(([name]) => {
+    const current    = currentMap[name] || 0;
+    const currentPct = (current / total * 100);
+    const target     = userTargets[name] || 0;
+    const diff       = current - (target / 100 * total);
+    const color      = assetColors[name] || '#8a9bbf';
+    const diffLabel  = Math.abs(diff) < 5000 ? 'On target'
+                     : diff > 0 ? `↓ Sell ${fmtShort(Math.abs(diff))}`
+                     : `↑ Buy ${fmtShort(Math.abs(diff))}`;
+    const diffColor  = Math.abs(diff) < 5000 ? 'var(--green)'
+                     : diff > 0 ? 'var(--gold)' : 'var(--blue2)';
+
+    return `<div style="display:grid;grid-template-columns:120px 1fr 54px 54px 130px;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:8px;height:8px;border-radius:2px;background:${color};flex-shrink:0"></div>
+        <span style="font-size:12px;font-weight:600;color:var(--text)">${name}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <!-- Current bar -->
+        <div style="height:5px;border-radius:99px;background:var(--surface3);overflow:hidden">
+          <div style="width:${Math.min(100,currentPct).toFixed(1)}%;height:100%;background:var(--blue2);border-radius:99px;opacity:0.7"></div>
+        </div>
+        <!-- Target slider -->
+        <input type="range" min="0" max="60" value="${target}" step="1"
+          oninput="updateTarget('${name}',+this.value)"
+          style="width:100%;accent-color:${color};height:4px;cursor:pointer;margin:0">
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);text-align:right;line-height:1.6">
+        ${currentPct.toFixed(1)}%<br><span style="font-size:10px">now</span>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);text-align:right;line-height:1.6" id="reb_${name.replace(/[\s/]/g,'_')}_tgt">
+        ${target}%<br><span style="font-size:10px;color:var(--text3)">target</span>
+      </div>
+      <div style="font-size:11px;font-weight:600;text-align:right;color:${diffColor}" id="reb_${name.replace(/[\s/]/g,'_')}_act">
+        ${diffLabel}
+      </div>
+    </div>`;
+  }).join('');
+
+  updateRebalanceTotals();
+  renderRebTable();
+  renderSIPAlloc();
+}
 
 function updateTarget(name, val) {
   userTargets[name] = val;
-  const key = name.replace(/\s/g,'_');
+  const key = name.replace(/[\s/]/g,'_');
   const tEl = document.getElementById(`reb_${key}_tgt`);
-  if(tEl) tEl.innerHTML = `${val}%<br><span style="color:var(--text3)">target</span>`;
+  if(tEl) tEl.innerHTML = `${val}%<br><span style="font-size:10px;color:var(--text3)">target</span>`;
   const current = (summary.find(s=>s.name===name)?.value)||0;
   const diff = current - (val/100*portfolio.total);
-  const diffLabel = Math.abs(diff)<5000?'on target': diff>0?`Sell ${fmtShort(Math.abs(diff))}`:`Buy ${fmtShort(Math.abs(diff))}`;
+  const diffLabel = Math.abs(diff)<5000 ? 'On target'
+                  : diff>0 ? `↓ Sell ${fmtShort(Math.abs(diff))}`
+                  : `↑ Buy ${fmtShort(Math.abs(diff))}`;
   const diffColor = Math.abs(diff)<5000?'var(--green)':diff>0?'var(--gold)':'var(--blue2)';
   const aEl = document.getElementById(`reb_${key}_act`);
   if(aEl) { aEl.textContent = diffLabel; aEl.style.color = diffColor; }
   updateRebalanceTotals();
+  renderRebTable();
+  renderSIPAlloc();
 }
 
 function updateRebalanceTotals() {
-  const total = Object.values(userTargets).reduce((a,b)=>a+b,0);
-  set_('rebTotalPct', `Total: ${total}% ${total===100?'✓':total>100?'(over!)':'(under)'}`);
+  const totalPct = Object.values(userTargets).reduce((a,b)=>a+b,0);
   const pEl = document.getElementById('rebTotalPct');
-  if(pEl) pEl.style.color = total===100?'var(--green)':total>100?'var(--red)':'var(--gold)';
+  if(pEl) {
+    pEl.textContent = `Total: ${totalPct}% ${totalPct===100?'✓':totalPct>100?'⚠ over':'⚠ under'}`;
+    pEl.style.color = totalPct===100?'var(--green)':totalPct>100?'var(--red)':'var(--gold)';
+    pEl.style.borderColor = totalPct===100?'rgba(46,204,143,0.4)':totalPct>100?'rgba(255,94,106,0.4)':'rgba(212,168,67,0.4)';
+  }
 
-  let over=0, under=0, on=0;
+  let over=0, under=0, on=0, toMove=0;
   Object.entries(userTargets).forEach(([name,tgt]) => {
-    const curr = (summary.find(s=>s.name===name)?.value||0)/portfolio.total*100;
-    const diff  = Math.abs(curr-tgt);
-    if(diff<1) on++; else if(curr>tgt) over++; else under++;
+    const curr    = (summary.find(s=>s.name===name)?.value||0);
+    const tgtAmt  = tgt/100*portfolio.total;
+    const diff    = Math.abs(curr-tgtAmt);
+    const currPct = curr/portfolio.total*100;
+    if(diff < 5000 || Math.abs(currPct-tgt) < 0.5) on++;
+    else if(curr > tgtAmt) { over++; toMove += (curr-tgtAmt); }
+    else under++;
   });
-  set_('rebOverCount', over);
+  set_('rebOverCount',  over);
   set_('rebUnderCount', under);
-  set_('rebOnCount', on);
+  set_('rebOnCount',    on);
+  set_('rebToMove',     fmtShort(toMove));
+}
+
+function renderRebTable() {
+  const tb = document.getElementById('rebTableBody');
+  if(!tb) return;
+  tb.innerHTML = Object.entries(DEFAULT_TARGETS)
+    .map(([name]) => {
+      const current    = summary.find(s=>s.name===name)?.value || 0;
+      const currentPct = (current/portfolio.total*100).toFixed(1);
+      const target     = userTargets[name]||0;
+      const targetAmt  = target/100*portfolio.total;
+      const diff       = targetAmt - current;
+      const absDiff    = Math.abs(diff);
+      const isOn       = absDiff < 5000;
+      const isBuy      = diff > 0;
+      const badge = isOn
+        ? `<span style="font-size:11px;padding:2px 8px;border-radius:99px;background:rgba(46,204,143,0.12);color:var(--green);border:1px solid rgba(46,204,143,0.3)">On target</span>`
+        : isBuy
+        ? `<span style="font-size:11px;padding:2px 8px;border-radius:99px;background:rgba(79,127,255,0.12);color:var(--blue2);border:1px solid rgba(79,127,255,0.3)">Underweight</span>`
+        : `<span style="font-size:11px;padding:2px 8px;border-radius:99px;background:rgba(212,168,67,0.12);color:var(--gold);border:1px solid rgba(212,168,67,0.3)">Overweight</span>`;
+      return `<tr>
+        <td style="font-weight:600">${name}</td>
+        <td class="num" style="text-align:right">${fmt(current)}</td>
+        <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--blue2)">${currentPct}%</td>
+        <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold)">${target}%</td>
+        <td class="num" style="text-align:right;color:var(--text3)">${fmt(Math.round(targetAmt))}</td>
+        <td class="num" style="text-align:right;font-weight:600;color:${isOn?'var(--text3)':isBuy?'var(--blue2)':'var(--gold)'}">${isOn?'—':(isBuy?'+':'-')+fmt(absDiff)}</td>
+        <td style="text-align:center">${badge}</td>
+      </tr>`;
+    }).join('');
+}
+
+function renderSIPAlloc() {
+  const el = document.getElementById('sipAllocRows');
+  if(!el) return;
+  const sipAmt = parseFloat(document.getElementById('sipAmount')?.value||50000);
+  if(!sipAmt || isNaN(sipAmt)) return;
+
+  // Only allocate SIP to underweight assets
+  const buyItems = Object.entries(userTargets)
+    .map(([name,tgt]) => {
+      const current = summary.find(s=>s.name===name)?.value||0;
+      const tgtAmt  = tgt/100*portfolio.total;
+      return { name, tgt, diff: tgtAmt-current };
+    })
+    .filter(x => x.diff > 5000 && x.tgt > 0);
+
+  const totalBuyPct = buyItems.reduce((a,x)=>a+x.tgt, 0);
+  if(buyItems.length === 0) {
+    el.innerHTML = `<div style="color:var(--green);font-size:12px;padding:12px 0">✓ Portfolio is on target — no SIP reallocation needed</div>`;
+    return;
+  }
+
+  el.innerHTML = buyItems
+    .sort((a,b)=>b.diff-a.diff)
+    .map(x => {
+      const alloc = Math.round((x.tgt/totalBuyPct)*sipAmt);
+      const pct   = ((x.tgt/totalBuyPct)*100).toFixed(0);
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+        <div style="flex:1;font-size:12px;font-weight:600">${x.name}</div>
+        <div style="width:80px;height:4px;background:var(--surface3);border-radius:99px;overflow:hidden">
+          <div style="width:${pct}%;height:100%;background:var(--blue2);border-radius:99px"></div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold);min-width:80px;text-align:right;font-weight:700">${fmt(alloc)}</div>
+        <div style="font-size:11px;color:var(--text3);min-width:32px;text-align:right">${pct}%</div>
+      </div>`;
+    }).join('') +
+    `<div style="display:flex;justify-content:space-between;padding-top:10px;font-size:12px">
+      <span style="color:var(--text3)">Total SIP</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--green)">${fmt(sipAmt)}/mo</span>
+    </div>`;
+}
+
+function setTargetsFromCurrent() {
+  Object.keys(userTargets).forEach(name => {
+    const curr = summary.find(s=>s.name===name)?.value||0;
+    userTargets[name] = Math.round(curr/portfolio.total*100);
+  });
+  renderRebalance();
 }
 
 function resetTargets() {
@@ -2878,29 +3044,64 @@ function resetTargets() {
 function applyRebalance() {
   const ra = document.getElementById('rebActions');
   if(!ra) return;
-  const actions = [];
-  Object.entries(userTargets).forEach(([name, tgt]) => {
-    const current = summary.find(s=>s.name===name)?.value||0;
+
+  const actions = Object.entries(userTargets).map(([name, tgt]) => {
+    const current  = summary.find(s=>s.name===name)?.value||0;
     const targetAmt = tgt/100*portfolio.total;
     const diff = targetAmt - current;
-    if(Math.abs(diff) > 10000) {
-      actions.push({ name, diff, action: diff>0?'BUY':'SELL', amt: Math.abs(diff) });
-    }
-  });
-  actions.sort((a,b) => b.amt-a.amt);
-  ra.innerHTML = actions.length === 0
-    ? `<div style="text-align:center;padding:40px;color:var(--green);font-size:14px">✓ Portfolio is balanced — no actions needed</div>`
-    : `<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">${actions.map(a=>`
-        <div style="padding:16px;border-radius:12px;border:1px solid ${a.action==='BUY'?'rgba(79,127,255,0.3)':'rgba(212,168,67,0.3)'};background:${a.action==='BUY'?'rgba(79,127,255,0.05)':'rgba(212,168,67,0.05)'}">
-          <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:${a.action==='BUY'?'var(--blue2)':'var(--gold)'};margin-bottom:8px">${a.action}</div>
-          <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px">${a.name}</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:18px;color:${a.action==='BUY'?'var(--blue2)':'var(--gold)'}">
-            ${fmt(a.amt)}
-          </div>
-          <div style="font-size:11px;color:var(--text3);margin-top:6px">
-            Current: ${fmtShort(summary.find(s=>s.name===a.name)?.value||0)} → Target: ${fmtShort(userTargets[a.name]/100*portfolio.total)}
-          </div>
-        </div>`).join('')}</div>`;
+    return { name, diff, current, targetAmt, action: diff>0?'BUY':'SELL', amt: Math.abs(diff) };
+  }).filter(a => a.amt > 10000);
+
+  actions.sort((a,b) => b.amt - a.amt);
+
+  if(actions.length === 0) {
+    ra.innerHTML = `<div style="text-align:center;padding:40px;color:var(--green);font-size:14px">✓ Portfolio is balanced — no actions needed</div>`;
+    return;
+  }
+
+  const buys  = actions.filter(a=>a.action==='BUY');
+  const sells = actions.filter(a=>a.action==='SELL');
+  const totalBuy  = buys.reduce((a,x)=>a+x.amt,0);
+  const totalSell = sells.reduce((a,x)=>a+x.amt,0);
+
+  const renderCard = (a) => `
+    <div style="padding:16px;border-radius:12px;border:1px solid ${a.action==='BUY'?'rgba(79,127,255,0.25)':'rgba(212,168,67,0.25)'};background:${a.action==='BUY'?'rgba(79,127,255,0.04)':'rgba(212,168,67,0.04)'}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:${a.action==='BUY'?'var(--blue2)':'var(--gold)'};margin-bottom:4px">${a.action==='BUY'?'↑ BUY':'↓ SELL'}</div>
+          <div style="font-size:15px;font-weight:700;color:var(--text)">${a.name}</div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:800;color:${a.action==='BUY'?'var(--blue2)':'var(--gold)'}">
+          ${fmt(Math.round(a.amt))}
+        </div>
+      </div>
+      <div style="height:4px;background:var(--surface3);border-radius:99px;margin-bottom:10px;overflow:hidden">
+        <div style="width:${Math.min(100,(a.current/Math.max(a.current,a.targetAmt)*100)).toFixed(1)}%;height:100%;background:var(--blue2);border-radius:99px;opacity:0.6"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace">
+        <span>Now: ${fmtShort(a.current)} (${(a.current/portfolio.total*100).toFixed(1)}%)</span>
+        <span>Target: ${fmtShort(a.targetAmt)} (${userTargets[a.name]}%)</span>
+      </div>
+    </div>`;
+
+  ra.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+      <div style="padding:14px 16px;background:rgba(79,127,255,0.06);border-radius:12px;border:1px solid rgba(79,127,255,0.2)">
+        <div style="font-size:11px;color:var(--blue2);font-weight:700;letter-spacing:1px;margin-bottom:4px">TOTAL TO BUY</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800;color:var(--blue2)">${fmt(Math.round(totalBuy))}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">${buys.length} asset class${buys.length!==1?'es':''}</div>
+      </div>
+      <div style="padding:14px 16px;background:rgba(212,168,67,0.06);border-radius:12px;border:1px solid rgba(212,168,67,0.2)">
+        <div style="font-size:11px;color:var(--gold);font-weight:700;letter-spacing:1px;margin-bottom:4px">TOTAL TO SELL</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800;color:var(--gold)">${fmt(Math.round(totalSell))}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">${sells.length} asset class${sells.length!==1?'es':''}</div>
+      </div>
+    </div>
+    ${buys.length?`<div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--blue2);margin-bottom:10px">BUY</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">${buys.map(renderCard).join('')}</div>`:''}
+    ${sells.length?`<div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--gold);margin-bottom:10px">SELL / REDUCE</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${sells.map(renderCard).join('')}</div>`:''}
+    <div style="margin-top:16px;padding:12px 16px;background:var(--surface2);border-radius:10px;font-size:11px;color:var(--text3);border:1px solid var(--border)">
+      ⚠ These are indicative amounts based on target allocation. Consult your financial advisor before making changes. Tax implications may apply.
+    </div>`;
 }
 
 // ═══════════════════════════════════════════════════
