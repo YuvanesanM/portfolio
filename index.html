@@ -2487,19 +2487,19 @@ async function autoFetchPrices() {
   try {
     // ── Step 1: Gold & Silver ──────────────────────
     setFetchStatus('Fetching Gold & Silver prices…', 'var(--gold)');
-    const [goldResult, silverResult] = await Promise.all([
-      fetchCommodityPrice(GOLD_ETF_CANDIDATES, 'gold'),
-      fetchCommodityPrice(SILVER_ETF_CANDIDATES, 'silver'),
-    ]);
 
-    if(!goldResult)   throw new Error('Could not fetch gold price — all ETF codes failed');
+    // Run both fetches but don't let silver failure block gold/SGB
+    const goldResult = await fetchCommodityPrice(GOLD_ETF_CANDIDATES, 'gold');
+    if(!goldResult) throw new Error('Could not fetch gold price — all ETF codes failed');
 
-    const goldPerGram   = goldResult.price;
-    const silverPerGram = silverResult ? silverResult.price : null;
+    const goldPerGram = goldResult.price;
 
-    if(!silverResult) {
-      setFetchStatus(`⚠ Silver fetch failed — Gold ₹${goldPerGram.toLocaleString('en-IN')}/g · SGB updating…`, 'var(--gold)');
-    }
+    // Silver fetch — non-blocking, defaults to 0 if unavailable
+    let silverPerGram = 0;
+    try {
+      const silverResult = await fetchCommodityPrice(SILVER_ETF_CANDIDATES, 'silver');
+      if(silverResult) silverPerGram = silverResult.price;
+    } catch(e) { /* silver unavailable, continue without it */ }
 
     portfolio.holdings.forEach((h, i) => {
       const upc = getUnitPriceConfig(h);
@@ -2511,7 +2511,7 @@ async function autoFetchPrices() {
 
       let price = null;
       if(h.account === 'Au')                            price = goldPerGram;
-      else if(h.account === 'Ag' && silverPerGram)      price = silverPerGram;
+      else if(h.account === 'Ag' && silverPerGram > 0)    price = silverPerGram;
       else if((h.sub||'').toLowerCase() === 'sgb')      price = goldPerGram;
 
       if(price !== null) {
@@ -2525,7 +2525,7 @@ async function autoFetchPrices() {
       }
     });
 
-    setFetchStatus(`Gold ₹${goldPerGram.toLocaleString('en-IN')}/g${silverPerGram ? ` · Silver ₹${silverPerGram.toLocaleString('en-IN')}/g` : ''} · fetching MF…`, 'var(--gold)');
+    setFetchStatus(`Gold ₹${goldPerGram.toLocaleString('en-IN')}/g${silverPerGram > 0 ? ` · Silver ₹${silverPerGram.toLocaleString('en-IN')}/g` : ''} · fetching MF…`, 'var(--gold)');
 
     // ── Step 2: Mutual Funds ──────────────────────
     // Get unique MFAPI codes to fetch
@@ -2603,7 +2603,7 @@ async function autoFetchPrices() {
     });
 
     const fetchedMF = Object.keys(navMap).length;
-    const silverStr = silverPerGram ? ` · Silver ₹${silverPerGram.toLocaleString('en-IN')}/g` : ' · Silver: retry later';
+    const silverStr = silverPerGram > 0 ? ` · Silver ₹${silverPerGram.toLocaleString('en-IN')}/g` : ' · Silver unavailable';
     setFetchStatus(
       `✓ Gold ₹${goldPerGram.toLocaleString('en-IN')}/g${silverStr} · MF total ₹${(mfTotal/10000000).toFixed(2)}Cr (${fetchedMF}/${totalCodes} NAVs) · ${filled} rows filled`,
       'var(--green)'
