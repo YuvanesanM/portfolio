@@ -860,22 +860,24 @@
     </div>
 
     <!-- Auto-fetch bar -->
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:14px 18px;background:linear-gradient(135deg,rgba(212,168,67,0.08),rgba(79,127,255,0.06));border-radius:12px;border:1px solid rgba(212,168,67,0.2);">
-      <div style="font-size:20px">✨</div>
-      <div style="flex:1">
-        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;">Auto-Fetch Live Prices</div>
-        <div style="font-size:11px;color:var(--text3);">Fetches today's Gold, Silver &amp; SGB prices and fills them in automatically · powered by MFAPI.in</div>
+    <div style="margin-bottom:16px;padding:16px 18px;background:linear-gradient(135deg,rgba(212,168,67,0.1),rgba(79,127,255,0.07));border-radius:12px;border:1px solid rgba(212,168,67,0.25);">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div style="font-size:22px">✨</div>
+        <div style="flex:1;min-width:200px">
+          <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;">Auto-Fetch Live Prices</div>
+          <div style="font-size:11px;color:var(--text3);">Pulls latest NAVs for <span style="color:var(--gold)">Gold · Silver · SGB (7 tranches) · Mutual Funds (37 schemes)</span> via MFAPI.in</div>
+        </div>
+        <button id="fetchBtn" onclick="autoFetchPrices()" style="
+          background:linear-gradient(135deg,var(--gold),var(--gold2));
+          color:#080c10; border:none; border-radius:10px;
+          padding:12px 24px; font-family:'Plus Jakarta Sans',sans-serif;
+          font-size:14px; font-weight:800; cursor:pointer;
+          white-space:nowrap; transition:opacity 0.2s; flex-shrink:0;
+          box-shadow:0 4px 20px rgba(212,168,67,0.3);">
+          <span id="fetchBtnIcon">⬇</span> Fetch Prices
+        </button>
       </div>
-      <div id="fetchStatus" style="font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text3);min-width:180px;text-align:right;"></div>
-      <button id="fetchBtn" onclick="autoFetchPrices()" style="
-        background:linear-gradient(135deg,var(--gold),var(--gold2));
-        color:#080c10; border:none; border-radius:10px;
-        padding:10px 20px; font-family:'Plus Jakarta Sans',sans-serif;
-        font-size:13px; font-weight:700; cursor:pointer;
-        white-space:nowrap; transition:opacity 0.2s;
-        display:flex; align-items:center; gap:8px;">
-        <span id="fetchBtnIcon">⬇</span> Fetch Prices
-      </button>
+      <div id="fetchStatus" style="margin-top:10px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text3);min-height:16px;"></div>
     </div>
 
     <!-- Holdings table -->
