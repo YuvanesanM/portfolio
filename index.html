@@ -709,7 +709,7 @@
       <div class="hero-left">
         <div class="hero-label">Mutual Fund Portfolio</div>
         <div class="hero-value" id="mfTotalValue">₹2.48 Cr</div>
-        <div class="hero-sub">As of <span id="mfAsOf">17 Mar 2026</span> · <span style="color:var(--blue2)" id="mfSchemeCount">40 schemes</span></div>
+        <div class="hero-sub">As of <span id="mfAsOf">17 Mar 2026</span> · <span style="color:var(--blue2)" id="mfSchemeCount">47 schemes</span></div>
       </div>
       <div class="hero-right">
         <div class="hero-stat">
@@ -731,9 +731,15 @@
     <div class="grid-4" style="margin-bottom:24px">
       <div class="card">
         <div class="card-accent" style="background:var(--blue)"></div>
-        <div class="card-label">Total Schemes</div>
-        <div class="card-value" id="mfTotalSchemes">40</div>
-        <div class="card-sub" id="mfTotalSub">Across 10 fund houses</div>
+        <div class="card-label">Yuvan's MF</div>
+        <div class="card-value" id="mfYuvanTotal">—</div>
+        <div class="card-sub" id="mfYuvanSchemes">45 schemes · CAMS + KFin</div>
+      </div>
+      <div class="card">
+        <div class="card-accent" style="background:var(--purple)"></div>
+        <div class="card-label">Ramyaa's MF</div>
+        <div class="card-value" id="mfRamyaaTotal">—</div>
+        <div class="card-sub" id="mfRamyaaSchemes">2 schemes · CAMS + KFin</div>
       </div>
       <div class="card">
         <div class="card-accent" style="background:var(--gold)"></div>
@@ -743,15 +749,9 @@
       </div>
       <div class="card">
         <div class="card-accent" style="background:var(--green)"></div>
-        <div class="card-label">CAMS Schemes</div>
-        <div class="card-value" id="mfCAMS">—</div>
-        <div class="card-sub">CAMS registrar</div>
-      </div>
-      <div class="card">
-        <div class="card-accent" style="background:var(--purple)"></div>
-        <div class="card-label">KFintech Schemes</div>
-        <div class="card-value" id="mfKFIN">—</div>
-        <div class="card-sub">KFintech registrar</div>
+        <div class="card-label">Total Schemes</div>
+        <div class="card-value" id="mfTotalSchemes">47</div>
+        <div class="card-sub" id="mfTotalSub">Across 11 fund houses</div>
       </div>
     </div>
 
@@ -1247,7 +1247,8 @@ const DEFAULT_HOLDINGS = [
   { account:"ICICI",   type:"SGB",         sub:"SGB",            value:806600,   units:"50g",   remarks:"Matures 19-Jan-2029",      owner:"Yuvan",  purchaseDate:"2021-01-19", purchasePrice:252700   },
   { account:"ICICI",   type:"SGB",         sub:"SGB",            value:1613200,  units:"100g",  remarks:"Matures 09-Mar-2029",      owner:"Yuvan",  purchaseDate:"2021-03-09", purchasePrice:461200   },
   { account:"ICICI",   type:"SGB",         sub:"SGB",            value:1613200,  units:"100g",  remarks:"Matures 25-May-2029",      owner:"Yuvan",  purchaseDate:"2021-05-25", purchasePrice:472700   },
-  { account:"CAMS+KFin", type:"Mutual Fund", sub:"Mutual Fund",  value:0,        units:"",      remarks:"Auto-computed from CAS",   owner:"Yuvan",  purchaseDate:"2019-01-01", purchasePrice:24200753, _mfComputed:true },
+  { account:"CAMS+KFin", type:"Mutual Fund", sub:"Mutual Fund",  value:0,        units:"",      remarks:"Yuvan · 45 schemes",       owner:"Yuvan",  purchaseDate:"2019-01-01", purchasePrice:23900753, _mfComputed:true,  _mfOwner:"Yuvan"  },
+  { account:"CAMS+KFin", type:"Mutual Fund", sub:"Mutual Fund",  value:0,        units:"",      remarks:"Ramyaa · 2 schemes",        owner:"Ramyaa", purchaseDate:"2021-01-01", purchasePrice:400000,   _mfComputed:true,  _mfOwner:"Ramyaa" },
   { account:"ICICI",   type:"Shares",      sub:"ETF & Stocks",   value:2892904,  units:"",      remarks:"Demat",                    owner:"Yuvan",  purchaseDate:"2020-01-01", purchasePrice:2000000  },
   { account:"Kite",    type:"Shares",      sub:"Mixed Shares",   value:349265,   units:"",      remarks:"Zerodha",                  owner:"Yuvan",  purchaseDate:"2021-01-01", purchasePrice:300000   },
   { account:"360ONE",  type:"AIF",         sub:"AIF",            value:5000000,  units:"",      remarks:"Alternative",              owner:"Yuvan",  purchaseDate:"2022-01-01", purchasePrice:5000000  },
@@ -1350,13 +1351,22 @@ function fmtShort(n) {
 // Compute total MF value from MF_SCHEMES (both Yuvan + Ramyaa)
 // and sync into the single _mfComputed holding row
 function syncMFTotal() {
-  const total = MF_SCHEMES.reduce((a, s) => a + (s.value || 0), 0);
-  const cost  = MF_SCHEMES.reduce((a, s) => a + (s.cost  || 0), 0);
-  const h = portfolio.holdings.find(h => h._mfComputed);
-  if(h) {
-    h.value         = Math.round(total);
-    h.purchasePrice = Math.round(cost);
-  }
+  const yuvanTotal  = MF_SCHEMES.filter(s => !s.owner || s.owner === 'Yuvan').reduce((a,s) => a+(s.value||0), 0);
+  const ramyaaTotal = MF_SCHEMES.filter(s => s.owner === 'Ramyaa').reduce((a,s) => a+(s.value||0), 0);
+  const total       = yuvanTotal + ramyaaTotal;
+  const yuvanCost   = MF_SCHEMES.filter(s => !s.owner || s.owner === 'Yuvan').reduce((a,s) => a+(s.cost||0), 0);
+  const ramyaaCost  = MF_SCHEMES.filter(s => s.owner === 'Ramyaa').reduce((a,s) => a+(s.cost||0), 0);
+
+  portfolio.holdings.forEach(h => {
+    if(!h._mfComputed) return;
+    if(h._mfOwner === 'Yuvan' || (!h._mfOwner && h.owner === 'Yuvan')) {
+      h.value = Math.round(yuvanTotal);
+      h.purchasePrice = Math.round(yuvanCost);
+    } else if(h._mfOwner === 'Ramyaa' || h.owner === 'Ramyaa') {
+      h.value = Math.round(ramyaaTotal);
+      h.purchasePrice = Math.round(ramyaaCost);
+    }
+  });
   return Math.round(total);
 }
 
@@ -1590,37 +1600,41 @@ async function loadAndInit() {
     // into any GitHub-loaded holdings that are missing them (backwards compatibility)
     const loaded = ghData.holdings || DEFAULT_HOLDINGS;
 
-    // Detect old structure: had 2 separate MF rows (ICICI + HDFC)
-    // New structure: 1 _mfComputed row. Migrate on load.
+    // Migration 1: old 2-row MF (ICICI + HDFC) → new 2-row _mfComputed split
     const mfRows = loaded.filter(h => h.sub === 'Mutual Fund');
-    const hasTwoMFRows = mfRows.length >= 2 && !loaded.some(h => h._mfComputed);
+    const hasTwoOldRows   = mfRows.length >= 2 && !loaded.some(h => h._mfComputed);
+    // Migration 2: old single _mfComputed (no _mfOwner) → new 2-row split
+    const hasOneMFRow = loaded.filter(h => h._mfComputed).length === 1;
 
     let normalized = loaded;
-    if(hasTwoMFRows) {
-      // Remove old separate MF rows, insert single _mfComputed row at same position
-      const firstMFIdx = loaded.findIndex(h => h.sub === 'Mutual Fund');
-      const combinedCost = mfRows.reduce((a,h) => a+(h.purchasePrice||h.value||0), 0);
-      normalized = loaded.filter(h => h.sub !== 'Mutual Fund');
-      const newMFRow = {
-        account:'CAMS+KFin', type:'Mutual Fund', sub:'Mutual Fund',
-        value:0, units:'', remarks:'Auto-computed from CAS',
-        owner:'Yuvan', purchaseDate:'2019-01-01',
-        purchasePrice: combinedCost, _mfComputed:true
-      };
-      normalized.splice(firstMFIdx, 0, newMFRow);
+    if(hasTwoOldRows || hasOneMFRow) {
+      const firstMFIdx = loaded.findIndex(h => h.sub === 'Mutual Fund' || h._mfComputed);
+      const yuvanCost  = hasTwoOldRows
+        ? (mfRows.find(h => h.owner !== 'Ramyaa')?.purchasePrice || 23900753)
+        : 23900753;
+      const ramyaaCost = hasTwoOldRows
+        ? (mfRows.find(h => h.owner === 'Ramyaa')?.purchasePrice || 400000)
+        : 400000;
+      normalized = loaded.filter(h => h.sub !== 'Mutual Fund' && !h._mfComputed);
+      normalized.splice(firstMFIdx, 0,
+        { account:'CAMS+KFin', type:'Mutual Fund', sub:'Mutual Fund', value:0, units:'',
+          remarks:'Yuvan · 45 schemes', owner:'Yuvan', purchaseDate:'2019-01-01',
+          purchasePrice: yuvanCost,  _mfComputed:true, _mfOwner:'Yuvan'  },
+        { account:'CAMS+KFin', type:'Mutual Fund', sub:'Mutual Fund', value:0, units:'',
+          remarks:'Ramyaa · 2 schemes', owner:'Ramyaa', purchaseDate:'2021-01-01',
+          purchasePrice: ramyaaCost, _mfComputed:true, _mfOwner:'Ramyaa' }
+      );
     }
 
-    portfolio.holdings = normalized.map((h, i) => {
-      const def = DEFAULT_HOLDINGS[i] || {};
-      return {
-        ...h,
-        owner:         h.owner         || def.owner         || 'Yuvan',
-        purchaseDate:  h.purchaseDate  || def.purchaseDate  || '2020-01-01',
-        purchasePrice: h.purchasePrice || def.purchasePrice || h.value,
-        // _mfComputed only comes from the data itself, never from index-based def
-        _mfComputed:   h._mfComputed   || false,
-      };
-    });
+    // Also ensure existing _mfComputed rows get _mfOwner if missing
+    portfolio.holdings = normalized.map((h, i) => ({
+      ...h,
+      owner:         h.owner         || (DEFAULT_HOLDINGS[i]||{}).owner         || 'Yuvan',
+      purchaseDate:  h.purchaseDate  || (DEFAULT_HOLDINGS[i]||{}).purchaseDate  || '2020-01-01',
+      purchasePrice: h.purchasePrice || (DEFAULT_HOLDINGS[i]||{}).purchasePrice || h.value,
+      _mfComputed:   h._mfComputed   || false,
+      _mfOwner:      h._mfOwner      || (h._mfComputed ? (h.owner||'Yuvan') : undefined),
+    }));
     portfolio.asOf      = ghData.asOf        || '16 Sep 2025';
     snapshots           = ghData.snapshots   || DEFAULT_SNAPSHOTS;
     sgbTranches         = ghData.sgbTranches || DEFAULT_SGB;
@@ -2017,62 +2031,62 @@ function renderHoldings() {
 // ─── MF SCHEME DATA from CAS Statement 17-Mar-2026 ───────────────────────────
 const MF_SCHEMES = [
   // Axis
-  {house:'Axis',      scheme:'NIFTY Next 50 Index Fund Direct Growth',       cat:'Index',       cost:250000,   value:219908,  reg:'KFintech'},
-  {house:'Axis',      scheme:'Greater China Equity FOF Direct Growth',        cat:'FOF',         cost:100000,   value:129170,  reg:'KFintech'},
+  {house:'Axis',      scheme:'NIFTY Next 50 Index Fund Direct Growth',       cat:'Index',       cost:250000,   value:219908,  reg:'KFintech', owner:'Yuvan'},
+  {house:'Axis',      scheme:'Greater China Equity FOF Direct Growth',        cat:'FOF',         cost:100000,   value:129170,  reg:'KFintech', owner:'Yuvan'},
   // Bajaj Finserv
-  {house:'Bajaj',     scheme:'Consumption Fund Regular Growth',               cat:'Thematic',    cost:1082957,  value:935601,  reg:'KFintech'},
-  {house:'Bajaj',     scheme:'Flexi Cap Fund Regular Growth',                 cat:'Flexi Cap',   cost:100000,   value:96512,   reg:'KFintech'},
+  {house:'Bajaj',     scheme:'Consumption Fund Regular Growth',               cat:'Thematic',    cost:1082957,  value:935601,  reg:'KFintech', owner:'Yuvan'},
+  {house:'Bajaj',     scheme:'Flexi Cap Fund Regular Growth',                 cat:'Flexi Cap',   cost:100000,   value:96512,   reg:'KFintech', owner:'Yuvan'},
   // Bandhan
-  {house:'Bandhan',   scheme:'Large & Mid Cap Fund Regular Growth',           cat:'Large & Mid', cost:1253982,  value:1205429, reg:'CAMS'},
+  {house:'Bandhan',   scheme:'Large & Mid Cap Fund Regular Growth',           cat:'Large & Mid', cost:1253982,  value:1205429, reg:'CAMS', owner:'Yuvan'},
   // Franklin
-  {house:'Franklin',  scheme:'Small Cap Fund Growth',                         cat:'Small Cap',   cost:100000,   value:102106,  reg:'CAMS'},
-  {house:'Franklin',  scheme:'Focused Equity Fund Growth',                    cat:'Focused',     cost:200000,   value:177750,  reg:'CAMS'},
-  {house:'Franklin',  scheme:'Flexi Cap Fund Growth',                         cat:'Flexi Cap',   cost:275000,   value:253340,  reg:'CAMS'},
+  {house:'Franklin',  scheme:'Small Cap Fund Growth',                         cat:'Small Cap',   cost:100000,   value:102106,  reg:'CAMS', owner:'Yuvan'},
+  {house:'Franklin',  scheme:'Focused Equity Fund Growth',                    cat:'Focused',     cost:200000,   value:177750,  reg:'CAMS', owner:'Yuvan'},
+  {house:'Franklin',  scheme:'Flexi Cap Fund Growth',                         cat:'Flexi Cap',   cost:275000,   value:253340,  reg:'CAMS', owner:'Yuvan'},
   // HDFC
-  {house:'HDFC',      scheme:'Silver ETF Fund of Fund Regular Growth',        cat:'Commodity',   cost:200000,   value:524768,  reg:'CAMS'},
-  {house:'HDFC',      scheme:'Large and Mid Cap Fund Regular Growth',         cat:'Large & Mid', cost:325000,   value:369833,  reg:'CAMS'},
-  {house:'HDFC',      scheme:'Focused Fund Regular Growth',                   cat:'Focused',     cost:50000,    value:83037,   reg:'CAMS'},
-  {house:'HDFC',      scheme:'Flexi Cap Fund Regular Growth (F1)',            cat:'Flexi Cap',   cost:75000,    value:89698,   reg:'CAMS'},
-  {house:'HDFC',      scheme:'Banking & Financial Services Regular Growth',   cat:'Sectoral',    cost:25000,    value:29559,   reg:'CAMS'},
-  {house:'HDFC',      scheme:'Flexi Cap Fund Regular Growth (F2)',            cat:'Flexi Cap',   cost:75000,    value:88793,   reg:'CAMS'},
-  {house:'HDFC',      scheme:'Pharma and Healthcare Regular Growth',          cat:'Sectoral',    cost:575000,   value:591498,  reg:'CAMS'},
+  {house:'HDFC',      scheme:'Silver ETF Fund of Fund Regular Growth',        cat:'Commodity',   cost:200000,   value:524768,  reg:'CAMS', owner:'Yuvan'},
+  {house:'HDFC',      scheme:'Large and Mid Cap Fund Regular Growth',         cat:'Large & Mid', cost:325000,   value:369833,  reg:'CAMS', owner:'Yuvan'},
+  {house:'HDFC',      scheme:'Focused Fund Regular Growth',                   cat:'Focused',     cost:50000,    value:83037,   reg:'CAMS', owner:'Yuvan'},
+  {house:'HDFC',      scheme:'Flexi Cap Fund Regular Growth (F1)',            cat:'Flexi Cap',   cost:75000,    value:89698,   reg:'CAMS', owner:'Yuvan'},
+  {house:'HDFC',      scheme:'Banking & Financial Services Regular Growth',   cat:'Sectoral',    cost:25000,    value:29559,   reg:'CAMS', owner:'Yuvan'},
+  {house:'HDFC',      scheme:'Flexi Cap Fund Regular Growth (F2)',            cat:'Flexi Cap',   cost:75000,    value:88793,   reg:'CAMS', owner:'Yuvan'},
+  {house:'HDFC',      scheme:'Pharma and Healthcare Regular Growth',          cat:'Sectoral',    cost:575000,   value:591498,  reg:'CAMS', owner:'Yuvan'},
   // HSBC
-  {house:'HSBC',      scheme:'Multi Cap Fund Regular Growth (F1)',            cat:'Multi Cap',   cost:50000,    value:53906,   reg:'CAMS'},
-  {house:'HSBC',      scheme:'Multi Cap Fund Regular Growth (F2)',            cat:'Multi Cap',   cost:50000,    value:56459,   reg:'CAMS'},
+  {house:'HSBC',      scheme:'Multi Cap Fund Regular Growth (F1)',            cat:'Multi Cap',   cost:50000,    value:53906,   reg:'CAMS', owner:'Yuvan'},
+  {house:'HSBC',      scheme:'Multi Cap Fund Regular Growth (F2)',            cat:'Multi Cap',   cost:50000,    value:56459,   reg:'CAMS', owner:'Yuvan'},
   // ICICI Prudential
-  {house:'ICICI',     scheme:'Business Cycle Fund Growth (F1)',               cat:'Thematic',    cost:300000,   value:363050,  reg:'CAMS'},
-  {house:'ICICI',     scheme:'Manufacturing Fund Growth',                     cat:'Thematic',    cost:500000,   value:497784,  reg:'CAMS'},
-  {house:'ICICI',     scheme:'Thematic Advantage FOF Growth',                 cat:'FOF',         cost:2011685,  value:1877424, reg:'CAMS'},
-  {house:'ICICI',     scheme:'Multi-Asset Fund Growth (F1)',                  cat:'Multi Asset', cost:800000,   value:1012804, reg:'CAMS'},
-  {house:'ICICI',     scheme:'Large & Mid Cap Fund Growth (F1)',              cat:'Large & Mid', cost:425000,   value:489966,  reg:'CAMS'},
-  {house:'ICICI',     scheme:'Dynamic Asset Allocation Active FOF Growth',    cat:'FOF',         cost:4000000,  value:4171185, reg:'CAMS'},
-  {house:'ICICI',     scheme:'Business Cycle Fund Growth (F2)',               cat:'Thematic',    cost:500000,   value:588103,  reg:'CAMS'},
-  {house:'ICICI',     scheme:'Multi-Asset Fund Growth (F2)',                  cat:'Multi Asset', cost:700000,   value:877856,  reg:'CAMS'},
-  {house:'ICICI',     scheme:'Large & Mid Cap Fund Growth (F2)',              cat:'Large & Mid', cost:75000,    value:87085,   reg:'CAMS'},
-  {house:'ICICI',     scheme:'Balanced Advantage Fund Growth',                cat:'Hybrid',      cost:210160,   value:212283,  reg:'CAMS'},
-  {house:'ICICI',     scheme:'Multi-Asset Fund Growth (F3)',                  cat:'Multi Asset', cost:750000,   value:884277,  reg:'CAMS'},
+  {house:'ICICI',     scheme:'Business Cycle Fund Growth (F1)',               cat:'Thematic',    cost:300000,   value:363050,  reg:'CAMS', owner:'Yuvan'},
+  {house:'ICICI',     scheme:'Manufacturing Fund Growth',                     cat:'Thematic',    cost:500000,   value:497784,  reg:'CAMS', owner:'Yuvan'},
+  {house:'ICICI',     scheme:'Thematic Advantage FOF Growth',                 cat:'FOF',         cost:2011685,  value:1877424, reg:'CAMS',     owner:'Yuvan'},
+  {house:'ICICI',     scheme:'Multi-Asset Fund Growth (F1)',                  cat:'Multi Asset', cost:800000,   value:1012804, reg:'CAMS', owner:'Yuvan'},
+  {house:'ICICI',     scheme:'Large & Mid Cap Fund Growth (F1)',              cat:'Large & Mid', cost:425000,   value:489966,  reg:'CAMS', owner:'Yuvan'},
+  {house:'ICICI',     scheme:'Dynamic Asset Allocation Active FOF Growth',    cat:'FOF',         cost:4000000,  value:4171185, reg:'CAMS', owner:'Yuvan'},
+  {house:'ICICI',     scheme:'Business Cycle Fund Growth (F2)',               cat:'Thematic',    cost:500000,   value:588103,  reg:'CAMS', owner:'Yuvan'},
+  {house:'ICICI',     scheme:'Multi-Asset Fund Growth (F2)',                  cat:'Multi Asset', cost:700000,   value:877856,  reg:'CAMS', owner:'Yuvan'},
+  {house:'ICICI',     scheme:'Large & Mid Cap Fund Growth (F2)',              cat:'Large & Mid', cost:75000,    value:87085,   reg:'CAMS', owner:'Yuvan'},
+  {house:'ICICI',     scheme:'Balanced Advantage Fund Growth',                cat:'Hybrid',      cost:210160,   value:212283,  reg:'CAMS', owner:'Yuvan'},
+  {house:'ICICI',     scheme:'Multi-Asset Fund Growth (F3)',                  cat:'Multi Asset', cost:750000,   value:884277,  reg:'CAMS', owner:'Yuvan'},
   // Invesco
-  {house:'Invesco',   scheme:'Business Cycle Fund Regular Growth',            cat:'Thematic',    cost:600000,   value:681566,  reg:'KFintech'},
-  {house:'Invesco',   scheme:'Flexi Cap Fund Regular Growth',                 cat:'Flexi Cap',   cost:800000,   value:688366,  reg:'KFintech'},
-  {house:'Invesco',   scheme:'Large & Mid Cap Fund Regular Growth',           cat:'Large & Mid', cost:900000,   value:818727,  reg:'KFintech'},
+  {house:'Invesco',   scheme:'Business Cycle Fund Regular Growth',            cat:'Thematic',    cost:600000,   value:681566,  reg:'KFintech', owner:'Yuvan'},
+  {house:'Invesco',   scheme:'Flexi Cap Fund Regular Growth',                 cat:'Flexi Cap',   cost:800000,   value:688366,  reg:'KFintech',  owner:'Yuvan'},
+  {house:'Invesco',   scheme:'Large & Mid Cap Fund Regular Growth',           cat:'Large & Mid', cost:900000,   value:818727,  reg:'KFintech', owner:'Yuvan'},
   // Kotak
-  {house:'Kotak',     scheme:'Midcap Fund Growth Regular',                    cat:'Mid Cap',     cost:150000,   value:244425,  reg:'CAMS'},
-  {house:'Kotak',     scheme:'Large Cap Fund Growth Regular',                 cat:'Large Cap',   cost:50000,    value:69113,   reg:'CAMS'},
-  {house:'Kotak',     scheme:'Large & Midcap Fund Growth Regular',            cat:'Large & Mid', cost:75000,    value:86729,   reg:'CAMS'},
+  {house:'Kotak',     scheme:'Midcap Fund Growth Regular',                    cat:'Mid Cap',     cost:150000,   value:244425,  reg:'CAMS', owner:'Yuvan'},
+  {house:'Kotak',     scheme:'Large Cap Fund Growth Regular',                 cat:'Large Cap',   cost:50000,    value:69113,   reg:'CAMS', owner:'Yuvan'},
+  {house:'Kotak',     scheme:'Large & Midcap Fund Growth Regular',            cat:'Large & Mid', cost:75000,    value:86729,   reg:'CAMS', owner:'Yuvan'},
   // Motilal Oswal
-  {house:'Motilal',   scheme:'Midcap Fund Regular Growth (F1)',               cat:'Mid Cap',     cost:100000,   value:110343,  reg:'KFintech'},
-  {house:'Motilal',   scheme:'Large and Midcap Fund Regular Growth',          cat:'Large & Mid', cost:501030,   value:439879,  reg:'KFintech'},
-  {house:'Motilal',   scheme:'Midcap Fund Regular Growth (F2)',               cat:'Mid Cap',     cost:725000,   value:590797,  reg:'KFintech'},
-  {house:'Motilal',   scheme:'Gold and Silver Passive FOF Direct Growth',     cat:'Commodity',   cost:300000,   value:311760,  reg:'KFintech'},
+  {house:'Motilal',   scheme:'Midcap Fund Regular Growth (F1)',               cat:'Mid Cap',     cost:100000,   value:110343,  reg:'KFintech', owner:'Yuvan'},
+  {house:'Motilal',   scheme:'Large and Midcap Fund Regular Growth',          cat:'Large & Mid', cost:501030,   value:439879,  reg:'KFintech', owner:'Yuvan'},
+  {house:'Motilal',   scheme:'Midcap Fund Regular Growth (F2)',               cat:'Mid Cap',     cost:725000,   value:590797,  reg:'KFintech', owner:'Yuvan'},
+  {house:'Motilal',   scheme:'Gold and Silver Passive FOF Direct Growth',     cat:'Commodity',   cost:300000,   value:311760,  reg:'KFintech', owner:'Yuvan'},
   // Nippon
-  {house:'Nippon',    scheme:'Multi Cap Fund Growth (F1)',                     cat:'Multi Cap',   cost:75000,    value:86502,   reg:'KFintech'},
-  {house:'Nippon',    scheme:'Large Cap Fund Direct Growth',                  cat:'Large Cap',   cost:2115941,  value:2060828, reg:'KFintech'},
-  {house:'Nippon',    scheme:'Banking & Financial Services Fund Growth',      cat:'Sectoral',    cost:200000,   value:217135,  reg:'KFintech'},
-  {house:'Nippon',    scheme:'Multi Cap Fund Growth (F2)',                    cat:'Multi Cap',   cost:875000,   value:813516,  reg:'KFintech'},
+  {house:'Nippon',    scheme:'Multi Cap Fund Growth (F1)',                     cat:'Multi Cap',   cost:75000,    value:86502,   reg:'KFintech', owner:'Yuvan'},
+  {house:'Nippon',    scheme:'Large Cap Fund Direct Growth',                  cat:'Large Cap',   cost:2115941,  value:2060828, reg:'KFintech', owner:'Yuvan'},
+  {house:'Nippon',    scheme:'Banking & Financial Services Fund Growth',      cat:'Sectoral',    cost:200000,   value:217135,  reg:'KFintech', owner:'Yuvan'},
+  {house:'Nippon',    scheme:'Multi Cap Fund Growth (F2)',                    cat:'Multi Cap',   cost:875000,   value:813516,  reg:'KFintech', owner:'Yuvan'},
   // SBI
-  {house:'SBI',       scheme:'Multi Asset Allocation Fund Regular Growth',    cat:'Multi Asset', cost:500000,   value:562173,  reg:'CAMS'},
-  {house:'SBI',       scheme:'Contra Fund Regular Growth',                    cat:'Contra',      cost:750000,   value:762589,  reg:'CAMS'},
-  {house:'SBI',       scheme:'Large & Midcap Fund Regular Growth',            cat:'Large & Mid', cost:100000,   value:154005,  reg:'CAMS'},
+  {house:'SBI',       scheme:'Multi Asset Allocation Fund Regular Growth',    cat:'Multi Asset', cost:500000,   value:562173,  reg:'CAMS', owner:'Yuvan'},
+  {house:'SBI',       scheme:'Contra Fund Regular Growth',                    cat:'Contra',      cost:750000,   value:762589,  reg:'CAMS', owner:'Yuvan'},
+  {house:'SBI',       scheme:'Large & Midcap Fund Regular Growth',            cat:'Large & Mid', cost:100000,   value:154005,  reg:'CAMS', owner:'Yuvan'},
   // ── Ramyaa's schemes (CAMS CAS · 19-Mar-2026) ──
   {house:'ICICI',     scheme:'Thematic Advantage FOF Growth',                 cat:'FOF',         cost:100000,   value:95657,   reg:'CAMS',     units:449.123,   mfapiCode:'101026', owner:'Ramyaa'},
   {house:'Invesco',   scheme:'Flexi Cap Fund Regular Growth',                 cat:'Flexi Cap',   cost:300000,   value:271821,  reg:'KFintech',  units:16093.616, mfapiCode:'145255', owner:'Ramyaa'},
@@ -2099,24 +2113,26 @@ function renderMF() {
   const gainPct     = ((gain/casCost)*100).toFixed(1);
   const schemeCount = MF_SCHEMES.length;
   const largest     = [...MF_SCHEMES].sort((a,b)=>b.value-a.value)[0];
-  const camsCount   = MF_SCHEMES.filter(s=>s.reg==='CAMS').length;
-  const kfinCount   = MF_SCHEMES.filter(s=>s.reg==='KFintech').length;
-  const yuvanCount  = MF_SCHEMES.filter(s=>!s.owner||s.owner==='Yuvan').length;
-  const ramyaaCount = MF_SCHEMES.filter(s=>s.owner==='Ramyaa').length;
+  const yuvanSchemes  = MF_SCHEMES.filter(s => !s.owner || s.owner === 'Yuvan');
+  const ramyaaSchemes = MF_SCHEMES.filter(s => s.owner === 'Ramyaa');
+  const yuvanTotal    = yuvanSchemes.reduce((a,s)=>a+(s.value||0),0);
+  const ramyaaTotal   = ramyaaSchemes.reduce((a,s)=>a+(s.value||0),0);
 
   const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
   set('mfTotalValue',   fmt(casTotal));
   set('mfAsOf',         portfolio.asOf || '19 Mar 2026');
-  set('mfSchemeCount',  `${schemeCount} schemes · Yuvan (${yuvanCount}) + Ramyaa (${ramyaaCount})`);
+  set('mfSchemeCount',  `${schemeCount} schemes · Yuvan (${yuvanSchemes.length}) + Ramyaa (${ramyaaSchemes.length})`);
   set('mfCost',         fmt(casCost));
   set('mfGain',         (gain>=0?'+':'')+fmt(gain));
   set('mfReturn',       (gainPct>=0?'+':'')+gainPct+'%');
   set('mfTotalSchemes', schemeCount);
   set('mfTotalSub',     `Across ${new Set(MF_SCHEMES.map(s=>s.house)).size} fund houses`);
   set('mfLargest',      fmt(largest.value));
-  set('mfLargestName',  largest.scheme.substring(0,22)+'…');
-  set('mfCAMS',         camsCount);
-  set('mfKFIN',         kfinCount);
+  set('mfLargestName',  (largest.house+' '+largest.scheme).substring(0,24)+'…');
+  set('mfYuvanTotal',   fmt(yuvanTotal));
+  set('mfYuvanSchemes', `${yuvanSchemes.length} schemes · ${yuvanTotal > 0 ? ((yuvanTotal/casTotal)*100).toFixed(1)+'%' : '—'}`);
+  set('mfRamyaaTotal',  fmt(ramyaaTotal));
+  set('mfRamyaaSchemes',`${ramyaaSchemes.length} schemes · ${ramyaaTotal > 0 ? ((ramyaaTotal/casTotal)*100).toFixed(1)+'%' : '—'}`);
 
   // Colour gain
   const gainEl = document.getElementById('mfGain');
@@ -2566,22 +2582,43 @@ function renderFamily() {
 
   // Table
   const tb = document.getElementById('familyTbody');
-  if(tb) tb.innerHTML = [...portfolio.holdings]
-    .filter(h=>h.value>0)
-    .sort((a,b)=>b.value-a.value)
-    .map(h => {
-      const owner = h.owner||'Yuvan';
-      const ownerTotal = totals[owner]||1;
-      const c = colors[owner]||'#4f7fff';
-      return `<tr>
-        <td><span class="badge" style="background:${c}22;color:${c};border-color:${c}44;font-size:11px">${owner}</span></td>
-        <td style="font-weight:600">${h.account}</td>
-        <td>${h.sub}</td>
-        <td style="color:var(--text3);font-size:12px">${h.remarks||'—'}</td>
-        <td class="num" style="text-align:right">${fmt(h.value)}</td>
-        <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--blue2)">${(h.value/ownerTotal*100).toFixed(1)}%</td>
-      </tr>`;
-    }).join('');
+  if(tb) {
+    // Build rows — replace _mfComputed row with Yuvan+Ramyaa split rows
+    const rows = [];
+
+    [...portfolio.holdings]
+      .filter(h => h.value > 0)
+      .sort((a,b) => b.value - a.value)
+      .forEach(h => {
+        if(h._mfComputed) {
+          // Split into Yuvan MF row + Ramyaa MF row
+          const yuvanMF  = MF_SCHEMES.filter(s => !s.owner || s.owner === 'Yuvan').reduce((a,s)=>a+(s.value||0),0);
+          const ramyaaMF = MF_SCHEMES.filter(s => s.owner === 'Ramyaa').reduce((a,s)=>a+(s.value||0),0);
+          const yuvanCount  = MF_SCHEMES.filter(s => !s.owner || s.owner === 'Yuvan').length;
+          const ramyaaCount = MF_SCHEMES.filter(s => s.owner === 'Ramyaa').length;
+          if(yuvanMF > 0)  rows.push({ owner:'Yuvan',  account:'CAMS+KFin', sub:'Mutual Fund', remarks:`${yuvanCount} schemes`,  value: yuvanMF });
+          if(ramyaaMF > 0) rows.push({ owner:'Ramyaa', account:'CAMS+KFin', sub:'Mutual Fund', remarks:`${ramyaaCount} schemes`, value: ramyaaMF });
+        } else {
+          rows.push({ owner: h.owner||'Yuvan', account: h.account, sub: h.sub, remarks: h.remarks||'—', value: h.value });
+        }
+      });
+
+    tb.innerHTML = rows
+      .sort((a,b) => b.value - a.value)
+      .map(r => {
+        const owner = r.owner;
+        const ownerTotal = totals[owner] || 1;
+        const c = colors[owner] || '#4f7fff';
+        return `<tr>
+          <td><span class="badge" style="background:${c}22;color:${c};border-color:${c}44;font-size:11px">${owner}</span></td>
+          <td style="font-weight:600">${r.account}</td>
+          <td>${r.sub}</td>
+          <td style="color:var(--text3);font-size:12px">${r.remarks}</td>
+          <td class="num" style="text-align:right">${fmt(r.value)}</td>
+          <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--blue2)">${(r.value/ownerTotal*100).toFixed(1)}%</td>
+        </tr>`;
+      }).join('');
+  }
 }
 
 // ═══════════════════════════════════════════════════
@@ -2871,13 +2908,13 @@ const MF_ISIN_MAP = {
   'INF336L01QQ8': { code:'145114', units:6401.938,   name:'HSBC Multi Cap Regular' },        // combined both folios
   'INF109KC1O90': { code:'151271', units:40595.513,  name:'ICICI Pru Business Cycle Growth' }, // combined both folios
   'INF109KC1LG4': { code:'150920', units:14606.339,  name:'ICICI Pru Manufacturing Growth' },
-  'INF109K01852': { code:'101026', units:9396.290,   name:'ICICI Pru Thematic Advantage FOF', owners:'Yuvan+Ramyaa' },
+  'INF109K01852': { code:'101026', units:8947.167,   name:'ICICI Pru Thematic Advantage FOF' },
   'INF109K01761': { code:'100649', units:3548.222,   name:'ICICI Pru Multi-Asset Growth' },   // combined all folios
   'INF109K01431': { code:'100030', units:603.370,    name:'ICICI Pru Large & Mid Cap Growth' }, // combined both folios
   'INF109K01837': { code:'101024', units:35352.651,  name:'ICICI Pru Dynamic AA FOF Growth' },
   'INF109K01BH2': { code:'120586', units:2883.099,   name:'ICICI Pru Balanced Advantage' },
   'INF205KA1AF4': { code:'152068', units:59997.000,  name:'Invesco Business Cycle Regular' },
-  'INF205KA1460': { code:'145255', units:57990.513,  name:'Invesco Flexi Cap Regular', owners:'Yuvan+Ramyaa' },
+  'INF205KA1460': { code:'145255', units:41896.897,  name:'Invesco Flexi Cap Regular' },
   'INF205K01247': { code:'100733', units:9074.780,   name:'Invesco Large & Mid Cap Regular' },
   'INF174K01DS9': { code:'119533', units:1946.104,   name:'Kotak Midcap Regular' },
   'INF174K01153': { code:'100228', units:128.174,    name:'Kotak Large Cap Regular' },
@@ -3009,16 +3046,16 @@ async function autoFetchPrices() {
       }
     });
 
-    // Sync the single computed MF holding from MF_SCHEMES totals
-    const newMFTotal = syncMFTotal();
+    // Sync the computed MF holdings from MF_SCHEMES totals
+    syncMFTotal();
 
-    // Update the _mfComputed row in the modal
+    // Update both _mfComputed rows in the modal (Yuvan + Ramyaa)
     portfolio.holdings.forEach((h, i) => {
       if(!h._mfComputed) return;
       const nv = document.getElementById(`nv_${i}`);
       if(!nv) return;
       nv.removeAttribute('readonly');
-      nv.value = newMFTotal;
+      nv.value = h.value;  // set by syncMFTotal above
       nv.style.borderColor = 'var(--blue)';
       nv.style.color       = 'var(--blue2)';
       nv.style.fontWeight  = '700';
@@ -3139,10 +3176,14 @@ function renderUpdateTable() {
       // ── Normal direct-value row ──
       // Only the _mfComputed row is readonly (auto-computed from CAS)
       const isMF = !!h._mfComputed;
-      const mfSchemeCount = MF_SCHEMES.length;
+      const mfOwner = h._mfOwner || h.owner || 'Yuvan';
+      const mfSchemeCount = isMF
+        ? MF_SCHEMES.filter(s => mfOwner === 'Yuvan' ? (!s.owner || s.owner === 'Yuvan') : s.owner === mfOwner).length
+        : 0;
       const accountLabel = isMF ? 'CAMS+KFin' : h.account;
+      const ownerColor = mfOwner === 'Ramyaa' ? '#9b6dff' : '#4f7fff';
       const autoFetchTag = isMF
-        ? `<span style="font-size:10px;background:rgba(79,127,255,0.15);color:var(--blue2);border:1px solid rgba(79,127,255,0.3);border-radius:6px;padding:2px 7px;margin-left:6px;">✨ auto-fetch · ${mfSchemeCount} schemes</span>`
+        ? `<span style="font-size:10px;background:rgba(79,127,255,0.15);color:${ownerColor};border:1px solid rgba(79,127,255,0.3);border-radius:6px;padding:2px 7px;margin-left:6px;">✨ ${mfOwner} · ${mfSchemeCount} schemes</span>`
         : '';
 
       return `<tr id="row_${i}" style="${isMF?'background:rgba(79,127,255,0.03);':''}">
@@ -3163,7 +3204,7 @@ function renderUpdateTable() {
         </td>
         <td style="text-align:right;">
           ${isMF
-            ? `<div style="font-size:11px;color:var(--text3);text-align:right;line-height:1.6">Yuvan + Ramyaa<br>${mfSchemeCount} schemes</div>`
+            ? `<div style="font-size:11px;color:var(--text3);text-align:right;line-height:1.6">${mfOwner}<br>${mfSchemeCount} schemes</div>`
             : `<input type="text" id="nu_${i}" value="${h.units||''}" placeholder="${h.units||''}"
                 style="width:80px;background:var(--surface3);border:1px solid var(--border);border-radius:8px;padding:7px 8px;color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;text-align:right;outline:none;"
                 onfocus="this.style.borderColor='var(--blue2)'"
@@ -3206,8 +3247,8 @@ function recalcNewTotal() {
       if(inp && inp.value !== '') {
         v = parseFloat(inp.value);
       } else if(h._mfComputed) {
-        // Always use live MF total for computed row
-        v = MF_SCHEMES.reduce((a,s) => a+(s.value||0), 0);
+        // Always use live value set by syncMFTotal for computed MF rows
+        v = h.value || 0;
       } else {
         v = h.value || 0;
       }
