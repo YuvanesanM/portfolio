@@ -2525,7 +2525,7 @@ async function autoFetchPrices() {
       }
     });
 
-    setFetchStatus(`Gold ₹${goldPerGram.toLocaleString('en-IN')}/g · Silver ₹${silverPerGram.toLocaleString('en-IN')}/g · fetching MF…`, 'var(--gold)');
+    setFetchStatus(`Gold ₹${goldPerGram.toLocaleString('en-IN')}/g${silverPerGram ? ` · Silver ₹${silverPerGram.toLocaleString('en-IN')}/g` : ''} · fetching MF…`, 'var(--gold)');
 
     // ── Step 2: Mutual Funds ──────────────────────
     // Get unique MFAPI codes to fetch
