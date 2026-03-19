@@ -1,1 +1,347 @@
-{"asOf":"16 Sep 2025","holdings":[{"account":"ICICI","type":"Deposit","sub":"Fixed Deposit","value":2519467,"units":"","remarks":"Yuvan"},{"account":"ICICI","type":"Deposit","sub":"Fixed Deposit","value":0,"units":"","remarks":"Ramyaa"},{"account":"HDFC","type":"Deposit","sub":"Fixed Deposit","value":500000,"units":"","remarks":"Ramyaa"},{"account":"SBI","type":"Deposit","sub":"Fixed Deposit","value":340026,"units":"","remarks":"Yuvan"},{"account":"HDFC","type":"Deposit","sub":"Fixed Deposit","value":3500000,"units":"","remarks":"Yuvan"},{"account":"SSY","type":"Account","sub":"SSY Account","value":873501,"units":"","remarks":"ICICI - Sana"},{"account":"SSY","type":"Account","sub":"SSY Account","value":873501,"units":"","remarks":"ICICI - Tara"},{"account":"SBI","type":"ULIP","sub":"Insurance","value":344340,"units":"","remarks":"1K365542004"},{"account":"ICICI","type":"Insurance","sub":"Insurance","value":918076,"units":"","remarks":"Tara - A3067570"},{"account":"ICICI","type":"PMS","sub":"PMS","value":5800849,"units":"","remarks":""},{"account":"ICICI","type":"NPS","sub":"NPS","value":268923,"units":"","remarks":""},{"account":"ICICI","type":"SGB","sub":"SGB","value":1129240,"units":"70g","remarks":"Matures 14-Aug-2027"},{"account":"ICICI","type":"SGB","sub":"SGB","value":806600,"units":"50g","remarks":"Matures 10-Dec-2027"},{"account":"ICICI","type":"SGB","sub":"SGB","value":1613200,"units":"100g","remarks":"Matures 08-Sep-2028"},{"account":"ICICI","type":"SGB","sub":"SGB","value":483960,"units":"30g","remarks":"Matures 05-Jan-2029"},{"account":"ICICI","type":"SGB","sub":"SGB","value":806600,"units":"50g","remarks":"Matures 19-Jan-2029"},{"account":"ICICI","type":"SGB","sub":"SGB","value":1613200,"units":"100g","remarks":"Matures 09-Mar-2029"},{"account":"ICICI","type":"SGB","sub":"SGB","value":1613200,"units":"100g","remarks":"Matures 25-May-2029"},{"account":"ICICI","type":"Mutual Fund","sub":"Mutual Fund","value":25986323,"units":"","remarks":"ICICI - Total"},{"account":"HDFC","type":"Mutual Fund","sub":"Mutual Fund","value":413000,"units":"","remarks":"Ramyaa"},{"account":"ICICI","type":"Shares","sub":"ETF & Stocks","value":2892904,"units":"","remarks":"Demat"},{"account":"Kite","type":"Shares","sub":"Mixed Shares","value":349265,"units":"","remarks":"Zerodha"},{"account":"360ONE","type":"AIF","sub":"AIF","value":5000000,"units":"","remarks":"Alternative"},{"account":"ICICI","type":"Shares","sub":"Unlisted","value":975000,"units":"500","remarks":"NSE @ 1950"},{"account":"ICICI","type":"Shares","sub":"Unlisted","value":525000,"units":"25000","remarks":"Sunday Protech @ 20.75"},{"account":"ICICI","type":"Shares","sub":"Unlisted","value":700000,"units":"25000","remarks":"OYO @ 28"},{"account":"ICICI","type":"Shares","sub":"Unlisted","value":555000,"units":"15000","remarks":"Ecosure @ 37"},{"account":"ICICI","type":"REIT","sub":"REIT","value":3087645,"units":"","remarks":"Embassy / Nexus"},{"account":"Bitcoin","type":"Crypto","sub":"Crypto","value":179490,"units":"","remarks":"BTC"},{"account":"Au","type":"Coin","sub":"Coin","value":1856156,"units":"124g","remarks":"Gold coins"},{"account":"Ag","type":"Coin","sub":"Coin","value":450000,"units":"1500g","remarks":"Silver coins"},{"account":"Lq","type":"Savings","sub":"Savings","value":1000000,"units":"","remarks":"Liquid"}],"snapshots":[{"date":"2024-04-10","value":32550000},{"date":"2024-05-10","value":39605000},{"date":"2024-06-21","value":40906091},{"date":"2024-08-29","value":43633812},{"date":"2024-09-03","value":42584362},{"date":"2024-11-28","value":49125944},{"date":"2025-05-27","value":52557538},{"date":"2025-09-16","value":60029917},{"date":"2025-12-13","value":67974466}],"sgbTranches":[{"units":70,"maturity":"14 Aug 2027","cost":244930,"value":1129240},{"units":50,"maturity":"10 Dec 2027","cost":189750,"value":806600},{"units":100,"maturity":"08 Sep 2028","cost":511700,"value":1613200},{"units":30,"maturity":"05 Jan 2029","cost":150000,"value":483960},{"units":50,"maturity":"19 Jan 2029","cost":252700,"value":806600},{"units":100,"maturity":"09 Mar 2029","cost":461200,"value":1613200},{"units":100,"maturity":"25 May 2029","cost":472700,"value":1613200}]}
+{
+  "asOf": "19 Mar 2026",
+  "holdings": [
+    {
+      "account": "ICICI",
+      "type": "Deposit",
+      "sub": "Fixed Deposit",
+      "value": 2519467,
+      "units": "",
+      "remarks": "Yuvan"
+    },
+    {
+      "account": "ICICI",
+      "type": "Deposit",
+      "sub": "Fixed Deposit",
+      "value": 0,
+      "units": "",
+      "remarks": "Ramyaa"
+    },
+    {
+      "account": "HDFC",
+      "type": "Deposit",
+      "sub": "Fixed Deposit",
+      "value": 500000,
+      "units": "",
+      "remarks": "Ramyaa"
+    },
+    {
+      "account": "SBI",
+      "type": "Deposit",
+      "sub": "Fixed Deposit",
+      "value": 340026,
+      "units": "",
+      "remarks": "Yuvan"
+    },
+    {
+      "account": "HDFC",
+      "type": "Deposit",
+      "sub": "Fixed Deposit",
+      "value": 3500000,
+      "units": "",
+      "remarks": "Yuvan"
+    },
+    {
+      "account": "SSY",
+      "type": "Account",
+      "sub": "SSY Account",
+      "value": 873501,
+      "units": "",
+      "remarks": "ICICI - Sana"
+    },
+    {
+      "account": "SSY",
+      "type": "Account",
+      "sub": "SSY Account",
+      "value": 873501,
+      "units": "",
+      "remarks": "ICICI - Tara"
+    },
+    {
+      "account": "SBI",
+      "type": "ULIP",
+      "sub": "Insurance",
+      "value": 344340,
+      "units": "",
+      "remarks": "1K365542004"
+    },
+    {
+      "account": "ICICI",
+      "type": "Insurance",
+      "sub": "Insurance",
+      "value": 918076,
+      "units": "",
+      "remarks": "Tara - A3067570"
+    },
+    {
+      "account": "ICICI",
+      "type": "PMS",
+      "sub": "PMS",
+      "value": 5800849,
+      "units": "",
+      "remarks": ""
+    },
+    {
+      "account": "ICICI",
+      "type": "NPS",
+      "sub": "NPS",
+      "value": 268923,
+      "units": "",
+      "remarks": ""
+    },
+    {
+      "account": "ICICI",
+      "type": "SGB",
+      "sub": "SGB",
+      "value": 1129240,
+      "units": "70g",
+      "remarks": "Matures 14-Aug-2027"
+    },
+    {
+      "account": "ICICI",
+      "type": "SGB",
+      "sub": "SGB",
+      "value": 806600,
+      "units": "50g",
+      "remarks": "Matures 10-Dec-2027"
+    },
+    {
+      "account": "ICICI",
+      "type": "SGB",
+      "sub": "SGB",
+      "value": 1613200,
+      "units": "100g",
+      "remarks": "Matures 08-Sep-2028"
+    },
+    {
+      "account": "ICICI",
+      "type": "SGB",
+      "sub": "SGB",
+      "value": 483960,
+      "units": "30g",
+      "remarks": "Matures 05-Jan-2029"
+    },
+    {
+      "account": "ICICI",
+      "type": "SGB",
+      "sub": "SGB",
+      "value": 806600,
+      "units": "50g",
+      "remarks": "Matures 19-Jan-2029"
+    },
+    {
+      "account": "ICICI",
+      "type": "SGB",
+      "sub": "SGB",
+      "value": 1613200,
+      "units": "100g",
+      "remarks": "Matures 09-Mar-2029"
+    },
+    {
+      "account": "ICICI",
+      "type": "SGB",
+      "sub": "SGB",
+      "value": 1613200,
+      "units": "100g",
+      "remarks": "Matures 25-May-2029"
+    },
+    {
+      "account": "ICICI",
+      "type": "Mutual Fund",
+      "sub": "Mutual Fund",
+      "value": 25986323,
+      "units": "",
+      "remarks": "ICICI - Total"
+    },
+    {
+      "account": "HDFC",
+      "type": "Mutual Fund",
+      "sub": "Mutual Fund",
+      "value": 413000,
+      "units": "",
+      "remarks": "Ramyaa"
+    },
+    {
+      "account": "ICICI",
+      "type": "Shares",
+      "sub": "ETF & Stocks",
+      "value": 2892904,
+      "units": "",
+      "remarks": "Demat"
+    },
+    {
+      "account": "Kite",
+      "type": "Shares",
+      "sub": "Mixed Shares",
+      "value": 349265,
+      "units": "",
+      "remarks": "Zerodha"
+    },
+    {
+      "account": "360ONE",
+      "type": "AIF",
+      "sub": "AIF",
+      "value": 5000000,
+      "units": "",
+      "remarks": "Alternative"
+    },
+    {
+      "account": "ICICI",
+      "type": "Shares",
+      "sub": "Unlisted",
+      "value": 975000,
+      "units": "500",
+      "remarks": "NSE @ 1950"
+    },
+    {
+      "account": "ICICI",
+      "type": "Shares",
+      "sub": "Unlisted",
+      "value": 525000,
+      "units": "25000",
+      "remarks": "Sunday Protech @ 20.75"
+    },
+    {
+      "account": "ICICI",
+      "type": "Shares",
+      "sub": "Unlisted",
+      "value": 700000,
+      "units": "25000",
+      "remarks": "OYO @ 28"
+    },
+    {
+      "account": "ICICI",
+      "type": "Shares",
+      "sub": "Unlisted",
+      "value": 555000,
+      "units": "15000",
+      "remarks": "Ecosure @ 37"
+    },
+    {
+      "account": "ICICI",
+      "type": "REIT",
+      "sub": "REIT",
+      "value": 3087645,
+      "units": "",
+      "remarks": "Embassy / Nexus"
+    },
+    {
+      "account": "Bitcoin",
+      "type": "Crypto",
+      "sub": "Crypto",
+      "value": 179490,
+      "units": "",
+      "remarks": "BTC"
+    },
+    {
+      "account": "Au",
+      "type": "Coin",
+      "sub": "Coin",
+      "value": 1856156,
+      "units": "124g",
+      "remarks": "Gold coins"
+    },
+    {
+      "account": "Ag",
+      "type": "Coin",
+      "sub": "Coin",
+      "value": 412500,
+      "units": "1500g",
+      "remarks": "Silver coins"
+    },
+    {
+      "account": "Lq",
+      "type": "Savings",
+      "sub": "Savings",
+      "value": 1000000,
+      "units": "",
+      "remarks": "Liquid"
+    }
+  ],
+  "snapshots": [
+    {
+      "date": "2024-04-10",
+      "value": 32550000
+    },
+    {
+      "date": "2024-05-10",
+      "value": 39605000
+    },
+    {
+      "date": "2024-06-21",
+      "value": 40906091
+    },
+    {
+      "date": "2024-08-29",
+      "value": 43633812
+    },
+    {
+      "date": "2024-09-03",
+      "value": 42584362
+    },
+    {
+      "date": "2024-11-28",
+      "value": 49125944
+    },
+    {
+      "date": "2025-05-27",
+      "value": 52557538
+    },
+    {
+      "date": "2025-09-16",
+      "value": 60029917
+    },
+    {
+      "date": "2025-12-13",
+      "value": 67974466
+    },
+    {
+      "date": "2026-03-19",
+      "value": 67936966
+    }
+  ],
+  "sgbTranches": [
+    {
+      "units": 70,
+      "maturity": "14 Aug 2027",
+      "cost": 244930,
+      "value": 1129240
+    },
+    {
+      "units": 50,
+      "maturity": "10 Dec 2027",
+      "cost": 189750,
+      "value": 806600
+    },
+    {
+      "units": 100,
+      "maturity": "08 Sep 2028",
+      "cost": 511700,
+      "value": 1613200
+    },
+    {
+      "units": 30,
+      "maturity": "05 Jan 2029",
+      "cost": 150000,
+      "value": 483960
+    },
+    {
+      "units": 50,
+      "maturity": "19 Jan 2029",
+      "cost": 252700,
+      "value": 806600
+    },
+    {
+      "units": 100,
+      "maturity": "09 Mar 2029",
+      "cost": 461200,
+      "value": 1613200
+    },
+    {
+      "units": 100,
+      "maturity": "25 May 2029",
+      "cost": 472700,
+      "value": 1613200
+    }
+  ]
+}
