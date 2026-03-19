@@ -853,10 +853,29 @@
     </div>
 
     <!-- As-of date -->
-    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding:14px 16px;background:var(--surface2);border-radius:12px;border:1px solid var(--border);">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;padding:14px 16px;background:var(--surface2);border-radius:12px;border:1px solid var(--border);">
       <span style="font-size:12px;color:var(--text2);font-weight:600;letter-spacing:0.5px;">AS ON DATE</span>
       <input type="date" class="form-input" id="fDate" style="width:180px;padding:8px 12px;font-size:13px;">
       <span style="font-size:12px;color:var(--text3);">This date will be saved as the valuation date for this update</span>
+    </div>
+
+    <!-- Auto-fetch bar -->
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:14px 18px;background:linear-gradient(135deg,rgba(212,168,67,0.08),rgba(79,127,255,0.06));border-radius:12px;border:1px solid rgba(212,168,67,0.2);">
+      <div style="font-size:20px">✨</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;">Auto-Fetch Live Prices</div>
+        <div style="font-size:11px;color:var(--text3);">Fetches today's Gold, Silver &amp; SGB prices and fills them in automatically · powered by MFAPI.in</div>
+      </div>
+      <div id="fetchStatus" style="font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text3);min-width:180px;text-align:right;"></div>
+      <button id="fetchBtn" onclick="autoFetchPrices()" style="
+        background:linear-gradient(135deg,var(--gold),var(--gold2));
+        color:#080c10; border:none; border-radius:10px;
+        padding:10px 20px; font-family:'Plus Jakarta Sans',sans-serif;
+        font-size:13px; font-weight:700; cursor:pointer;
+        white-space:nowrap; transition:opacity 0.2s;
+        display:flex; align-items:center; gap:8px;">
+        <span id="fetchBtnIcon">⬇</span> Fetch Prices
+      </button>
     </div>
 
     <!-- Holdings table -->
@@ -1743,6 +1762,210 @@ function renderJourney() {
       options:{ responsive:true, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${fmt(ctx.raw)}`},bodyColor:'#e8eef8',backgroundColor:'#161e2e',borderColor:'rgba(212,168,67,0.3)',borderWidth:1}}, scales:{x:{grid:{color:'rgba(99,140,255,0.06)'},ticks:{color:'#4a5a7a',font:{size:11}}},y:{grid:{color:'rgba(99,140,255,0.06)'},ticks:{color:'#4a5a7a',font:{size:11},callback:v=>fmtShort(v)}}} }
     });
   }
+}
+
+// ═══════════════════════════════════════════════════
+//  AUTO-FETCH LIVE PRICES
+// ═══════════════════════════════════════════════════
+
+// MFAPI scheme codes for price proxies
+const GOLD_ETF_CODE   = '101431';  // Nippon India Gold ETF — 1 unit ≈ 1 gram gold
+const SILVER_ETF_CODE = '120494';  // HDFC Silver ETF — 1 unit ≈ 1 gram silver
+
+// ISIN → { mfapiCode, units } for all 45 MF schemes from CAS statement
+// Value = units × latest NAV from MFAPI
+const MF_ISIN_MAP = {
+  'INF846K019E7': { code:'145552', units:13790.892,  name:'Axis NIFTY Next 50 Index Direct' },
+  'INF846K01Y39': { code:'145160', units:11441.076,  name:'Axis Greater China FOF Direct' },
+  'INF0QA701979': { code:'151506', units:115349.611, name:'Bajaj Consumption Regular' },
+  'INF0QA701383': { code:'151500', units:7108.986,   name:'Bajaj Flexi Cap Regular' },
+  'INF194K01524': { code:'119533', units:9453.973,   name:'Bandhan Large & Mid Cap Regular' },
+  'INF090I01569': { code:'148621', units:681.714,    name:'Franklin Small Cap Growth' },
+  'INF090I01981': { code:'148930', units:1816.136,   name:'Franklin Focused Equity Growth' },
+  'INF090I01239': { code:'100444', units:167.805,    name:'Franklin Flexi Cap Growth' },
+  'INF179KC1DV5': { code:'149830', units:13194.680,  name:'HDFC Silver ETF FOF Regular' },
+  'INF179KA1RT1': { code:'120594', units:1178.475,   name:'HDFC Large and Mid Cap Regular' },
+  'INF179K01574': { code:'100282', units:380.415,    name:'HDFC Focused Fund Regular' },
+  'INF179K01608': { code:'100270', units:94.248,     name:'HDFC Flexi Cap Regular' },        // combined both folios units
+  'INF179KC1BJ4': { code:'148800', units:1779.270,   name:'HDFC Banking & Financial Regular' },
+  'INF179KC1HL7': { code:'151191', units:34843.177,  name:'HDFC Pharma Healthcare Regular' },
+  'INF336L01QQ8': { code:'145114', units:6401.938,   name:'HSBC Multi Cap Regular' },        // combined both folios
+  'INF109KC1O90': { code:'151271', units:40595.513,  name:'ICICI Pru Business Cycle Growth' }, // combined both folios
+  'INF109KC1LG4': { code:'150920', units:14606.339,  name:'ICICI Pru Manufacturing Growth' },
+  'INF109K01852': { code:'101026', units:8947.167,   name:'ICICI Pru Thematic Advantage FOF' },
+  'INF109K01761': { code:'100649', units:3548.222,   name:'ICICI Pru Multi-Asset Growth' },   // combined all folios
+  'INF109K01431': { code:'100030', units:603.370,    name:'ICICI Pru Large & Mid Cap Growth' }, // combined both folios
+  'INF109K01837': { code:'101024', units:35352.651,  name:'ICICI Pru Dynamic AA FOF Growth' },
+  'INF109K01BH2': { code:'120586', units:2883.099,   name:'ICICI Pru Balanced Advantage' },
+  'INF205KA1AF4': { code:'152068', units:59997.000,  name:'Invesco Business Cycle Regular' },
+  'INF205KA1460': { code:'145255', units:41896.897,  name:'Invesco Flexi Cap Regular' },
+  'INF205K01247': { code:'100733', units:9074.780,   name:'Invesco Large & Mid Cap Regular' },
+  'INF174K01DS9': { code:'119533', units:1946.104,   name:'Kotak Midcap Regular' },
+  'INF174K01153': { code:'100228', units:128.174,    name:'Kotak Large Cap Regular' },
+  'INF174K01187': { code:'100225', units:265.031,    name:'Kotak Large & Midcap Regular' },
+  'INF247L01411': { code:'135800', units:8454.902,   name:'Motilal Midcap Regular' },         // combined both folios
+  'INF247L01965': { code:'152708', units:14400.768,  name:'Motilal Large & Midcap Regular' },
+  'INF247L01BM8': { code:'153268', units:9731.305,   name:'Motilal Gold & Silver FOF Direct' },
+  'INF204K01489': { code:'100474', units:3243.127,   name:'Nippon Multi Cap Growth' },        // combined both folios
+  'INF204K01XI3': { code:'120716', units:21479.463,  name:'Nippon Large Cap Direct Growth' },
+  'INF204K01927': { code:'101237', units:357.546,    name:'Nippon Banking & Financial' },
+  'INF200K01800': { code:'103504', units:8745.725,   name:'SBI Multi Asset Allocation Regular' },
+  'INF200K01362': { code:'100185', units:2099.778,   name:'SBI Contra Fund Regular' },
+  'INF200K01305': { code:'100443', units:255.200,    name:'SBI Large & Midcap Regular' },
+};
+
+function setFetchStatus(msg, color='var(--text3)') {
+  const el = document.getElementById('fetchStatus');
+  if(el) { el.textContent = msg; el.style.color = color; }
+}
+
+async function fetchLatestNAV(schemeCode) {
+  const res = await fetchWithTimeout(`https://api.mfapi.in/mf/${schemeCode}/latest`, {}, 12000);
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+  return parseFloat(data.data[0].nav);
+}
+
+async function autoFetchPrices() {
+  const btn     = document.getElementById('fetchBtn');
+  const btnIcon = document.getElementById('fetchBtnIcon');
+  btn.disabled  = true;
+  btnIcon.textContent = '⏳';
+  setFetchStatus('Starting fetch…', 'var(--text3)');
+
+  let filled = 0;
+  let errors = 0;
+
+  try {
+    // ── Step 1: Gold & Silver ──────────────────────
+    setFetchStatus('Fetching Gold & Silver prices…', 'var(--gold)');
+    const [goldNAV, silverNAV] = await Promise.all([
+      fetchLatestNAV(GOLD_ETF_CODE),
+      fetchLatestNAV(SILVER_ETF_CODE),
+    ]);
+    const goldPerGram   = Math.round(goldNAV);
+    const silverPerGram = Math.round(silverNAV);
+
+    portfolio.holdings.forEach((h, i) => {
+      const upc = getUnitPriceConfig(h);
+      if(!upc) return;
+      const priceInput = document.getElementById(`up_${i}`);
+      const hiddenVal  = document.getElementById(`nv_${i}`);
+      const calcLabel  = document.getElementById(`calc_${i}`);
+      if(!priceInput) return;
+
+      let price = null;
+      if(h.account === 'Au')                            price = goldPerGram;
+      else if(h.account === 'Ag')                       price = silverPerGram;
+      else if((h.sub||'').toLowerCase() === 'sgb')      price = goldPerGram;
+
+      if(price !== null) {
+        priceInput.value = price;
+        priceInput.style.borderColor = 'var(--green)';
+        priceInput.style.color       = 'var(--green)';
+        const total = Math.round(price * upc.qty);
+        hiddenVal.value = total;
+        if(calcLabel) { calcLabel.textContent = `= ${fmt(total)}`; calcLabel.style.color = 'var(--green)'; }
+        filled++;
+      }
+    });
+
+    setFetchStatus(`Gold ₹${goldPerGram.toLocaleString('en-IN')}/g · Silver ₹${silverPerGram.toLocaleString('en-IN')}/g · fetching MF…`, 'var(--gold)');
+
+    // ── Step 2: Mutual Funds ──────────────────────
+    // Get unique MFAPI codes to fetch
+    const uniqueCodes = [...new Set(Object.values(MF_ISIN_MAP).map(v => v.code))];
+    const totalCodes  = uniqueCodes.length;
+
+    setFetchStatus(`Fetching ${totalCodes} MF NAVs… (0/${totalCodes})`, 'var(--blue2)');
+
+    // Batch fetch in groups of 5 to avoid rate limiting
+    const navMap = {};  // code → NAV
+    const batchSize = 5;
+    for(let i = 0; i < uniqueCodes.length; i += batchSize) {
+      const batch = uniqueCodes.slice(i, i + batchSize);
+      const results = await Promise.allSettled(
+        batch.map(async code => ({ code, nav: await fetchLatestNAV(code) }))
+      );
+      results.forEach(r => {
+        if(r.status === 'fulfilled') navMap[r.value.code] = r.value.nav;
+        else errors++;
+      });
+      const done = Math.min(i + batchSize, uniqueCodes.length);
+      setFetchStatus(`Fetching MF NAVs… (${done}/${totalCodes})`, 'var(--blue2)');
+      // Small delay between batches
+      if(i + batchSize < uniqueCodes.length) await new Promise(r => setTimeout(r, 300));
+    }
+
+    // Calculate total MF value from NAVs
+    let mfTotal = 0;
+    const mfDetails = [];
+    Object.entries(MF_ISIN_MAP).forEach(([isin, scheme]) => {
+      const nav = navMap[scheme.code];
+      if(nav) {
+        const val = Math.round(nav * scheme.units);
+        mfTotal += val;
+        mfDetails.push({ name: scheme.name, nav, units: scheme.units, value: val });
+      }
+    });
+
+    // Update the Mutual Fund holdings rows in modal
+    portfolio.holdings.forEach((h, i) => {
+      if(h.sub !== 'Mutual Fund') return;
+      const nv = document.getElementById(`nv_${i}`);
+      if(!nv) return;
+
+      // ICICI MF → use ICICI total, HDFC MF → use HDFC total
+      let assignedValue = 0;
+      if(h.account === 'ICICI') {
+        // ICICI folio total = mfTotal minus HDFC share
+        const hdfcSchemes = ['INF179KC1DV5','INF179KA1RT1','INF179K01574','INF179K01608','INF179KC1BJ4','INF179KC1HL7'];
+        const hdfcTotal = hdfcSchemes.reduce((acc, isin) => {
+          const s = MF_ISIN_MAP[isin];
+          const nav = s ? navMap[s.code] : null;
+          return acc + (nav ? Math.round(nav * s.units) : 0);
+        }, 0);
+        assignedValue = mfTotal - hdfcTotal;
+      } else if(h.account === 'HDFC') {
+        const hdfcSchemes = ['INF179KC1DV5','INF179KA1RT1','INF179K01574','INF179K01608','INF179KC1BJ4','INF179KC1HL7'];
+        assignedValue = hdfcSchemes.reduce((acc, isin) => {
+          const s = MF_ISIN_MAP[isin];
+          const nav = s ? navMap[s.code] : null;
+          return acc + (nav ? Math.round(nav * s.units) : 0);
+        }, 0);
+      }
+
+      if(assignedValue > 0) {
+        nv.value = assignedValue;
+        nv.style.borderColor = 'var(--blue)';
+        nv.style.color       = 'var(--blue2)';
+        filled++;
+      }
+    });
+
+    recalcNewTotal();
+
+    // Also update MF_SCHEMES live values for MF page refresh
+    MF_SCHEMES.forEach(s => {
+      // Match by checking if any ISIN in our map corresponds to this scheme
+      const entry = Object.entries(MF_ISIN_MAP).find(([isin, m]) => m.name === s.scheme || m.code === s.mfapiCode);
+      if(entry && navMap[entry[1].code]) {
+        s.value = Math.round(navMap[entry[1].code] * entry[1].units);
+      }
+    });
+
+    const fetchedMF = Object.keys(navMap).length;
+    setFetchStatus(
+      `✓ Gold ₹${goldPerGram.toLocaleString('en-IN')}/g · Silver ₹${silverPerGram.toLocaleString('en-IN')}/g · MF ${fetchedMF}/${totalCodes} NAVs · ${filled} rows filled`,
+      'var(--green)'
+    );
+
+  } catch(e) {
+    setFetchStatus(`✗ Fetch failed: ${e.message}`, 'var(--red)');
+  }
+
+  btn.disabled       = false;
+  btnIcon.textContent = '⬇';
 }
 
 // ═══════════════════════════════════════════════════
