@@ -485,15 +485,15 @@
       <div class="hero-right">
         <div class="hero-stat">
           <div class="hero-stat-label">Mutual Funds</div>
-          <div class="hero-stat-value gold">₹2.64 Cr</div>
+          <div class="hero-stat-value gold" id="statMF">₹2.64 Cr</div>
         </div>
         <div class="hero-stat">
           <div class="hero-stat-label">Liquid Assets</div>
-          <div class="hero-stat-value green">₹68.6 L</div>
+          <div class="hero-stat-value green" id="statLiquid">₹68.6 L</div>
         </div>
         <div class="hero-stat">
           <div class="hero-stat-label">Illiquid / Lock-in</div>
-          <div class="hero-stat-value blue">₹3.32 Cr</div>
+          <div class="hero-stat-value blue" id="statIlliquid">₹3.32 Cr</div>
         </div>
       </div>
     </div>
@@ -504,28 +504,28 @@
         <div class="card-accent" style="background:var(--gold)"></div>
         <div class="card-icon">📈</div>
         <div class="card-label">SGB Holdings</div>
-        <div class="card-value">₹80.7 L</div>
-        <div class="card-sub">500 grams · 7 tranches</div>
+        <div class="card-value" id="statSGB">₹80.7 L</div>
+        <div class="card-sub" id="statSGBsub">500 grams · 7 tranches</div>
       </div>
       <div class="card">
         <div class="card-accent" style="background:var(--purple)"></div>
         <div class="card-icon">🏦</div>
         <div class="card-label">PMS + AIF</div>
-        <div class="card-value">₹1.08 Cr</div>
+        <div class="card-value" id="statPMSAIF">₹1.08 Cr</div>
         <div class="card-sub">Alternative investments</div>
       </div>
       <div class="card">
         <div class="card-accent" style="background:var(--teal)"></div>
         <div class="card-icon">🏢</div>
         <div class="card-label">REIT</div>
-        <div class="card-value">₹30.9 L</div>
+        <div class="card-value" id="statREIT">₹30.9 L</div>
         <div class="card-sub">Real estate exposure</div>
       </div>
       <div class="card">
         <div class="card-accent" style="background:var(--orange)"></div>
         <div class="card-icon">💰</div>
         <div class="card-label">Physical + Crypto</div>
-        <div class="card-value">₹25 L</div>
+        <div class="card-value" id="statPhysical">₹25 L</div>
         <div class="card-sub">Gold coins, Ag, Bitcoin</div>
       </div>
     </div>
@@ -1078,10 +1078,34 @@ function showPage(id, btn) {
 // ═══════════════════════════════════════════════════
 //  RENDER
 // ═══════════════════════════════════════════════════
+function renderStats() {
+  // Hero stats
+  const mf       = summary.find(s=>s.name==='Mutual Fund')?.value||0;
+  const liquid   = summary.filter(s=>['Mutual Fund','Fixed Deposit','Savings','Crypto'].includes(s.name)).reduce((a,b)=>a+b.value,0);
+  const illiquid = summary.filter(s=>['SGB','PMS','AIF','SSY Account','Insurance','NPS'].includes(s.name)).reduce((a,b)=>a+b.value,0);
+  const sgbTotal = sgbTranches.reduce((a,b)=>a+b.value,0);
+  const sgbGrams = sgbTranches.reduce((a,b)=>a+b.units,0);
+  const pmsaif   = (summary.find(s=>s.name==='PMS')?.value||0) + (summary.find(s=>s.name==='AIF')?.value||0);
+  const reit     = summary.find(s=>s.name==='REIT')?.value||0;
+  const physical = (summary.find(s=>s.name==='Coin')?.value||0) + (summary.find(s=>s.name==='Crypto')?.value||0);
+
+  const set = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
+
+  set('statMF',       fmt(mf));
+  set('statLiquid',   fmt(liquid));
+  set('statIlliquid', fmt(illiquid));
+  set('statSGB',      fmt(sgbTotal));
+  set('statSGBsub',   `${sgbGrams} grams · ${sgbTranches.length} tranches`);
+  set('statPMSAIF',   fmt(pmsaif));
+  set('statREIT',     fmt(reit));
+  set('statPhysical', fmt(physical));
+}
+
 function initDashboard() {
-  document.getElementById('heroTotal').textContent = fmt(portfolio.total);
-  document.getElementById('heroDate').textContent  = portfolio.asOf;
+  document.getElementById('heroTotal').textContent   = fmt(portfolio.total);
+  document.getElementById('heroDate').textContent    = portfolio.asOf;
   document.getElementById('lastUpdated').textContent = 'Updated: '+portfolio.asOf;
+  renderStats();
   renderAlloc();
   renderCharts();
   renderHoldings();
@@ -1119,6 +1143,7 @@ function refreshDashboard() {
   document.getElementById('lastUpdated').textContent = 'Updated: ' + portfolio.asOf;
 
   // Re-render everything
+  renderStats();
   renderAlloc();
   renderCharts();
   renderHoldings();
