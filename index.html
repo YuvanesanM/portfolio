@@ -237,6 +237,15 @@
     transition: border-color 0.2s, transform 0.2s;
   }
   .card:hover { border-color: rgba(99,140,255,0.25); transform: translateY(-2px); }
+  .card-clickable { cursor: pointer; position: relative; }
+  .card-clickable:hover { border-color: rgba(212,168,67,0.4); transform: translateY(-3px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+  .card-clickable:active { transform: translateY(-1px); }
+  .card-arrow {
+    position: absolute; bottom: 18px; right: 20px;
+    font-size: 16px; color: var(--text3);
+    transition: color 0.2s, transform 0.2s;
+  }
+  .card-clickable:hover .card-arrow { color: var(--gold); transform: translateX(3px); }
   .card-label { font-size: 11px; font-weight: 500; letter-spacing: 1.5px; color: var(--text3); text-transform: uppercase; margin-bottom: 12px; }
   .card-value { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 28px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
   .card-sub { font-size: 12px; color: var(--text2); }
@@ -463,6 +472,8 @@
     <nav class="header-nav">
       <button class="nav-btn active" onclick="showPage('overview',this)">Overview</button>
       <button class="nav-btn" onclick="showPage('holdings',this)">Holdings</button>
+      <button class="nav-btn" onclick="showPage('mf',this)">Mutual Funds</button>
+      <button class="nav-btn" onclick="showPage('fd',this)">Fixed Deposits</button>
       <button class="nav-btn" onclick="showPage('sgb',this)">SGB</button>
       <button class="nav-btn" onclick="showPage('journey',this)">Wealth Journey</button>
     </nav>
@@ -499,13 +510,30 @@
     </div>
 
     <!-- STAT CARDS -->
-    <div class="grid-4">
-      <div class="card">
+    <div class="grid-3">
+      <div class="card card-clickable" onclick="navToPage('mf')">
+        <div class="card-accent" style="background:var(--blue)"></div>
+        <div class="card-icon">📊</div>
+        <div class="card-label">Mutual Funds</div>
+        <div class="card-value" id="statMF">₹2.64 Cr</div>
+        <div class="card-sub" id="statMFsub">2 folios</div>
+        <div class="card-arrow">→</div>
+      </div>
+      <div class="card card-clickable" onclick="navToPage('fd')">
+        <div class="card-accent" style="background:var(--green)"></div>
+        <div class="card-icon">🏛️</div>
+        <div class="card-label">Fixed Deposits</div>
+        <div class="card-value" id="statFD">₹68.6 L</div>
+        <div class="card-sub" id="statFDsub">4 deposits</div>
+        <div class="card-arrow">→</div>
+      </div>
+      <div class="card card-clickable" onclick="navToPage('sgb')">
         <div class="card-accent" style="background:var(--gold)"></div>
         <div class="card-icon">📈</div>
         <div class="card-label">SGB Holdings</div>
         <div class="card-value" id="statSGB">₹80.7 L</div>
         <div class="card-sub" id="statSGBsub">500 grams · 7 tranches</div>
+        <div class="card-arrow">→</div>
       </div>
       <div class="card">
         <div class="card-accent" style="background:var(--purple)"></div>
@@ -572,26 +600,128 @@
     </div>
   </div>
 
+  <!-- ═══════════ PAGE: MUTUAL FUNDS ═══════════ -->
+  <div class="page" id="page-mf">
+    <div class="grid-3" style="margin-bottom:24px">
+      <div class="card">
+        <div class="card-accent" style="background:var(--blue)"></div>
+        <div class="card-label">Total MF Value</div>
+        <div class="card-value" id="mfTotalValue">—</div>
+        <div class="card-sub" id="mfTotalSub">—</div>
+      </div>
+      <div class="card">
+        <div class="card-accent" style="background:var(--blue2)"></div>
+        <div class="card-label">ICICI Folios</div>
+        <div class="card-value" id="mfICICI">—</div>
+        <div class="card-sub">Primary MF account</div>
+      </div>
+      <div class="card">
+        <div class="card-accent" style="background:var(--purple)"></div>
+        <div class="card-label">HDFC Folios</div>
+        <div class="card-value" id="mfHDFC">—</div>
+        <div class="card-sub">Ramyaa's account</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Mutual Fund Holdings</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Account</th>
+              <th>Holder</th>
+              <th style="text-align:right">Current Value</th>
+              <th style="text-align:right">% of MF</th>
+              <th style="text-align:right">% of Portfolio</th>
+            </tr>
+          </thead>
+          <tbody id="mfTbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="grid-2" style="margin-top:24px">
+      <div class="card">
+        <h3>MF Account Split</h3>
+        <canvas id="mfDonut" width="260" height="260"></canvas>
+      </div>
+      <div class="card">
+        <h3>MF as % of Total Portfolio</h3>
+        <div id="mfAllocRows"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ PAGE: FIXED DEPOSITS ═══════════ -->
+  <div class="page" id="page-fd">
+    <div class="grid-3" style="margin-bottom:24px">
+      <div class="card">
+        <div class="card-accent" style="background:var(--green)"></div>
+        <div class="card-label">Total FD Value</div>
+        <div class="card-value" id="fdTotalValue">—</div>
+        <div class="card-sub" id="fdTotalSub">—</div>
+      </div>
+      <div class="card">
+        <div class="card-accent" style="background:var(--teal)"></div>
+        <div class="card-label">Largest FD</div>
+        <div class="card-value" id="fdLargest">—</div>
+        <div class="card-sub" id="fdLargestSub">—</div>
+      </div>
+      <div class="card">
+        <div class="card-accent" style="background:var(--blue2)"></div>
+        <div class="card-label">No. of FDs</div>
+        <div class="card-value" id="fdCount">—</div>
+        <div class="card-sub">Across all banks</div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Fixed Deposit Details</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Bank</th>
+              <th>Holder</th>
+              <th style="text-align:right">Value</th>
+              <th style="text-align:right">% of FD</th>
+              <th style="text-align:right">% of Portfolio</th>
+            </tr>
+          </thead>
+          <tbody id="fdTbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="grid-2" style="margin-top:24px">
+      <div class="card">
+        <h3>FD Bank Distribution</h3>
+        <canvas id="fdDonut" width="260" height="260"></canvas>
+      </div>
+      <div class="card">
+        <h3>FD Holder Split</h3>
+        <div id="fdHolderRows"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- ═══════════ PAGE: SGB ═══════════ -->
   <div class="page" id="page-sgb">
     <div class="grid-3" style="margin-bottom:24px">
       <div class="card">
         <div class="card-accent" style="background:var(--gold)"></div>
         <div class="card-label">Total SGB Value</div>
-        <div class="card-value">₹80.66 L</div>
-        <div class="card-sub">7 tranches · ICICI Demat</div>
+        <div class="card-value" id="sgbTotalValue">₹80.66 L</div>
+        <div class="card-sub" id="sgbTotalSub">7 tranches · ICICI Demat</div>
       </div>
       <div class="card">
         <div class="card-accent" style="background:var(--gold2)"></div>
         <div class="card-label">Total Units</div>
-        <div class="card-value">500 grams</div>
+        <div class="card-value" id="sgbTotalUnits">500 grams</div>
         <div class="card-sub">Sovereign Gold Bonds</div>
       </div>
       <div class="card">
         <div class="card-accent" style="background:var(--green)"></div>
         <div class="card-label">Cost Basis</div>
-        <div class="card-value">₹22.82 L</div>
-        <div class="card-sub">Unrealised gain: ₹57.84 L</div>
+        <div class="card-value" id="sgbCostBasis">₹22.82 L</div>
+        <div class="card-sub" id="sgbGainSub">Unrealised gain: ₹57.84 L</div>
       </div>
     </div>
     <div class="card">
@@ -614,21 +744,21 @@
     <div class="hero" style="margin-bottom:28px">
       <div class="hero-left">
         <div class="hero-label">Wealth Journey</div>
-        <div class="hero-value">₹6.80 Cr</div>
-        <div class="hero-sub">Target: <span>₹10 Cr</span> · Progress: <span style="color:var(--gold)">68%</span></div>
+        <div class="hero-value" id="journeyTotal">₹6.80 Cr</div>
+        <div class="hero-sub">Target: <span>₹10 Cr</span> · Progress: <span style="color:var(--gold)" id="journeyProgress">68%</span></div>
       </div>
       <div class="hero-right">
         <div class="hero-stat">
           <div class="hero-stat-label">At 12% CAGR</div>
-          <div class="hero-stat-value gold">~2.8 yrs</div>
+          <div class="hero-stat-value gold" id="cagr12">~2.8 yrs</div>
         </div>
         <div class="hero-stat">
           <div class="hero-stat-label">At 15% CAGR</div>
-          <div class="hero-stat-value green">~2.2 yrs</div>
+          <div class="hero-stat-value green" id="cagr15">~2.2 yrs</div>
         </div>
         <div class="hero-stat">
           <div class="hero-stat-label">Retirement SWR</div>
-          <div class="hero-stat-value blue">₹3.2L/mo</div>
+          <div class="hero-stat-value blue" id="journeySWR">₹3.2L/mo</div>
         </div>
       </div>
     </div>
@@ -1068,6 +1198,11 @@ async function loadAndInit() {
 // ═══════════════════════════════════════════════════
 //  NAV
 // ═══════════════════════════════════════════════════
+function navToPage(id) {
+  const btn = document.querySelector(`.nav-btn[onclick="showPage('${id}',this)"]`);
+  if(btn) showPage(id, btn);
+}
+
 function showPage(id, btn) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
@@ -1079,19 +1214,23 @@ function showPage(id, btn) {
 //  RENDER
 // ═══════════════════════════════════════════════════
 function renderStats() {
-  // Hero stats
   const mf       = summary.find(s=>s.name==='Mutual Fund')?.value||0;
+  const fdHoldings = portfolio.holdings.filter(h=>h.sub==='Fixed Deposit' && h.value>0);
+  const fdTotal  = fdHoldings.reduce((a,b)=>a+(b.value||0),0);
   const liquid   = summary.filter(s=>['Mutual Fund','Fixed Deposit','Savings','Crypto'].includes(s.name)).reduce((a,b)=>a+b.value,0);
   const illiquid = summary.filter(s=>['SGB','PMS','AIF','SSY Account','Insurance','NPS'].includes(s.name)).reduce((a,b)=>a+b.value,0);
   const sgbTotal = sgbTranches.reduce((a,b)=>a+b.value,0);
   const sgbGrams = sgbTranches.reduce((a,b)=>a+b.units,0);
-  const pmsaif   = (summary.find(s=>s.name==='PMS')?.value||0) + (summary.find(s=>s.name==='AIF')?.value||0);
+  const pmsaif   = (summary.find(s=>s.name==='PMS')?.value||0)+(summary.find(s=>s.name==='AIF')?.value||0);
   const reit     = summary.find(s=>s.name==='REIT')?.value||0;
-  const physical = (summary.find(s=>s.name==='Coin')?.value||0) + (summary.find(s=>s.name==='Crypto')?.value||0);
+  const physical = (summary.find(s=>s.name==='Coin')?.value||0)+(summary.find(s=>s.name==='Crypto')?.value||0);
+  const mfCount  = portfolio.holdings.filter(h=>h.sub==='Mutual Fund').length;
 
-  const set = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
-
+  const set = (id,val) => { const e=document.getElementById(id); if(e) e.textContent=val; };
   set('statMF',       fmt(mf));
+  set('statMFsub',    `${mfCount} folio${mfCount!==1?'s':''} · ${(mf/portfolio.total*100).toFixed(1)}% of portfolio`);
+  set('statFD',       fmt(fdTotal));
+  set('statFDsub',    `${fdHoldings.length} deposit${fdHoldings.length!==1?'s':''} · ${(fdTotal/portfolio.total*100).toFixed(1)}% of portfolio`);
   set('statLiquid',   fmt(liquid));
   set('statIlliquid', fmt(illiquid));
   set('statSGB',      fmt(sgbTotal));
@@ -1109,6 +1248,8 @@ function initDashboard() {
   renderAlloc();
   renderCharts();
   renderHoldings();
+  renderMF();
+  renderFD();
   renderSGB();
   renderJourney();
 }
@@ -1147,6 +1288,8 @@ function refreshDashboard() {
   renderAlloc();
   renderCharts();
   renderHoldings();
+  renderMF();
+  renderFD();
   renderSGB();
   renderJourney();
 }
@@ -1194,30 +1337,181 @@ function renderHoldings() {
   }).join('');
 }
 
+function renderMF() {
+  const mfHoldings = portfolio.holdings.filter(h => h.sub === 'Mutual Fund');
+  const total = mfHoldings.reduce((a,b) => a+(b.value||0), 0);
+  const icicTotal = mfHoldings.filter(h=>h.account==='ICICI').reduce((a,b)=>a+(b.value||0),0);
+  const hdfcTotal = mfHoldings.filter(h=>h.account==='HDFC').reduce((a,b)=>a+(b.value||0),0);
+
+  const set = (id,val) => { const e=document.getElementById(id); if(e) e.textContent=val; };
+  set('mfTotalValue', fmt(total));
+  set('mfTotalSub',   `${mfHoldings.length} folios · ${(total/portfolio.total*100).toFixed(1)}% of portfolio`);
+  set('mfICICI',      fmt(icicTotal));
+  set('mfHDFC',       hdfcTotal > 0 ? fmt(hdfcTotal) : '—');
+
+  // Table
+  const tb = document.getElementById('mfTbody');
+  if(tb) tb.innerHTML = mfHoldings.map(h => {
+    const pctMF   = total > 0 ? (h.value/total*100).toFixed(1)+'%' : '—';
+    const pctPort = (h.value/portfolio.total*100).toFixed(2)+'%';
+    const holder  = h.remarks || h.account;
+    return `<tr>
+      <td><span class="badge" style="background:rgba(79,127,255,0.15);color:var(--blue2);border-color:rgba(79,127,255,0.3)">${h.account}</span></td>
+      <td style="color:var(--text2);font-size:13px">${holder}</td>
+      <td class="num" style="text-align:right">${fmt(h.value)}</td>
+      <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold)">${pctMF}</td>
+      <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text3)">${pctPort}</td>
+    </tr>`;
+  }).join('');
+
+  // Alloc rows
+  const allocEl = document.getElementById('mfAllocRows');
+  if(allocEl) {
+    const rows = [
+      { label:'Mutual Funds', value:total, color:'var(--blue)' },
+      { label:'Rest of Portfolio', value:portfolio.total-total, color:'var(--surface3)' },
+    ];
+    allocEl.innerHTML = rows.map(r => `
+      <div class="alloc-row">
+        <div class="alloc-dot" style="background:${r.color}"></div>
+        <div class="alloc-name">${r.label}</div>
+        <div class="alloc-bar-wrap"><div class="alloc-bar-fill" style="width:${(r.value/portfolio.total*100).toFixed(1)}%;background:${r.color}"></div></div>
+        <div class="alloc-pct">${(r.value/portfolio.total*100).toFixed(1)}%</div>
+        <div class="alloc-val">${fmtShort(r.value)}</div>
+      </div>`).join('');
+  }
+
+  // Donut
+  const canvas = document.getElementById('mfDonut');
+  if(canvas) {
+    const existing = Chart.getChart(canvas);
+    if(existing) existing.destroy();
+    if(total > 0) {
+      new Chart(canvas.getContext('2d'), {
+        type:'doughnut',
+        data:{ labels:mfHoldings.map(h=>h.account+' – '+h.remarks), datasets:[{ data:mfHoldings.map(h=>h.value), backgroundColor:['#4f7fff','#9b6dff','#00c4b4','#ff8c42'], borderWidth:2, borderColor:'#0f1520', hoverOffset:6 }] },
+        options:{ cutout:'65%', responsive:false, plugins:{ legend:{display:true, position:'bottom', labels:{color:'#8a9bbf',font:{size:11},boxWidth:12}}, tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${fmt(ctx.raw)}`},bodyColor:'#e8eef8',backgroundColor:'#161e2e',borderColor:'rgba(99,140,255,0.2)',borderWidth:1} } }
+      });
+    }
+  }
+}
+
+function renderFD() {
+  const fdHoldings = portfolio.holdings.filter(h => h.sub === 'Fixed Deposit' && h.value > 0);
+  const total = fdHoldings.reduce((a,b) => a+(b.value||0), 0);
+  const largest = [...fdHoldings].sort((a,b) => b.value-a.value)[0];
+
+  const set = (id,val) => { const e=document.getElementById(id); if(e) e.textContent=val; };
+  set('fdTotalValue', fmt(total));
+  set('fdTotalSub',   `${fdHoldings.length} deposits · ${(total/portfolio.total*100).toFixed(1)}% of portfolio`);
+  set('fdCount',      fdHoldings.length.toString());
+  set('fdLargest',    largest ? fmt(largest.value) : '—');
+  set('fdLargestSub', largest ? `${largest.account} · ${largest.remarks}` : '—');
+
+  // Table
+  const tb = document.getElementById('fdTbody');
+  if(tb) tb.innerHTML = fdHoldings.map(h => {
+    const pctFD   = total > 0 ? (h.value/total*100).toFixed(1)+'%' : '—';
+    const pctPort = (h.value/portfolio.total*100).toFixed(2)+'%';
+    return `<tr>
+      <td><span class="badge" style="background:rgba(46,204,143,0.1);color:var(--green);border-color:rgba(46,204,143,0.3)">${h.account}</span></td>
+      <td style="color:var(--text2);font-size:13px">${h.remarks||'—'}</td>
+      <td class="num" style="text-align:right">${fmt(h.value)}</td>
+      <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold)">${pctFD}</td>
+      <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text3)">${pctPort}</td>
+    </tr>`;
+  }).join('');
+
+  // Holder split rows
+  const holderEl = document.getElementById('fdHolderRows');
+  if(holderEl) {
+    const yuvanTotal = fdHoldings.filter(h=>h.remarks==='Yuvan').reduce((a,b)=>a+(b.value||0),0);
+    const ramyaaTotal = fdHoldings.filter(h=>h.remarks==='Ramyaa').reduce((a,b)=>a+(b.value||0),0);
+    const rows = [
+      { label:'Yuvan', value:yuvanTotal, color:'var(--blue2)' },
+      { label:'Ramyaa', value:ramyaaTotal, color:'var(--purple)' },
+    ].filter(r => r.value > 0);
+    holderEl.innerHTML = rows.map(r => `
+      <div class="alloc-row">
+        <div class="alloc-dot" style="background:${r.color}"></div>
+        <div class="alloc-name">${r.label}</div>
+        <div class="alloc-bar-wrap"><div class="alloc-bar-fill" style="width:${(r.value/total*100).toFixed(1)}%;background:${r.color}"></div></div>
+        <div class="alloc-pct">${(r.value/total*100).toFixed(1)}%</div>
+        <div class="alloc-val">${fmtShort(r.value)}</div>
+      </div>`).join('');
+  }
+
+  // Donut by bank
+  const canvas = document.getElementById('fdDonut');
+  if(canvas) {
+    const existing = Chart.getChart(canvas);
+    if(existing) existing.destroy();
+    if(total > 0) {
+      const banks = [...new Set(fdHoldings.map(h=>h.account))];
+      const bankTotals = banks.map(b => fdHoldings.filter(h=>h.account===b).reduce((a,h)=>a+(h.value||0),0));
+      const colors = ['#2ecc8f','#4f7fff','#ff8c42','#9b6dff','#f0c96b'];
+      new Chart(canvas.getContext('2d'), {
+        type:'doughnut',
+        data:{ labels:banks, datasets:[{ data:bankTotals, backgroundColor:colors.slice(0,banks.length), borderWidth:2, borderColor:'#0f1520', hoverOffset:6 }] },
+        options:{ cutout:'65%', responsive:false, plugins:{ legend:{display:true, position:'bottom', labels:{color:'#8a9bbf',font:{size:11},boxWidth:12}}, tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${fmt(ctx.raw)}`},bodyColor:'#e8eef8',backgroundColor:'#161e2e',borderColor:'rgba(99,140,255,0.2)',borderWidth:1} } }
+      });
+    }
+  }
+}
+
 function renderSGB() {
   const el = document.getElementById('sgbRows');
   if(!el) return;
-  el.innerHTML = sgbTranches.map(t=>{
-    const gain = t.value-t.cost;
+
+  const totalValue = sgbTranches.reduce((a,b) => a+b.value, 0);
+  const totalUnits = sgbTranches.reduce((a,b) => a+b.units, 0);
+  const totalCost  = sgbTranches.reduce((a,b) => a+b.cost,  0);
+  const totalGain  = totalValue - totalCost;
+
+  // Update SGB stat cards
+  const set = (id, val) => { const e=document.getElementById(id); if(e) e.textContent=val; };
+  set('sgbTotalValue', fmt(totalValue));
+  set('sgbTotalSub',   `${sgbTranches.length} tranches · ICICI Demat`);
+  set('sgbTotalUnits', `${totalUnits} grams`);
+  set('sgbCostBasis',  fmt(totalCost));
+  set('sgbGainSub',    `Unrealised gain: ${fmt(totalGain)}`);
+
+  el.innerHTML = sgbTranches.map(t => {
+    const gain    = t.value - t.cost;
     const gainPct = ((gain/t.cost)*100).toFixed(1);
     return `<div class="sgb-row">
       <div class="sgb-units">${t.units}g</div>
       <div class="sgb-date">${t.maturity}</div>
       <div class="sgb-cost">Cost: ${fmt(t.cost)}</div>
       <div class="sgb-val">${fmt(t.value)}</div>
-      <div class="sgb-gain">+${gainPct}%</div>
+      <div class="sgb-gain">${gain>=0?'+':''}${gainPct}%</div>
     </div>`;
   }).join('');
 }
 
 function renderJourney() {
-  const milestones=[
-    {label:'₹5 Crore',target:50000000},{label:'₹6 Crore',target:60000000},
-    {label:'₹7 Crore',target:70000000},{label:'₹8 Crore',target:80000000},
-    {label:'₹10 Crore (Target)',target:100000000},{label:'₹15 Crore',target:150000000},
+  const TARGET = 100000000; // ₹10 Cr
+  const progress = Math.min(100, (portfolio.total/TARGET)*100);
+
+  // Update journey hero stats dynamically
+  const yrs12 = (Math.log(TARGET/portfolio.total)/Math.log(1.12)).toFixed(1);
+  const yrs15 = (Math.log(TARGET/portfolio.total)/Math.log(1.15)).toFixed(1);
+  const swr   = Math.round(portfolio.total * 0.12 / 12);
+
+  const set = (id,val) => { const e=document.getElementById(id); if(e) e.textContent=val; };
+  set('journeyTotal',    fmt(portfolio.total));
+  set('journeyProgress', progress.toFixed(0)+'%');
+  set('cagr12',          `~${yrs12} yrs`);
+  set('cagr15',          `~${yrs15} yrs`);
+  set('journeySWR',      `${fmt(swr)}/mo`);
+
+  const milestones = [
+    {label:'₹5 Crore', target:50000000}, {label:'₹6 Crore', target:60000000},
+    {label:'₹7 Crore', target:70000000}, {label:'₹8 Crore', target:80000000},
+    {label:'₹10 Crore (Target)', target:100000000}, {label:'₹15 Crore', target:150000000},
   ];
   const el = document.getElementById('milestoneRows');
-  if(el) el.innerHTML = milestones.map(m=>{
+  if(el) el.innerHTML = milestones.map(m => {
     const pct = Math.min(100,(portfolio.total/m.target)*100);
     return `<div class="milestone-row">
       <div class="milestone-num">${m.label.split(' ')[0]}</div>
@@ -1230,10 +1524,10 @@ function renderJourney() {
   }).join('');
 
   const tb = document.getElementById('snapshotTbody');
-  if(tb) tb.innerHTML = snapshots.map((s,i)=>{
-    const prev = snapshots[i-1];
-    const growth = prev?((s.value-prev.value)/prev.value*100).toFixed(1):'—';
-    const color = !prev?'var(--text3)':s.value>=prev.value?'var(--green)':'var(--red)';
+  if(tb) tb.innerHTML = snapshots.map((s,i) => {
+    const prev   = snapshots[i-1];
+    const growth = prev ? ((s.value-prev.value)/prev.value*100).toFixed(1) : '—';
+    const color  = !prev ? 'var(--text3)' : s.value>=prev.value ? 'var(--green)' : 'var(--red)';
     return `<tr>
       <td>${new Date(s.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</td>
       <td class="num">${fmt(s.value)}</td>
@@ -1241,12 +1535,17 @@ function renderJourney() {
     </tr>`;
   }).join('');
 
+  // Destroy existing growth chart before recreating
   const gc = document.getElementById('growthChart');
-  if(gc) new Chart(gc.getContext('2d'),{
-    type:'line',
-    data:{ labels:snapshots.map(s=>new Date(s.date).toLocaleDateString('en-IN',{month:'short',year:'2-digit'})), datasets:[{ label:'Portfolio Value', data:snapshots.map(s=>s.value), borderColor:'#d4a843', backgroundColor:'rgba(212,168,67,0.08)', borderWidth:2.5, fill:true, tension:0.4, pointBackgroundColor:'#d4a843', pointRadius:5, pointHoverRadius:8 }] },
-    options:{ responsive:true, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${fmt(ctx.raw)}`},bodyColor:'#e8eef8',backgroundColor:'#161e2e',borderColor:'rgba(212,168,67,0.3)',borderWidth:1}}, scales:{x:{grid:{color:'rgba(99,140,255,0.06)'},ticks:{color:'#4a5a7a',font:{size:11}}},y:{grid:{color:'rgba(99,140,255,0.06)'},ticks:{color:'#4a5a7a',font:{size:11},callback:v=>fmtShort(v)}}} }
-  });
+  if(gc) {
+    const existing = Chart.getChart(gc);
+    if(existing) existing.destroy();
+    new Chart(gc.getContext('2d'), {
+      type:'line',
+      data:{ labels:snapshots.map(s=>new Date(s.date).toLocaleDateString('en-IN',{month:'short',year:'2-digit'})), datasets:[{ label:'Portfolio Value', data:snapshots.map(s=>s.value), borderColor:'#d4a843', backgroundColor:'rgba(212,168,67,0.08)', borderWidth:2.5, fill:true, tension:0.4, pointBackgroundColor:'#d4a843', pointRadius:5, pointHoverRadius:8 }] },
+      options:{ responsive:true, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${fmt(ctx.raw)}`},bodyColor:'#e8eef8',backgroundColor:'#161e2e',borderColor:'rgba(212,168,67,0.3)',borderWidth:1}}, scales:{x:{grid:{color:'rgba(99,140,255,0.06)'},ticks:{color:'#4a5a7a',font:{size:11}}},y:{grid:{color:'rgba(99,140,255,0.06)'},ticks:{color:'#4a5a7a',font:{size:11},callback:v=>fmtShort(v)}}} }
+    });
+  }
 }
 
 // ═══════════════════════════════════════════════════
@@ -1280,36 +1579,24 @@ const UNIT_PRICE_HOLDINGS = {
 function getUnitPriceConfig(h) {
   const r = (h.remarks||'').toLowerCase();
   const s = (h.sub||'').toLowerCase();
+  // Parse quantity — strip any non-numeric suffix like 'g'
+  const qty = parseFloat((h.units||'0').toString().replace(/[^0-9.]/g,'')) || 0;
 
-  // Gold coins — Au, qty = 124g
   if(h.account === 'Au' && s === 'coin')
-    return { label:'Gold Price', unitLabel:'₹/gram', qty: parseFloat(h.units) || 124 };
-
-  // Silver coins — Ag, qty = 1500g
+    return { label:'Gold Price', unitLabel:'₹/gram', qty: qty||124 };
   if(h.account === 'Ag' && s === 'coin')
-    return { label:'Silver Price', unitLabel:'₹/gram', qty: parseFloat(h.units) || 1500 };
-
-  // SGB — each tranche priced per gram
+    return { label:'Silver Price', unitLabel:'₹/gram', qty: qty||1500 };
   if(s === 'sgb')
-    return { label:'SGB Price', unitLabel:'₹/gram', qty: parseFloat(h.units) || 0 };
-
-  // Unlisted — NSE shares
+    return { label:'SGB Price', unitLabel:'₹/gram', qty: qty||0 };
   if(s === 'unlisted' && r.includes('nse'))
-    return { label:'NSE Share Price', unitLabel:'₹/share', qty: parseFloat(h.units) || 500 };
-
-  // Unlisted — Sunday Protech
+    return { label:'NSE Share Price', unitLabel:'₹/share', qty: qty||500 };
   if(s === 'unlisted' && r.includes('sunday'))
-    return { label:'Sunday Protech Price', unitLabel:'₹/share', qty: parseFloat(h.units) || 25000 };
-
-  // Unlisted — OYO
+    return { label:'Sunday Protech Price', unitLabel:'₹/share', qty: qty||25000 };
   if(s === 'unlisted' && r.includes('oyo'))
-    return { label:'OYO Price', unitLabel:'₹/share', qty: parseFloat(h.units) || 25000 };
-
-  // Unlisted — Ecosure
+    return { label:'OYO Price', unitLabel:'₹/share', qty: qty||25000 };
   if(s === 'unlisted' && r.includes('ecosure'))
-    return { label:'Ecosure Price', unitLabel:'₹/share', qty: parseFloat(h.units) || 15000 };
-
-  return null; // normal value-entry mode
+    return { label:'Ecosure Price', unitLabel:'₹/share', qty: qty||15000 };
+  return null;
 }
 
 function renderUpdateTable() {
@@ -1424,29 +1711,31 @@ async function applyUpdate() {
   const dateVal = document.getElementById('fDate').value;
   const asOf = new Date(dateVal).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
 
-  // Collect new values — works for both direct and unit-price rows
-  let changed = false;
-  portfolio.holdings.forEach((h,i)=>{
+  // Pass 1 — collect all new values into a map before applying
+  const newValues = {};
+  portfolio.holdings.forEach((h,i) => {
     const nv = document.getElementById(`nv_${i}`);
-    const nu = document.getElementById(`nu_${i}`);
-    if(nv && nv.value !== '') {
-      h.value = parseFloat(nv.value);
-      changed = true;
-    }
-    if(nu && nu.value !== '') h.units = nu.value;
+    if(nv && nv.value !== '') newValues[i] = parseFloat(nv.value);
   });
 
-  // Also update sgbTranches values from SGB unit-price rows
-  portfolio.holdings.forEach((h,i)=>{
+  // Pass 2 — sync sgbTranches BEFORE updating holdings values
+  // Track SGB holdings by their original index position in sgbTranches
+  let sgbIdx = 0;
+  portfolio.holdings.forEach((h, i) => {
     if((h.sub||'').toLowerCase() === 'sgb') {
-      const nv = document.getElementById(`nv_${i}`);
-      if(nv && nv.value !== '') {
-        // Find matching tranche by units and update its value
-        const units = parseFloat(h.units) || 0;
-        const match = sgbTranches.find(t => t.units === units && Math.abs(t.value - h.value) < 100000);
-        if(match) match.value = parseFloat(nv.value);
+      if(newValues[i] !== undefined && sgbTranches[sgbIdx]) {
+        sgbTranches[sgbIdx].value = newValues[i];
       }
+      sgbIdx++;
     }
+  });
+
+  // Pass 3 — apply new values to holdings
+  let changed = false;
+  portfolio.holdings.forEach((h, i) => {
+    const nu = document.getElementById(`nu_${i}`);
+    if(newValues[i] !== undefined) { h.value = newValues[i]; changed = true; }
+    if(nu && nu.value !== '') h.units = nu.value;
   });
 
   if(!changed) {
@@ -1456,7 +1745,7 @@ async function applyUpdate() {
     return;
   }
 
-  portfolio.total = portfolio.holdings.reduce((a,b)=>a+(b.value||0),0);
+  portfolio.total = portfolio.holdings.reduce((a,b) => a+(b.value||0), 0);
   portfolio.asOf  = asOf;
   summary         = buildSummary(portfolio.holdings);
   snapshots.push({ date: dateVal, value: portfolio.total });
@@ -1465,13 +1754,13 @@ async function applyUpdate() {
   try {
     await saveToGitHub(payload);
     showModalSuccess(`✓ Saved to GitHub! Portfolio updated to ${fmt(portfolio.total)} as of ${asOf}`);
-    // Full dashboard refresh — destroy charts and reinit everything
     setTimeout(() => {
       closeModal();
       refreshDashboard();
     }, 1800);
   } catch(e) {
-    showModalError('GitHub save failed: '+e.message+'. Values updated locally only.');
+    showModalError('GitHub save failed: ' + e.message + '. Values updated locally only.');
+    refreshDashboard();
   }
 
   btn.textContent = '💾 Save & Sync to GitHub';
