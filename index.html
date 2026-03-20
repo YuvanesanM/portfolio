@@ -1751,10 +1751,12 @@ async function loadAndInit() {
       return noIdGroupSeen[key] <= remaining;
     });
 
-    // Also ensure existing _mfComputed rows get _mfOwner if missing
+    // Merge fields from DEFAULT_HOLDINGS — use h._id only if it already exists on the row
+    // NEVER assign _id by index — index alignment is unreliable when rows are missing
     portfolio.holdings = normalized.map((h, i) => ({
       ...h,
-      _id:           h._id           || (DEFAULT_HOLDINGS[i]||{})._id           || undefined,
+      // Only carry _id if the row already has one (from prior save) — never derive from index
+      _id:           h._id           || undefined,
       owner:         h.owner         || (DEFAULT_HOLDINGS[i]||{}).owner         || 'Yuvan',
       purchaseDate:  h.purchaseDate  || (DEFAULT_HOLDINGS[i]||{}).purchaseDate  || '2020-01-01',
       purchasePrice: h.purchasePrice || (DEFAULT_HOLDINGS[i]||{}).purchasePrice || h.value,
