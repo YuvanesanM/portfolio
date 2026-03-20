@@ -732,6 +732,9 @@
 
   <!-- ═══════════ PAGE: HOLDINGS ═══════════ -->
   <div class="page" id="page-holdings">
+    <!-- ── Holdings summary cards ── -->
+    <div id="holdingSummaryCards" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px"></div>
+
     <div class="card" style="margin-bottom:20px">
 
       <!-- ── Filter bar ── -->
@@ -2199,6 +2202,7 @@ function initDashboard() {
   renderStats();
   renderAlloc();
   renderCharts();
+  renderHoldingCards();
   renderHoldings();
   renderMF();
   renderFD();
@@ -2223,6 +2227,7 @@ function refreshDashboard() {
   renderStats();
   renderAlloc();
   renderCharts();
+  renderHoldingCards();
   renderHoldings();
   renderMF();
   renderFD();
@@ -2267,6 +2272,114 @@ function renderCharts() {
     type:'bar', data:{ labels:summary.map(s=>s.name), datasets:[{ data:summary.map(s=>s.value), backgroundColor:summary.map(s=>s.color), borderRadius:6 }] },
     options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${fmt(ctx.raw)}`},...CHART_TOOLTIP}}, scales:CHART_SCALES_YX }
   });
+}
+
+
+function renderHoldingCards() {
+  const el = document.getElementById('holdingSummaryCards');
+  if(!el) return;
+
+  const h = portfolio.holdings;
+  const total = portfolio.total;
+
+  // Define card specs — each maps to one or more sub types
+  const cards = [
+    { id:'hc-mf',       label:'Mutual Funds',      icon:'📊', color:'var(--blue)',    accent:'#4f7fff',
+      filter:'Mutual Fund',
+      value: summaryMap['Mutual Fund']||0,
+      sub: ()=>{ const v=summaryMap['Mutual Fund']||0; return `47 schemes · ${(v/total*100).toFixed(1)}%`; } },
+    { id:'hc-fd',       label:'Fixed Deposits',     icon:'🏛️', color:'var(--green)',   accent:'#2ecc8f',
+      filter:'Fixed Deposit',
+      value: summaryMap['Fixed Deposit']||0,
+      sub: ()=>{ const fds=h.filter(x=>x.sub==='Fixed Deposit'&&x.value>0); return `${fds.length} deposits · ${((summaryMap['Fixed Deposit']||0)/total*100).toFixed(1)}%`; } },
+    { id:'hc-sgb',      label:'SGB',                icon:'🥇', color:'var(--gold)',    accent:'#d4a843',
+      filter:'SGB',
+      value: summaryMap['SGB']||0,
+      sub: ()=>{ const g=sgbTranches.reduce((a,b)=>a+b.units,0); return `${g}g · ${sgbTranches.length} tranches`; } },
+    { id:'hc-pms',      label:'PMS',                icon:'🏦', color:'var(--purple)',  accent:'#9b6dff',
+      filter:'Other',
+      value: summaryMap['PMS']||0,
+      sub: ()=>'Portfolio Mgmt Service' },
+    { id:'hc-aif',      label:'AIF',                icon:'🔒', color:'var(--orange)',  accent:'#ff8c42',
+      filter:'Other',
+      value: summaryMap['AIF']||0,
+      sub: ()=>'Alternative Inv. Fund' },
+    { id:'hc-reit',     label:'REIT',               icon:'🏢', color:'var(--teal)',    accent:'#5debd7',
+      filter:'Other',
+      value: summaryMap['REIT']||0,
+      sub: ()=>'Embassy · Nexus' },
+    { id:'hc-shares',   label:'Stocks',             icon:'📈', color:'#00c4b4',        accent:'#00c4b4',
+      filter:'Shares',
+      value: summaryMap['Shares']||0,
+      sub: ()=>'ICICI Demat · Zerodha' },
+    { id:'hc-unlisted', label:'Unlisted',            icon:'🔓', color:'#9b59b6',        accent:'#9b59b6',
+      filter:'Unlisted',
+      value: summaryMap['Unlisted']||0,
+      sub: ()=>{ const n=h.filter(x=>x.sub==='Unlisted').length; return `${n} companies`; } },
+    { id:'hc-coin',     label:'Gold / Silver',      icon:'🪙', color:'var(--gold)',    accent:'#f0c96b',
+      filter:'Other',
+      value: summaryMap['Coin']||0,
+      sub: ()=>'Gold coins · Silver coins' },
+    { id:'hc-crypto',   label:'Crypto',             icon:'₿',  color:'#f39c12',        accent:'#f39c12',
+      filter:'Other',
+      value: summaryMap['Crypto']||0,
+      sub: ()=>'Bitcoin' },
+  ];
+
+  el.innerHTML = cards.map(c => {
+    const isActive = holdingsTypeFilter === c.filter && c.filter !== 'Other';
+    const gain = (() => {
+      const subs = {
+        'Mutual Fund': ['Mutual Fund'],
+        'Fixed Deposit': ['Fixed Deposit'],
+        'SGB': ['SGB'],
+        'Shares': ['ETF & Stocks','Mixed Shares'],
+        'Unlisted': ['Unlisted'],
+      }[c.filter];
+      if(!subs) return null;
+      const rows = h.filter(x => subs.includes(x.sub) && x.purchasePrice > 0);
+      const cost = rows.reduce((a,x)=>a+(x.purchasePrice||0),0);
+      const val  = rows.reduce((a,x)=>a+(x.value||0),0);
+      return cost > 0 ? val - cost : null;
+    })();
+
+    const gainStr = gain === null ? '' :
+      `<div style="font-size:10px;font-weight:600;color:${gain>=0?'var(--green)':'var(--red)'};margin-top:2px">
+        ${gain>=0?'+':''}${fmtShort(gain)}
+      </div>`;
+
+    return `<div class="card" onclick="holdingCardClick('${c.filter}',this)"
+      style="padding:14px;cursor:pointer;border-left:3px solid ${c.accent};transition:all 0.15s;
+             ${isActive?`background:var(--surface2);border-color:${c.accent};box-shadow:0 0 0 1px ${c.accent}44`:''}
+             position:relative;overflow:hidden;"
+      onmouseover="this.style.background='var(--surface2)'"
+      onmouseout="this.style.background='${isActive?'var(--surface2)':'var(--surface)'}'">
+      <div style="font-size:18px;margin-bottom:6px">${c.icon}</div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--text3);margin-bottom:4px;text-transform:uppercase">${c.label}</div>
+      <div style="font-size:18px;font-weight:800;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;line-height:1.2">
+        ${c.value > 0 ? fmt(c.value) : '—'}
+      </div>
+      ${gainStr}
+      <div style="font-size:10px;color:var(--text3);margin-top:4px">${c.sub()}</div>
+      ${c.value > 0 ? `<div style="position:absolute;bottom:0;left:0;right:0;height:2px;background:${c.accent};opacity:${isActive?'1':'0.3'}"></div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function holdingCardClick(type, btn) {
+  // Toggle: if already active, reset to All
+  const newFilter = (holdingsTypeFilter === type && type !== 'Other') ? 'All' : type;
+  holdingsTypeFilter = newFilter;
+
+  // Update type pills
+  document.querySelectorAll('#typePills .h-pill').forEach(b => {
+    const matches = b.getAttribute('onclick')?.includes(`'${newFilter}'`);
+    b.classList.toggle('h-pill-active', matches && newFilter !== 'All' ||
+      (newFilter === 'All' && b.getAttribute('onclick')?.includes("'All'")));
+  });
+
+  renderHoldingCards();
+  renderHoldings();
 }
 
 // ── Holdings page filter state ────────────────────────────────────────────────
