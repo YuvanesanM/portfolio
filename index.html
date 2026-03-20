@@ -1725,6 +1725,22 @@ async function loadAndInit() {
       _mfComputed:   h._mfComputed   || false,
       _mfOwner:      h._mfOwner      || (h._mfComputed ? (h.owner||'Yuvan') : undefined),
     }));
+
+    // Inject any DEFAULT_HOLDINGS rows missing from loaded data
+    // Match by remarks field (most stable identifier per holding)
+    DEFAULT_HOLDINGS.forEach(def => {
+      if(!def.remarks) return;
+      const exists = portfolio.holdings.some(h =>
+        h.remarks === def.remarks && h.sub === def.sub && h.account === def.account
+      );
+      if(!exists) {
+        // Find the right position (after the preceding row)
+        const defIdx = DEFAULT_HOLDINGS.indexOf(def);
+        const insertAt = Math.min(defIdx, portfolio.holdings.length);
+        portfolio.holdings.splice(insertAt, 0, { ...def });
+        console.log(`Injected missing holding: ${def.account} ${def.remarks}`);
+      }
+    });
     portfolio.asOf      = ghData.asOf        || '16 Sep 2025';
     snapshots           = ghData.snapshots   || DEFAULT_SNAPSHOTS;
     sgbTranches         = ghData.sgbTranches || DEFAULT_SGB;
