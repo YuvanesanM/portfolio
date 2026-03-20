@@ -754,15 +754,23 @@
           <button class="h-pill" onclick="setHoldingsOwner('Sana',this)">Sana</button>
           <button class="h-pill" onclick="setHoldingsOwner('Tara',this)">Tara</button>
         </div>
-        <!-- Type pills -->
+        <!-- Type pills — all 14 asset classes -->
         <div style="display:flex;gap:6px;flex-wrap:wrap" id="typePills">
-          <button class="h-pill h-pill-active" onclick="setHoldingsType('All',this)">All types</button>
+          <button class="h-pill h-pill-active" onclick="setHoldingsType('All',this)">All</button>
           <button class="h-pill" onclick="setHoldingsType('Mutual Fund',this)">MF</button>
-          <button class="h-pill" onclick="setHoldingsType('Fixed Deposit',this)">FD</button>
           <button class="h-pill" onclick="setHoldingsType('SGB',this)">SGB</button>
+          <button class="h-pill" onclick="setHoldingsType('Fixed Deposit',this)">FD</button>
+          <button class="h-pill" onclick="setHoldingsType('PMS',this)">PMS</button>
+          <button class="h-pill" onclick="setHoldingsType('AIF',this)">AIF</button>
+          <button class="h-pill" onclick="setHoldingsType('Shares',this)">Stocks</button>
+          <button class="h-pill" onclick="setHoldingsType('REIT',this)">REIT</button>
           <button class="h-pill" onclick="setHoldingsType('Unlisted',this)">Unlisted</button>
-          <button class="h-pill" onclick="setHoldingsType('Shares',this)">Shares</button>
-          <button class="h-pill" onclick="setHoldingsType('Other',this)">Other</button>
+          <button class="h-pill" onclick="setHoldingsType('Coin',this)">Gold/Silver</button>
+          <button class="h-pill" onclick="setHoldingsType('SSY Account',this)">SSY</button>
+          <button class="h-pill" onclick="setHoldingsType('Insurance',this)">Insurance</button>
+          <button class="h-pill" onclick="setHoldingsType('Savings',this)">Savings</button>
+          <button class="h-pill" onclick="setHoldingsType('NPS',this)">NPS</button>
+          <button class="h-pill" onclick="setHoldingsType('Crypto',this)">Crypto</button>
         </div>
         <!-- Results count -->
         <span id="holdingsCount" style="font-size:11px;color:var(--text3);margin-left:auto;white-space:nowrap"></span>
@@ -2279,101 +2287,142 @@ function renderHoldingCards() {
   const el = document.getElementById('holdingSummaryCards');
   if(!el) return;
 
-  const h = portfolio.holdings;
-  const total = portfolio.total;
+  const allH = portfolio.holdings;
 
-  // All 14 asset classes matching buildSummary / asset allocation panel
+  // Filter holdings by owner for card values
+  const filteredH = holdingsOwnerFilter === 'All'
+    ? allH
+    : allH.filter(h => h.owner === holdingsOwnerFilter);
+
+  // Build a filtered summaryMap from owner-filtered holdings
+  // For MF, use MF_SCHEMES filtered by owner
+  const fsMap = {};
+  filteredH.forEach(h => {
+    const key = h.sub === 'SSY Account'                                              ? 'SSY Account'
+              : h.sub === 'Insurance' || h.type === 'ULIP' || h.type === 'Insurance' ? 'Insurance'
+              : h.sub === 'Fixed Deposit'                                             ? 'Fixed Deposit'
+              : h.sub === 'Mutual Fund'                                               ? 'Mutual Fund'
+              : h.sub === 'SGB'                                                       ? 'SGB'
+              : h.sub === 'PMS'                                                       ? 'PMS'
+              : h.sub === 'AIF'                                                       ? 'AIF'
+              : h.sub === 'Unlisted'                                                  ? 'Unlisted'
+              : (h.sub === 'ETF & Stocks' || h.sub === 'Mixed Shares')               ? 'Shares'
+              : h.sub === 'REIT'                                                      ? 'REIT'
+              : h.sub === 'Crypto'                                                    ? 'Crypto'
+              : h.sub === 'Coin'                                                      ? 'Coin'
+              : h.sub === 'NPS'                                                       ? 'NPS'
+              : h.sub === 'Savings'                                                   ? 'Savings'
+              : h.sub;
+    // For _mfComputed rows, use MF_SCHEMES filtered by owner instead of the combined row value
+    if(h._mfComputed) {
+      const mfOwner = h._mfOwner || h.owner || 'Yuvan';
+      if(holdingsOwnerFilter === 'All' || holdingsOwnerFilter === mfOwner) {
+        fsMap['Mutual Fund'] = (fsMap['Mutual Fund']||0) + (h.value||0);
+      }
+      return;
+    }
+    fsMap[key] = (fsMap[key]||0) + (h.value||0);
+  });
+
+  // Filtered total for % calculations
+  const filteredTotal = Object.values(fsMap).reduce((a,b)=>a+b,0);
+
+  // All 14 asset classes
   const cards = [
     { key:'Mutual Fund',  label:'Mutual Funds',   icon:'📊', accent:'#4f7fff',
-      value: summaryMap['Mutual Fund']||0,
-      sub: function(){ var v=summaryMap['Mutual Fund']||0; return '47 schemes · '+(total>0?(v/total*100).toFixed(1):0)+'%'; },
+      value: fsMap['Mutual Fund']||0,
+      sub: function(){ var v=fsMap['Mutual Fund']||0; var cnt=holdingsOwnerFilter==='All'?47:MF_SCHEMES.filter(function(s){return holdingsOwnerFilter==='Ramyaa'?s.owner==='Ramyaa':(!s.owner||s.owner==='Yuvan');}).length; return cnt+' schemes · '+(filteredTotal>0?(v/portfolio.total*100).toFixed(1):0)+'%'; },
       gainSubs:['Mutual Fund'] },
     { key:'SGB',          label:'SGB',            icon:'🥇', accent:'#d4a843',
-      value: summaryMap['SGB']||0,
+      value: fsMap['SGB']||0,
       sub: function(){ var g=sgbTranches.reduce(function(a,b){return a+b.units;},0); return g+'g · '+sgbTranches.length+' tranches'; },
       gainSubs:['SGB'] },
     { key:'Fixed Deposit',label:'Fixed Deposits', icon:'🏛️', accent:'#2ecc8f',
-      value: summaryMap['Fixed Deposit']||0,
-      sub: function(){ var fds=h.filter(function(x){return x.sub==='Fixed Deposit'&&x.value>0;}); return fds.length+' deposits · '+(total>0?((summaryMap['Fixed Deposit']||0)/total*100).toFixed(1):0)+'%'; },
+      value: fsMap['Fixed Deposit']||0,
+      sub: function(){ var fds=filteredH.filter(function(x){return x.sub==='Fixed Deposit'&&x.value>0;}); return fds.length+' deposits · '+(portfolio.total>0?((fsMap['Fixed Deposit']||0)/portfolio.total*100).toFixed(1):0)+'%'; },
       gainSubs:[] },
     { key:'PMS',          label:'PMS',            icon:'🏦', accent:'#9b6dff',
-      value: summaryMap['PMS']||0,
+      value: fsMap['PMS']||0,
       sub: function(){ return 'Portfolio Mgmt Service'; },
       gainSubs:['PMS'] },
     { key:'AIF',          label:'AIF',            icon:'🔒', accent:'#ff8c42',
-      value: summaryMap['AIF']||0,
+      value: fsMap['AIF']||0,
       sub: function(){ return 'Alternative Inv. Fund'; },
       gainSubs:['AIF'] },
     { key:'Shares',       label:'Stocks',         icon:'📈', accent:'#00c4b4',
-      value: summaryMap['Shares']||0,
+      value: fsMap['Shares']||0,
       sub: function(){ return 'ICICI Demat · Zerodha'; },
       gainSubs:['ETF & Stocks','Mixed Shares'] },
     { key:'REIT',         label:'REIT',           icon:'🏢', accent:'#5debd7',
-      value: summaryMap['REIT']||0,
+      value: fsMap['REIT']||0,
       sub: function(){ return 'Embassy · Nexus'; },
       gainSubs:['REIT'] },
     { key:'Unlisted',     label:'Unlisted',       icon:'🔓', accent:'#9b59b6',
-      value: summaryMap['Unlisted']||0,
-      sub: function(){ var n=h.filter(function(x){return x.sub==='Unlisted';}).length; return n+' companies'; },
+      value: fsMap['Unlisted']||0,
+      sub: function(){ var n=filteredH.filter(function(x){return x.sub==='Unlisted';}).length; return n+' companies'; },
       gainSubs:['Unlisted'] },
     { key:'Coin',         label:'Gold / Silver',  icon:'🪙', accent:'#f0c96b',
-      value: summaryMap['Coin']||0,
+      value: fsMap['Coin']||0,
       sub: function(){ return 'Gold coins · Silver coins'; },
       gainSubs:['Coin'] },
     { key:'SSY Account',  label:'SSY',            icon:'👧', accent:'#ff5e6a',
-      value: summaryMap['SSY Account']||0,
-      sub: function(){ var n=h.filter(function(x){return x.sub==='SSY Account';}).length; return n+' accounts · Sana & Tara'; },
+      value: fsMap['SSY Account']||0,
+      sub: function(){ var n=filteredH.filter(function(x){return x.sub==='SSY Account';}).length; return n+' accounts · Sana & Tara'; },
       gainSubs:[] },
     { key:'Insurance',    label:'Insurance',      icon:'🛡️', accent:'#7aa3ff',
-      value: summaryMap['Insurance']||0,
+      value: fsMap['Insurance']||0,
       sub: function(){ return 'SBI ULIP · ICICI'; },
       gainSubs:['Insurance'] },
     { key:'Savings',      label:'Savings',        icon:'💰', accent:'#a8edbd',
-      value: summaryMap['Savings']||0,
+      value: fsMap['Savings']||0,
       sub: function(){ return 'Liquid savings'; },
       gainSubs:[] },
     { key:'NPS',          label:'NPS',            icon:'🏛', accent:'#e0a0ff',
-      value: summaryMap['NPS']||0,
+      value: fsMap['NPS']||0,
       sub: function(){ return 'National Pension System'; },
       gainSubs:['NPS'] },
     { key:'Crypto',       label:'Crypto',         icon:'₿',  accent:'#f39c12',
-      value: summaryMap['Crypto']||0,
+      value: fsMap['Crypto']||0,
       sub: function(){ return 'Bitcoin'; },
       gainSubs:['Crypto'] },
   ];
 
-    el.innerHTML = cards.map(c => {
-    const isActive = holdingsTypeFilter === c.key;
-    const gain = (() => {
+  el.innerHTML = cards.map(function(c) {
+    var isActive = holdingsTypeFilter === c.key;
+    var gain = (function() {
       if(!c.gainSubs || c.gainSubs.length === 0) return null;
-      const rows = h.filter(x => c.gainSubs.includes(x.sub) && x.purchasePrice > 0 && x.purchasePrice !== x.value);
-      const cost = rows.reduce((a,x)=>a+(x.purchasePrice||0),0);
-      const val  = rows.reduce((a,x)=>a+(x.value||0),0);
+      var rows = filteredH.filter(function(x) {
+        return c.gainSubs.includes(x.sub) && x.purchasePrice > 0 && x.purchasePrice !== x.value;
+      });
+      var cost = rows.reduce(function(a,x){ return a+(x.purchasePrice||0); }, 0);
+      var val  = rows.reduce(function(a,x){ return a+(x.value||0); }, 0);
       return cost > 0 ? val - cost : null;
     })();
 
-    const gainStr = gain === null ? '' :
-      `<div style="font-size:10px;font-weight:600;color:${gain>=0?'var(--green)':'var(--red)'};margin-top:2px">
-        ${gain>=0?'+':''}${fmtShort(gain)}
-      </div>`;
+    var gainStr = gain === null ? '' :
+      '<div style="font-size:10px;font-weight:600;color:' + (gain>=0?'var(--green)':'var(--red)') + ';margin-top:2px">' +
+      (gain>=0?'+':'') + fmtShort(gain) + '</div>';
 
-    return `<div class="card" onclick="holdingCardClick('${c.key}')"
-      style="padding:14px;cursor:pointer;border-left:3px solid ${c.accent};transition:all 0.15s;
-             ${isActive?`background:var(--surface2);border-color:${c.accent};box-shadow:0 0 0 1px ${c.accent}44`:''}
-             position:relative;overflow:hidden;"
-      onmouseover="this.style.background='var(--surface2)'"
-      onmouseout="this.style.background='${isActive?'var(--surface2)':'var(--surface)'}'">
-      <div style="font-size:18px;margin-bottom:6px">${c.icon}</div>
-      <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--text3);margin-bottom:4px;text-transform:uppercase">${c.label}</div>
-      <div style="font-size:18px;font-weight:800;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;line-height:1.2">
-        ${c.value > 0 ? fmt(c.value) : '—'}
-      </div>
-      ${gainStr}
-      <div style="font-size:10px;color:var(--text3);margin-top:4px">${c.sub()}</div>
-      ${c.value > 0 ? `<div style="position:absolute;bottom:0;left:0;right:0;height:2px;background:${c.accent};opacity:${isActive?'1':'0.3'}"></div>` : ''}
-    </div>`;
+    var activeStyle = isActive
+      ? 'background:var(--surface2);box-shadow:0 0 0 1px ' + c.accent + '44;'
+      : '';
+
+    var card = '<div class="card" ';
+    card += 'onclick="holdingCardClick(&apos;' + c.key + '&apos;)" ';
+    card += 'style="padding:14px;cursor:pointer;border-left:3px solid ' + c.accent + ';transition:all 0.15s;' + activeStyle + 'position:relative;overflow:hidden;">';
+    card += '<div style="font-size:18px;margin-bottom:6px">' + c.icon + '</div>';
+    card += '<div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--text3);margin-bottom:4px;text-transform:uppercase">' + c.label + '</div>';
+    card += '<div style="font-size:18px;font-weight:800;color:var(--text);font-family:Plus Jakarta Sans,sans-serif;line-height:1.2">' + (c.value > 0 ? fmt(c.value) : '—') + '</div>';
+    card += gainStr;
+    card += '<div style="font-size:10px;color:var(--text3);margin-top:4px">' + c.sub() + '</div>';
+    if(c.value > 0) {
+      card += '<div style="position:absolute;bottom:0;left:0;right:0;height:2px;background:' + c.accent + ';opacity:' + (isActive?'1':'0.3') + '"></div>';
+    }
+    card += '</div>';
+    return card;
   }).join('');
 }
+
 
 function holdingCardClick(type) {
   // Toggle: clicking active card resets to All
@@ -2404,6 +2453,7 @@ function setHoldingsOwner(v, btn) {
   holdingsOwnerFilter = v;
   document.querySelectorAll('#ownerPills .h-pill').forEach(b => b.classList.remove('h-pill-active'));
   btn.classList.add('h-pill-active');
+  renderHoldingCards();
   renderHoldings();
 }
 function setHoldingsType(v, btn) {
