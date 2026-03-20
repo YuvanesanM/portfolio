@@ -1309,12 +1309,11 @@
 const PROXY_URL = 'https://portfolio-proxy-6ezf.onrender.com';
 const GH_FILE   = 'holdings.json';
 
-// PASSWORD should be defined in config.js (git-ignored)
-// Fallback in case config.js is missing (e.g. GitHub Pages)
-if(typeof PASSWORD === 'undefined') {
-  console.warn('config.js not loaded — using fallback password');
-  window.PASSWORD = 'yuvan2025';
-}
+// Session token — issued by proxy after server-side password verification
+// Lives in sessionStorage only — cleared on tab close, never in source code
+const getToken   = ()  => sessionStorage.getItem('portfolio_token') || '';
+const setToken   = (t) => sessionStorage.setItem('portfolio_token', t);
+const clearToken = ()  => sessionStorage.removeItem('portfolio_token');
 
 // ═══════════════════════════════════════════════════
 //  DEFAULT DATA (fallback if no GitHub file yet)
@@ -1511,14 +1510,11 @@ async function fetchFromGitHub() {
   try {
     const res = await fetchWithTimeout(`${PROXY_URL}/holdings`, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` }
     }, 45000);
+    if(res.status === 401) { clearToken(); location.reload(); return null; }
     if(!res.ok) return null;
-    const data = await res.json();
-    if(data.content) {
-      return JSON.parse(atob(data.content.replace(/\n/g,'')));
-    }
-    return null;
+    return await res.json();  // proxy decrypts and returns plain JSON
   } catch(e) {
     console.warn('GitHub fetch failed or timed out:', e.message);
     return null;
@@ -1526,31 +1522,14 @@ async function fetchFromGitHub() {
 }
 
 async function saveToGitHub(payload) {
-  let sha = null;
-  try {
-    const getRes = await fetchWithTimeout(`${PROXY_URL}/holdings`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
-    }, 45000);
-    if(getRes.ok) {
-      const existing = await getRes.json();
-      sha = existing?.sha || null;
-    }
-  } catch(e) { /* proceed without sha */ }
-
-  const content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
-  const body = {
-    message: `Portfolio update – ${payload.asOf}`,
-    content,
-    ...(sha ? { sha } : {})
-  };
-
+  // Proxy handles SHA fetch, AES-256-CBC encryption, and GitHub write
   const res = await fetchWithTimeout(`${PROXY_URL}/holdings`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+    body: JSON.stringify(payload)
   }, 45000);
 
+  if(res.status === 401) { clearToken(); location.reload(); return; }
   if(!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error || err.message || 'Proxy save failed');
@@ -1642,20 +1621,67 @@ function showPasswordStep() {
   }, 300);
 }
 
-function unlock() {
+async function unlock() {
   if(!captchaVerified) return;
-  const v = document.getElementById('pwdInput').value;
-  if(v === PASSWORD) {
-    document.getElementById('lockScreen').style.display = 'none';
-    // Show loading overlay — do NOT replace dashboard innerHTML
-    document.getElementById('loadingOverlay').style.display = 'flex';
-    loadAndInit();
-  } else {
-    const inp = document.getElementById('pwdInput');
-    inp.classList.add('error');
-    document.getElementById('lockErr').textContent = 'Incorrect password. Please try again.';
-    setTimeout(() => inp.classList.remove('error'), 500);
-  }
+  const v    = document.getElementById('pwdInput').value.trim();
+  const btn  = document.getElementById('unlockBtn');
+  const err  = document.getElementById('lockErr');
+  if(!v) return;
+
+  btn.disabled    = true;
+  btn.textContent = 'Connecting…';
+  err.textContent = '';
+
+  // Proxy may be cold-starting (free Render tier sleeps after inactivity)
+  // Retry POST /auth up to 3 times with escalating wait messages
+  const MESSAGES = [
+    [0,    'Connecting…'],
+    [4000, 'Waking up server (free tier, ~30s)…'],
+    [15000,'Almost there, server is starting up…'],
+    [28000,'Taking longer than usual, please wait…'],
+  ];
+  const timers = MESSAGES.map(([delay, msg]) =>
+    setTimeout(() => { btn.textContent = msg; }, delay)
+  );
+  const clearTimers = () => timers.forEach(clearTimeout);
+
+  const attemptAuth = async (attemptsLeft) => {
+    try {
+      const res  = await fetchWithTimeout(`${PROXY_URL}/auth`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: v })
+      }, 40000);
+      const data = await res.json();
+      clearTimers();
+
+      if(data.ok && data.token) {
+        setToken(data.token);
+        document.getElementById('lockScreen').style.display = 'none';
+        document.getElementById('loadingOverlay').style.display = 'flex';
+        loadAndInit();
+      } else {
+        const inp = document.getElementById('pwdInput');
+        inp.classList.add('error');
+        err.textContent  = 'Incorrect password. Please try again.';
+        btn.disabled     = false;
+        btn.textContent  = 'UNLOCK DASHBOARD';
+        setTimeout(() => inp.classList.remove('error'), 500);
+      }
+    } catch(e) {
+      if(attemptsLeft > 1) {
+        // Server still waking — retry once after a short pause
+        setTimeout(() => attemptAuth(attemptsLeft - 1), 3000);
+      } else {
+        clearTimers();
+        err.textContent  = 'Server unreachable — try again in a moment.';
+        btn.disabled     = false;
+        btn.textContent  = 'UNLOCK DASHBOARD';
+      }
+    }
+  };
+
+  attemptAuth(3);
 }
 
 document.addEventListener('keydown', e => {
