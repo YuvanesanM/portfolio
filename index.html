@@ -1357,10 +1357,10 @@ const DEFAULT_HOLDINGS = [
   { account:"ICICI",   type:"Shares",      sub:"Unlisted",       value:700000,   units:"25000", remarks:"OYO @ ₹28",              owner:"Yuvan",  purchaseDate:"2022-01-01", purchasePrice:700000   , _id:"unl-oyo" },
   { account:"ICICI",   type:"Shares",      sub:"Unlisted",       value:555000,   units:"15000", remarks:"Ecosure @ ₹37",          owner:"Yuvan",  purchaseDate:"2023-01-01", purchasePrice:555000   , _id:"unl-ecosure" },
   { account:"ICICI",   type:"Shares",      sub:"Unlisted",       value:240000,   units:"5000",  remarks:"AITMC Drone @ ₹48",      owner:"Yuvan",  purchaseDate:"2024-01-01", purchasePrice:240000   , _id:"unl-aitmc" },
-  { account:"ICICI",   type:"REIT",        sub:"REIT",           value:3087645,  units:"",      remarks:"Embassy / Nexus",          owner:"Yuvan",  purchaseDate:"2021-01-01", purchasePrice:2500000  , _id:"reit-icici" },
+  { account:"ICICI",   type:"REIT",        sub:"REIT",           value:3087645,  units:"",      remarks:"Embassy / Nexus",          owner:"Yuvan",  purchaseDate:"2021-01-01", purchasePrice:3232000  , _id:"reit-icici" },
   { account:"Bitcoin", type:"Crypto",      sub:"Crypto",         value:179490,   units:"",      remarks:"BTC",                      owner:"Yuvan",  purchaseDate:"2021-01-01", purchasePrice:100000   , _id:"crypto-btc" },
-  { account:"Au",      type:"Coin",        sub:"Coin",           value:1856156,  units:"124g",  remarks:"Gold coins",               owner:"Yuvan",  purchaseDate:"2020-01-01", purchasePrice:620000   , _id:"coin-au" },
-  { account:"Ag",      type:"Coin",        sub:"Coin",           value:450000,   units:"1500g", remarks:"Silver coins",             owner:"Yuvan",  purchaseDate:"2021-01-01", purchasePrice:225000   , _id:"coin-ag" },
+  { account:"Au",      type:"Coin",        sub:"Coin",           value:1856156,  units:"124g",  remarks:"Gold coins",               owner:"Yuvan",  purchaseDate:"2020-01-01", purchasePrice:868000   , _id:"coin-au" },
+  { account:"Ag",      type:"Coin",        sub:"Coin",           value:450000,   units:"1500g", remarks:"Silver coins",             owner:"Yuvan",  purchaseDate:"2021-01-01", purchasePrice:140000   , _id:"coin-ag" },
   { account:"Lq",      type:"Savings",     sub:"Savings",        value:1000000,  units:"",      remarks:"Liquid",                   owner:"Yuvan",  purchaseDate:"2024-01-01", purchasePrice:1000000  , _id:"savings-lq" },
 ];
 
@@ -2697,14 +2697,19 @@ function renderReturns() {
   // By asset class bar chart
   const classMap = {};
   h.forEach(hh => {
-    const key = hh.sub === 'SSY Account' ? 'SSY' : hh.sub === 'ETF & Stocks' || hh.sub === 'Mixed Shares' || hh.sub === 'Unlisted' ? 'Shares' : hh.sub === 'Insurance' || hh.type === 'ULIP' ? 'Insurance' : hh.sub === 'Fixed Deposit' ? 'Fixed Deposit' : hh.sub;
+    const key = hh.sub === 'SSY Account'                                              ? 'SSY'
+              : (hh.sub === 'ETF & Stocks' || hh.sub === 'Mixed Shares')               ? 'Shares'
+              : hh.sub === 'Unlisted'                                                   ? 'Unlisted'
+              : (hh.sub === 'Insurance' || hh.type === 'ULIP' || hh.type==='Insurance') ? 'Insurance'
+              : hh.sub === 'Fixed Deposit'                                              ? 'Fixed Deposit'
+              : hh.sub;
     if(!classMap[key]) classMap[key] = { cost:0, value:0 };
     classMap[key].cost  += (hh.purchasePrice||0);
     classMap[key].value += (hh.value||0);
   });
   const classes = Object.entries(classMap)
     .map(([name,d]) => ({ name, gain: d.value-d.cost, gainPct: d.cost>0?((d.value-d.cost)/d.cost*100).toFixed(1):0, value:d.value }))
-    .filter(c => c.value > 0)
+    .filter(c => c.value > 0 || c.gain !== 0)
     .sort((a,b) => b.gain - a.gain);
 
   const rc = destroyChart('returnsChart');
