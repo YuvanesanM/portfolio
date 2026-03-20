@@ -1310,10 +1310,20 @@ const PROXY_URL = 'https://portfolio-proxy-6ezf.onrender.com';
 const GH_FILE   = 'holdings.json';
 
 // Session token — issued by proxy after server-side password verification
-// Lives in sessionStorage only — cleared on tab close, never in source code
-const getToken   = ()  => sessionStorage.getItem('portfolio_token') || '';
-const setToken   = (t) => sessionStorage.setItem('portfolio_token', t);
-const clearToken = ()  => sessionStorage.removeItem('portfolio_token');
+// Stored in localStorage so it survives page refresh (token has 24h server-side expiry)
+const TOKEN_KEY  = 'portfolio_token';
+const getToken   = ()  => localStorage.getItem(TOKEN_KEY) || '';
+const setToken   = (t) => localStorage.setItem(TOKEN_KEY, t);
+const clearToken = ()  => localStorage.removeItem(TOKEN_KEY);
+
+// Auto-unlock if a valid token already exists (e.g. page refresh within 24h)
+// Token format: "<expiry_timestamp>.<hmac_sig>" — expiry is readable client-side
+function getStoredTokenExpiry() {
+  const t = getToken();
+  if(!t) return 0;
+  const parts = t.split('.');
+  return parts.length === 2 ? parseInt(parts[0]) || 0 : 0;
+}
 
 // ═══════════════════════════════════════════════════
 //  DEFAULT DATA (fallback if no GitHub file yet)
@@ -1561,6 +1571,17 @@ function runCaptchaCheck() {
 }
 
 window.addEventListener('load', () => {
+  // If a valid unexpired token exists (e.g. page refresh), skip lock screen entirely
+  const expiry = getStoredTokenExpiry();
+  if(expiry > Date.now()) {
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('loadingOverlay').style.display = 'flex';
+    loadAndInit();
+    return;
+  }
+  // Token expired or missing — clear it and show lock screen normally
+  clearToken();
+
   let attempts = 0;
   const tryRun = () => {
     attempts++;
