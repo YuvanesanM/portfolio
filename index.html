@@ -733,7 +733,7 @@
   <!-- ═══════════ PAGE: HOLDINGS ═══════════ -->
   <div class="page" id="page-holdings">
     <!-- ── Holdings summary cards ── -->
-    <div id="holdingSummaryCards" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px"></div>
+    <div id="holdingSummaryCards" style="display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:20px"></div>
 
     <div class="card" style="margin-bottom:20px">
 
@@ -2282,62 +2282,71 @@ function renderHoldingCards() {
   const h = portfolio.holdings;
   const total = portfolio.total;
 
-  // Define card specs — each maps to one or more sub types
+  // All 14 asset classes matching buildSummary / asset allocation panel
   const cards = [
-    { id:'hc-mf',       label:'Mutual Funds',      icon:'📊', color:'var(--blue)',    accent:'#4f7fff',
-      filter:'Mutual Fund',
+    { key:'Mutual Fund',  label:'Mutual Funds',   icon:'📊', accent:'#4f7fff',
       value: summaryMap['Mutual Fund']||0,
-      sub: ()=>{ const v=summaryMap['Mutual Fund']||0; return `47 schemes · ${(v/total*100).toFixed(1)}%`; } },
-    { id:'hc-fd',       label:'Fixed Deposits',     icon:'🏛️', color:'var(--green)',   accent:'#2ecc8f',
-      filter:'Fixed Deposit',
-      value: summaryMap['Fixed Deposit']||0,
-      sub: ()=>{ const fds=h.filter(x=>x.sub==='Fixed Deposit'&&x.value>0); return `${fds.length} deposits · ${((summaryMap['Fixed Deposit']||0)/total*100).toFixed(1)}%`; } },
-    { id:'hc-sgb',      label:'SGB',                icon:'🥇', color:'var(--gold)',    accent:'#d4a843',
-      filter:'SGB',
+      sub: function(){ var v=summaryMap['Mutual Fund']||0; return '47 schemes · '+(total>0?(v/total*100).toFixed(1):0)+'%'; },
+      gainSubs:['Mutual Fund'] },
+    { key:'SGB',          label:'SGB',            icon:'🥇', accent:'#d4a843',
       value: summaryMap['SGB']||0,
-      sub: ()=>{ const g=sgbTranches.reduce((a,b)=>a+b.units,0); return `${g}g · ${sgbTranches.length} tranches`; } },
-    { id:'hc-pms',      label:'PMS',                icon:'🏦', color:'var(--purple)',  accent:'#9b6dff',
-      filter:'Other',
+      sub: function(){ var g=sgbTranches.reduce(function(a,b){return a+b.units;},0); return g+'g · '+sgbTranches.length+' tranches'; },
+      gainSubs:['SGB'] },
+    { key:'Fixed Deposit',label:'Fixed Deposits', icon:'🏛️', accent:'#2ecc8f',
+      value: summaryMap['Fixed Deposit']||0,
+      sub: function(){ var fds=h.filter(function(x){return x.sub==='Fixed Deposit'&&x.value>0;}); return fds.length+' deposits · '+(total>0?((summaryMap['Fixed Deposit']||0)/total*100).toFixed(1):0)+'%'; },
+      gainSubs:[] },
+    { key:'PMS',          label:'PMS',            icon:'🏦', accent:'#9b6dff',
       value: summaryMap['PMS']||0,
-      sub: ()=>'Portfolio Mgmt Service' },
-    { id:'hc-aif',      label:'AIF',                icon:'🔒', color:'var(--orange)',  accent:'#ff8c42',
-      filter:'Other',
+      sub: function(){ return 'Portfolio Mgmt Service'; },
+      gainSubs:['PMS'] },
+    { key:'AIF',          label:'AIF',            icon:'🔒', accent:'#ff8c42',
       value: summaryMap['AIF']||0,
-      sub: ()=>'Alternative Inv. Fund' },
-    { id:'hc-reit',     label:'REIT',               icon:'🏢', color:'var(--teal)',    accent:'#5debd7',
-      filter:'Other',
-      value: summaryMap['REIT']||0,
-      sub: ()=>'Embassy · Nexus' },
-    { id:'hc-shares',   label:'Stocks',             icon:'📈', color:'#00c4b4',        accent:'#00c4b4',
-      filter:'Shares',
+      sub: function(){ return 'Alternative Inv. Fund'; },
+      gainSubs:['AIF'] },
+    { key:'Shares',       label:'Stocks',         icon:'📈', accent:'#00c4b4',
       value: summaryMap['Shares']||0,
-      sub: ()=>'ICICI Demat · Zerodha' },
-    { id:'hc-unlisted', label:'Unlisted',            icon:'🔓', color:'#9b59b6',        accent:'#9b59b6',
-      filter:'Unlisted',
+      sub: function(){ return 'ICICI Demat · Zerodha'; },
+      gainSubs:['ETF & Stocks','Mixed Shares'] },
+    { key:'REIT',         label:'REIT',           icon:'🏢', accent:'#5debd7',
+      value: summaryMap['REIT']||0,
+      sub: function(){ return 'Embassy · Nexus'; },
+      gainSubs:['REIT'] },
+    { key:'Unlisted',     label:'Unlisted',       icon:'🔓', accent:'#9b59b6',
       value: summaryMap['Unlisted']||0,
-      sub: ()=>{ const n=h.filter(x=>x.sub==='Unlisted').length; return `${n} companies`; } },
-    { id:'hc-coin',     label:'Gold / Silver',      icon:'🪙', color:'var(--gold)',    accent:'#f0c96b',
-      filter:'Other',
+      sub: function(){ var n=h.filter(function(x){return x.sub==='Unlisted';}).length; return n+' companies'; },
+      gainSubs:['Unlisted'] },
+    { key:'Coin',         label:'Gold / Silver',  icon:'🪙', accent:'#f0c96b',
       value: summaryMap['Coin']||0,
-      sub: ()=>'Gold coins · Silver coins' },
-    { id:'hc-crypto',   label:'Crypto',             icon:'₿',  color:'#f39c12',        accent:'#f39c12',
-      filter:'Other',
+      sub: function(){ return 'Gold coins · Silver coins'; },
+      gainSubs:['Coin'] },
+    { key:'SSY Account',  label:'SSY',            icon:'👧', accent:'#ff5e6a',
+      value: summaryMap['SSY Account']||0,
+      sub: function(){ var n=h.filter(function(x){return x.sub==='SSY Account';}).length; return n+' accounts · Sana & Tara'; },
+      gainSubs:[] },
+    { key:'Insurance',    label:'Insurance',      icon:'🛡️', accent:'#7aa3ff',
+      value: summaryMap['Insurance']||0,
+      sub: function(){ return 'SBI ULIP · ICICI'; },
+      gainSubs:['Insurance'] },
+    { key:'Savings',      label:'Savings',        icon:'💰', accent:'#a8edbd',
+      value: summaryMap['Savings']||0,
+      sub: function(){ return 'Liquid savings'; },
+      gainSubs:[] },
+    { key:'NPS',          label:'NPS',            icon:'🏛', accent:'#e0a0ff',
+      value: summaryMap['NPS']||0,
+      sub: function(){ return 'National Pension System'; },
+      gainSubs:['NPS'] },
+    { key:'Crypto',       label:'Crypto',         icon:'₿',  accent:'#f39c12',
       value: summaryMap['Crypto']||0,
-      sub: ()=>'Bitcoin' },
+      sub: function(){ return 'Bitcoin'; },
+      gainSubs:['Crypto'] },
   ];
 
-  el.innerHTML = cards.map(c => {
-    const isActive = holdingsTypeFilter === c.filter && c.filter !== 'Other';
+    el.innerHTML = cards.map(c => {
+    const isActive = holdingsTypeFilter === c.key;
     const gain = (() => {
-      const subs = {
-        'Mutual Fund': ['Mutual Fund'],
-        'Fixed Deposit': ['Fixed Deposit'],
-        'SGB': ['SGB'],
-        'Shares': ['ETF & Stocks','Mixed Shares'],
-        'Unlisted': ['Unlisted'],
-      }[c.filter];
-      if(!subs) return null;
-      const rows = h.filter(x => subs.includes(x.sub) && x.purchasePrice > 0);
+      if(!c.gainSubs || c.gainSubs.length === 0) return null;
+      const rows = h.filter(x => c.gainSubs.includes(x.sub) && x.purchasePrice > 0 && x.purchasePrice !== x.value);
       const cost = rows.reduce((a,x)=>a+(x.purchasePrice||0),0);
       const val  = rows.reduce((a,x)=>a+(x.value||0),0);
       return cost > 0 ? val - cost : null;
@@ -2348,7 +2357,7 @@ function renderHoldingCards() {
         ${gain>=0?'+':''}${fmtShort(gain)}
       </div>`;
 
-    return `<div class="card" onclick="holdingCardClick('${c.filter}',this)"
+    return `<div class="card" onclick="holdingCardClick('${c.key}')"
       style="padding:14px;cursor:pointer;border-left:3px solid ${c.accent};transition:all 0.15s;
              ${isActive?`background:var(--surface2);border-color:${c.accent};box-shadow:0 0 0 1px ${c.accent}44`:''}
              position:relative;overflow:hidden;"
@@ -2366,16 +2375,19 @@ function renderHoldingCards() {
   }).join('');
 }
 
-function holdingCardClick(type, btn) {
-  // Toggle: if already active, reset to All
-  const newFilter = (holdingsTypeFilter === type && type !== 'Other') ? 'All' : type;
-  holdingsTypeFilter = newFilter;
+function holdingCardClick(type) {
+  // Toggle: clicking active card resets to All
+  holdingsTypeFilter = holdingsTypeFilter === type ? 'All' : type;
 
-  // Update type pills
+  // Sync coarse type pills — fine-grained card filters won't match pill labels
+  const pillMap = {'Mutual Fund':1,'Fixed Deposit':1,'SGB':1,'Shares':1,'Unlisted':1,'All':1};
   document.querySelectorAll('#typePills .h-pill').forEach(b => {
-    const matches = b.getAttribute('onclick')?.includes(`'${newFilter}'`);
-    b.classList.toggle('h-pill-active', matches && newFilter !== 'All' ||
-      (newFilter === 'All' && b.getAttribute('onclick')?.includes("'All'")));
+    const m = (b.getAttribute('onclick')||'').match(/'([^']+)'/);
+    const pillType = m ? m[1] : '';
+    const active = pillType === holdingsTypeFilter
+      || (holdingsTypeFilter === 'All' && pillType === 'All')
+      || (pillType === 'Other' && !pillMap[holdingsTypeFilter] && holdingsTypeFilter !== 'All');
+    b.classList.toggle('h-pill-active', active);
   });
 
   renderHoldingCards();
@@ -2398,6 +2410,7 @@ function setHoldingsType(v, btn) {
   holdingsTypeFilter = v;
   document.querySelectorAll('#typePills .h-pill').forEach(b => b.classList.remove('h-pill-active'));
   btn.classList.add('h-pill-active');
+  renderHoldingCards();
   renderHoldings();
 }
 function sortHoldings(key) {
@@ -2414,14 +2427,23 @@ function renderHoldings() {
 
   const q = (document.getElementById('holdingsSearch')?.value || '').toLowerCase();
 
-  // Type bucket helper — same grouping as filters
+  // Type bucket helper — maps all 14 sub types to their own filter key
   const typeBucket = h =>
-      h.sub === 'Mutual Fund'                           ? 'Mutual Fund'
-    : h.sub === 'Fixed Deposit'                         ? 'Fixed Deposit'
-    : h.sub === 'SGB'                                   ? 'SGB'
-    : h.sub === 'Unlisted'                              ? 'Unlisted'
-    : (h.sub === 'ETF & Stocks' || h.sub === 'Mixed Shares') ? 'Shares'
-    : 'Other';
+      h.sub === 'Mutual Fund'                                        ? 'Mutual Fund'
+    : h.sub === 'Fixed Deposit'                                      ? 'Fixed Deposit'
+    : h.sub === 'SGB'                                                ? 'SGB'
+    : h.sub === 'Unlisted'                                           ? 'Unlisted'
+    : (h.sub === 'ETF & Stocks' || h.sub === 'Mixed Shares')         ? 'Shares'
+    : h.sub === 'PMS'                                                ? 'PMS'
+    : h.sub === 'AIF'                                                ? 'AIF'
+    : h.sub === 'REIT'                                               ? 'REIT'
+    : h.sub === 'Coin'                                               ? 'Coin'
+    : h.sub === 'SSY Account'                                        ? 'SSY Account'
+    : (h.sub === 'Insurance' || h.type === 'ULIP' || h.type === 'Insurance') ? 'Insurance'
+    : h.sub === 'NPS'                                                ? 'NPS'
+    : h.sub === 'Savings'                                            ? 'Savings'
+    : h.sub === 'Crypto'                                             ? 'Crypto'
+    : h.sub;
 
   // Filter
   let rows = portfolio.holdings.filter(h => {
