@@ -474,6 +474,17 @@
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 99px; }
+  .h-pill {
+    padding:5px 12px;border-radius:99px;font-size:11px;font-weight:600;
+    background:var(--surface2);color:var(--text3);border:1px solid var(--border);
+    cursor:pointer;transition:all 0.15s;white-space:nowrap;
+  }
+  .h-pill:hover { background:var(--surface3);color:var(--text); }
+  .h-pill-active { background:rgba(212,168,67,0.15)!important;color:var(--gold)!important;border-color:rgba(212,168,67,0.4)!important; }
+  #holdingsTable tfoot td {
+    font-weight:700;font-size:12px;border-top:2px solid var(--border);
+    padding:10px 12px;background:var(--surface2);
+  }
 </style>
 </head>
 <body>
@@ -721,18 +732,59 @@
 
   <!-- ═══════════ PAGE: HOLDINGS ═══════════ -->
   <div class="page" id="page-holdings">
-    <div class="card" style="margin-bottom:24px">
-      <h3>All Holdings</h3>
+    <div class="card" style="margin-bottom:20px">
+
+      <!-- ── Filter bar ── -->
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:16px">
+        <!-- Search -->
+        <div style="position:relative;flex:1;min-width:160px;max-width:260px">
+          <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px;pointer-events:none">🔍</span>
+          <input id="holdingsSearch" type="text" placeholder="Search…"
+            oninput="renderHoldings()"
+            style="width:100%;padding:7px 10px 7px 30px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;box-sizing:border-box">
+        </div>
+        <!-- Owner pills -->
+        <div style="display:flex;gap:6px;flex-wrap:wrap" id="ownerPills">
+          <button class="h-pill h-pill-active" onclick="setHoldingsOwner('All',this)">All</button>
+          <button class="h-pill" onclick="setHoldingsOwner('Yuvan',this)">Yuvan</button>
+          <button class="h-pill" onclick="setHoldingsOwner('Ramyaa',this)">Ramyaa</button>
+          <button class="h-pill" onclick="setHoldingsOwner('Sana',this)">Sana</button>
+          <button class="h-pill" onclick="setHoldingsOwner('Tara',this)">Tara</button>
+        </div>
+        <!-- Type pills -->
+        <div style="display:flex;gap:6px;flex-wrap:wrap" id="typePills">
+          <button class="h-pill h-pill-active" onclick="setHoldingsType('All',this)">All types</button>
+          <button class="h-pill" onclick="setHoldingsType('Mutual Fund',this)">MF</button>
+          <button class="h-pill" onclick="setHoldingsType('Fixed Deposit',this)">FD</button>
+          <button class="h-pill" onclick="setHoldingsType('SGB',this)">SGB</button>
+          <button class="h-pill" onclick="setHoldingsType('Unlisted',this)">Unlisted</button>
+          <button class="h-pill" onclick="setHoldingsType('Shares',this)">Shares</button>
+          <button class="h-pill" onclick="setHoldingsType('Other',this)">Other</button>
+        </div>
+        <!-- Results count -->
+        <span id="holdingsCount" style="font-size:11px;color:var(--text3);margin-left:auto;white-space:nowrap"></span>
+      </div>
+
+      <!-- ── Table ── -->
       <div class="table-wrap">
         <table id="holdingsTable">
           <thead>
             <tr>
-              <th>Account</th><th>Type</th><th>Sub-Type</th><th>Value</th><th>Units</th><th>Remarks</th><th>Weight</th>
+              <th style="cursor:pointer" onclick="sortHoldings('account')">Account ⇅</th>
+              <th>Type</th>
+              <th style="cursor:pointer" onclick="sortHoldings('sub')">Sub-Type ⇅</th>
+              <th style="cursor:pointer;text-align:right" onclick="sortHoldings('value')">Value ⇅</th>
+              <th style="text-align:right">Units</th>
+              <th>Remarks</th>
+              <th>Owner</th>
+              <th style="text-align:right;cursor:pointer" onclick="sortHoldings('pct')">Weight ⇅</th>
             </tr>
           </thead>
           <tbody id="holdingsTbody"></tbody>
+          <tfoot id="holdingsTfoot"></tfoot>
         </table>
       </div>
+
     </div>
   </div>
 
@@ -2217,22 +2269,121 @@ function renderCharts() {
   });
 }
 
+// ── Holdings page filter state ────────────────────────────────────────────────
+let holdingsOwnerFilter = 'All';
+let holdingsTypeFilter  = 'All';
+let holdingsSortKey     = 'value';
+let holdingsSortAsc     = false;
+
+function setHoldingsOwner(v, btn) {
+  holdingsOwnerFilter = v;
+  document.querySelectorAll('#ownerPills .h-pill').forEach(b => b.classList.remove('h-pill-active'));
+  btn.classList.add('h-pill-active');
+  renderHoldings();
+}
+function setHoldingsType(v, btn) {
+  holdingsTypeFilter = v;
+  document.querySelectorAll('#typePills .h-pill').forEach(b => b.classList.remove('h-pill-active'));
+  btn.classList.add('h-pill-active');
+  renderHoldings();
+}
+function sortHoldings(key) {
+  if(holdingsSortKey === key) holdingsSortAsc = !holdingsSortAsc;
+  else { holdingsSortKey = key; holdingsSortAsc = key !== 'value'; }
+  renderHoldings();
+}
+
 function renderHoldings() {
-  const tb = document.getElementById('holdingsTbody');
+  const tb   = document.getElementById('holdingsTbody');
+  const tf   = document.getElementById('holdingsTfoot');
+  const cnt  = document.getElementById('holdingsCount');
   if(!tb) return;
-  tb.innerHTML = portfolio.holdings.map(h=>{
-    const pct = (h.value/portfolio.total*100).toFixed(2);
-    const c = TYPE_COLORS[h.sub]||TYPE_COLORS[h.type]||'#8a9bbf';
-    return `<tr>
-      <td>${h.account}</td>
-      <td><span class="badge" style="background:${c}22;color:${c};border-color:${c}44">${h.type}</span></td>
-      <td>${h.sub}</td>
-      <td class="num">${h.value>0?fmt(h.value):'—'}</td>
-      <td class="num" style="color:var(--text3)">${h.units||'—'}</td>
-      <td style="color:var(--text3);font-size:12px">${h.remarks||'—'}</td>
-      <td><span style="color:var(--blue2);font-family:'JetBrains Mono',monospace;font-size:12px">${h.value>0?pct+'%':'—'}</span></td>
+
+  const q = (document.getElementById('holdingsSearch')?.value || '').toLowerCase();
+
+  // Type bucket helper — same grouping as filters
+  const typeBucket = h =>
+      h.sub === 'Mutual Fund'                           ? 'Mutual Fund'
+    : h.sub === 'Fixed Deposit'                         ? 'Fixed Deposit'
+    : h.sub === 'SGB'                                   ? 'SGB'
+    : h.sub === 'Unlisted'                              ? 'Unlisted'
+    : (h.sub === 'ETF & Stocks' || h.sub === 'Mixed Shares') ? 'Shares'
+    : 'Other';
+
+  // Filter
+  let rows = portfolio.holdings.filter(h => {
+    if(holdingsOwnerFilter !== 'All' && h.owner !== holdingsOwnerFilter) return false;
+    if(holdingsTypeFilter  !== 'All' && typeBucket(h) !== holdingsTypeFilter) return false;
+    if(q) {
+      const haystack = `${h.account} ${h.sub} ${h.type} ${h.remarks||''} ${h.owner||''}`.toLowerCase();
+      if(!haystack.includes(q)) return false;
+    }
+    return true;
+  });
+
+  // Sort
+  rows = [...rows].sort((a, b) => {
+    let av, bv;
+    if(holdingsSortKey === 'value')   { av = a.value||0;   bv = b.value||0; }
+    else if(holdingsSortKey === 'pct'){ av = a.value||0;   bv = b.value||0; }
+    else if(holdingsSortKey === 'account'){ av = a.account; bv = b.account; }
+    else if(holdingsSortKey === 'sub'){ av = a.sub;        bv = b.sub; }
+    else { av = a.value||0; bv = b.value||0; }
+    const cmp = typeof av === 'string' ? av.localeCompare(bv) : av - bv;
+    return holdingsSortAsc ? cmp : -cmp;
+  });
+
+  // Render rows
+  const OWNER_COLORS = { Yuvan:'#4f7fff', Ramyaa:'#9b6dff', Sana:'#ff6b9d', Tara:'#2ecc8f' };
+  tb.innerHTML = rows.map(h => {
+    const pct = portfolio.total > 0 ? (h.value/portfolio.total*100).toFixed(2) : '0.00';
+    const barW = Math.min(100, parseFloat(pct) * 2.5); // scale: 40% = full bar
+    const c  = TYPE_COLORS[h.sub] || TYPE_COLORS[h.type] || '#8a9bbf';
+    const oc = OWNER_COLORS[h.owner] || '#8a9bbf';
+    const gain = h.purchasePrice > 0 ? h.value - h.purchasePrice : null;
+    const gainColor = gain === null ? '' : gain >= 0 ? 'var(--green)' : 'var(--red)';
+    const gainStr  = gain === null ? '' : (gain >= 0 ? '+' : '') + fmtShort(gain);
+    return `<tr style="border-left:3px solid ${c}44;transition:background 0.1s" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background=''">
+      <td style="font-weight:600;font-size:12px">${h.account}</td>
+      <td><span class="badge" style="background:${c}22;color:${c};border-color:${c}44;font-size:10px">${h.sub}</span></td>
+      <td style="color:var(--text3);font-size:11px">${h.remarks||'—'}</td>
+      <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700">
+        ${h.value > 0 ? fmt(h.value) : '<span style="color:var(--text3)">—</span>'}
+        ${gain !== null && h.value > 0 ? `<div style="font-size:10px;color:${gainColor};font-weight:600">${gainStr}</div>` : ''}
+      </td>
+      <td style="text-align:right;color:var(--text3);font-size:11px;font-family:'JetBrains Mono',monospace">${h.units||'—'}</td>
+      <td style="text-align:center">
+        <span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px;background:${oc}18;color:${oc};border:1px solid ${oc}33">${h.owner||'—'}</span>
+      </td>
+      <td style="text-align:right;min-width:90px">
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--blue2);font-weight:600">${h.value>0?pct+'%':'—'}</span>
+          <div style="width:60px;height:3px;background:var(--surface3);border-radius:99px;overflow:hidden">
+            <div style="width:${h.value>0?barW:0}%;height:100%;background:var(--blue2);border-radius:99px;opacity:0.6"></div>
+          </div>
+        </div>
+      </td>
     </tr>`;
   }).join('');
+
+  // Footer totals
+  const filteredTotal = rows.reduce((a,h) => a + (h.value||0), 0);
+  const filteredPct   = portfolio.total > 0 ? (filteredTotal/portfolio.total*100).toFixed(1) : '0';
+  const filteredCount = rows.length;
+  const allCount      = portfolio.holdings.length;
+
+  if(cnt) cnt.textContent = filteredCount === allCount
+    ? `${allCount} holdings`
+    : `${filteredCount} of ${allCount} holdings`;
+
+  if(tf) tf.innerHTML = `<tr>
+    <td colspan="3" style="color:var(--text3);font-size:11px">
+      ${filteredCount} holding${filteredCount!==1?'s':''} ${holdingsOwnerFilter!=='All'||holdingsTypeFilter!=='All'||q?' (filtered)':''}
+    </td>
+    <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--gold)">${fmt(filteredTotal)}</td>
+    <td colspan="2"></td>
+    <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--blue2)">${filteredPct}%</td>
+  </tr>`;
 }
 
 // ─── MF SCHEME DATA from CAS Statement 17-Mar-2026 ───────────────────────────
