@@ -1319,39 +1319,39 @@ if(typeof PASSWORD === 'undefined') {
 //  DEFAULT DATA (fallback if no GitHub file yet)
 // ═══════════════════════════════════════════════════
 const DEFAULT_HOLDINGS = [
-  { account:"ICICI",   type:"Deposit",     sub:"Fixed Deposit",  value:2519467,  units:"",      remarks:"Yuvan",                    owner:"Yuvan",  purchaseDate:"2023-01-01", purchasePrice:2519467  },
-  { account:"ICICI",   type:"Deposit",     sub:"Fixed Deposit",  value:0,        units:"",      remarks:"Ramyaa",                   owner:"Ramyaa", purchaseDate:"2023-01-01", purchasePrice:0        },
-  { account:"HDFC",    type:"Deposit",     sub:"Fixed Deposit",  value:500000,   units:"",      remarks:"Ramyaa",                   owner:"Ramyaa", purchaseDate:"2023-06-01", purchasePrice:500000   },
-  { account:"SBI",     type:"Deposit",     sub:"Fixed Deposit",  value:340026,   units:"",      remarks:"Yuvan",                    owner:"Yuvan",  purchaseDate:"2023-03-01", purchasePrice:340026   },
-  { account:"HDFC",    type:"Deposit",     sub:"Fixed Deposit",  value:3500000,  units:"",      remarks:"Yuvan",                    owner:"Yuvan",  purchaseDate:"2024-01-01", purchasePrice:3500000  },
-  { account:"SSY",     type:"Account",     sub:"SSY Account",    value:873501,   units:"",      remarks:"ICICI – Sana",             owner:"Sana",   purchaseDate:"2017-04-17", purchasePrice:873501   },
-  { account:"SSY",     type:"Account",     sub:"SSY Account",    value:873501,   units:"",      remarks:"ICICI – Tara",             owner:"Tara",   purchaseDate:"2020-01-11", purchasePrice:873501   },
-  { account:"SBI",     type:"ULIP",        sub:"Insurance",      value:344340,   units:"",      remarks:"1K365542004",              owner:"Yuvan",  purchaseDate:"2018-01-01", purchasePrice:200000   },
-  { account:"ICICI",   type:"Insurance",   sub:"Insurance",      value:918076,   units:"",      remarks:"Tara – A3067570",          owner:"Tara",   purchaseDate:"2021-01-11", purchasePrice:500000   },
-  { account:"ICICI",   type:"PMS",         sub:"PMS",            value:5800849,  units:"",      remarks:"",                         owner:"Yuvan",  purchaseDate:"2022-04-01", purchasePrice:5000000  },
-  { account:"ICICI",   type:"NPS",         sub:"NPS",            value:268923,   units:"",      remarks:"",                         owner:"Yuvan",  purchaseDate:"2018-01-01", purchasePrice:200000   },
-  { account:"ICICI",   type:"SGB",         sub:"SGB",            value:1129240,  units:"70g",   remarks:"Matures 14-Aug-2027",      owner:"Yuvan",  purchaseDate:"2019-08-14", purchasePrice:244930   },
-  { account:"ICICI",   type:"SGB",         sub:"SGB",            value:806600,   units:"50g",   remarks:"Matures 10-Dec-2027",      owner:"Yuvan",  purchaseDate:"2019-12-10", purchasePrice:189750   },
-  { account:"ICICI",   type:"SGB",         sub:"SGB",            value:1613200,  units:"100g",  remarks:"Matures 08-Sep-2028",      owner:"Yuvan",  purchaseDate:"2020-09-08", purchasePrice:511700   },
-  { account:"ICICI",   type:"SGB",         sub:"SGB",            value:483960,   units:"30g",   remarks:"Matures 05-Jan-2029",      owner:"Yuvan",  purchaseDate:"2021-01-05", purchasePrice:150000   },
-  { account:"ICICI",   type:"SGB",         sub:"SGB",            value:806600,   units:"50g",   remarks:"Matures 19-Jan-2029",      owner:"Yuvan",  purchaseDate:"2021-01-19", purchasePrice:252700   },
-  { account:"ICICI",   type:"SGB",         sub:"SGB",            value:1613200,  units:"100g",  remarks:"Matures 09-Mar-2029",      owner:"Yuvan",  purchaseDate:"2021-03-09", purchasePrice:461200   },
-  { account:"ICICI",   type:"SGB",         sub:"SGB",            value:1613200,  units:"100g",  remarks:"Matures 25-May-2029",      owner:"Yuvan",  purchaseDate:"2021-05-25", purchasePrice:472700   },
-  { account:"CAMS+KFin", type:"Mutual Fund", sub:"Mutual Fund",  value:0,        units:"",      remarks:"Yuvan · 45 schemes",       owner:"Yuvan",  purchaseDate:"2019-01-01", purchasePrice:23900753, _mfComputed:true,  _mfOwner:"Yuvan"  },
-  { account:"CAMS+KFin", type:"Mutual Fund", sub:"Mutual Fund",  value:0,        units:"",      remarks:"Ramyaa · 2 schemes",        owner:"Ramyaa", purchaseDate:"2021-01-01", purchasePrice:400000,   _mfComputed:true,  _mfOwner:"Ramyaa" },
-  { account:"ICICI",   type:"Shares",      sub:"ETF & Stocks",   value:2892904,  units:"",      remarks:"Demat",                    owner:"Yuvan",  purchaseDate:"2020-01-01", purchasePrice:2000000  },
-  { account:"Kite",    type:"Shares",      sub:"Mixed Shares",   value:349265,   units:"",      remarks:"Zerodha",                  owner:"Yuvan",  purchaseDate:"2021-01-01", purchasePrice:300000   },
-  { account:"360ONE",  type:"AIF",         sub:"AIF",            value:5000000,  units:"",      remarks:"Alternative",              owner:"Yuvan",  purchaseDate:"2022-01-01", purchasePrice:5000000  },
-  { account:"ICICI",   type:"Shares",      sub:"Unlisted",       value:975000,   units:"500",   remarks:"NSE @ ₹1950",             owner:"Yuvan",  purchaseDate:"2022-01-01", purchasePrice:975000   },
-  { account:"ICICI",   type:"Shares",      sub:"Unlisted",       value:525000,   units:"25000", remarks:"Sunday Protech @ ₹20.75", owner:"Yuvan",  purchaseDate:"2022-01-01", purchasePrice:518750   },
-  { account:"ICICI",   type:"Shares",      sub:"Unlisted",       value:700000,   units:"25000", remarks:"OYO @ ₹28",              owner:"Yuvan",  purchaseDate:"2022-01-01", purchasePrice:700000   },
-  { account:"ICICI",   type:"Shares",      sub:"Unlisted",       value:555000,   units:"15000", remarks:"Ecosure @ ₹37",          owner:"Yuvan",  purchaseDate:"2023-01-01", purchasePrice:555000   },
-  { account:"ICICI",   type:"Shares",      sub:"Unlisted",       value:240000,   units:"5000",  remarks:"AITMC Drone @ ₹48",      owner:"Yuvan",  purchaseDate:"2024-01-01", purchasePrice:240000   },
-  { account:"ICICI",   type:"REIT",        sub:"REIT",           value:3087645,  units:"",      remarks:"Embassy / Nexus",          owner:"Yuvan",  purchaseDate:"2021-01-01", purchasePrice:2500000  },
-  { account:"Bitcoin", type:"Crypto",      sub:"Crypto",         value:179490,   units:"",      remarks:"BTC",                      owner:"Yuvan",  purchaseDate:"2021-01-01", purchasePrice:100000   },
-  { account:"Au",      type:"Coin",        sub:"Coin",           value:1856156,  units:"124g",  remarks:"Gold coins",               owner:"Yuvan",  purchaseDate:"2020-01-01", purchasePrice:620000   },
-  { account:"Ag",      type:"Coin",        sub:"Coin",           value:450000,   units:"1500g", remarks:"Silver coins",             owner:"Yuvan",  purchaseDate:"2021-01-01", purchasePrice:225000   },
-  { account:"Lq",      type:"Savings",     sub:"Savings",        value:1000000,  units:"",      remarks:"Liquid",                   owner:"Yuvan",  purchaseDate:"2024-01-01", purchasePrice:1000000  },
+  { account:"ICICI",   type:"Deposit",     sub:"Fixed Deposit",  value:2519467,  units:"",      remarks:"Yuvan",                    owner:"Yuvan",  purchaseDate:"2023-01-01", purchasePrice:2519467  , _id:"fd-icici1" },
+  { account:"ICICI",   type:"Deposit",     sub:"Fixed Deposit",  value:0,        units:"",      remarks:"Ramyaa",                   owner:"Ramyaa", purchaseDate:"2023-01-01", purchasePrice:0        , _id:"fd-icici2" },
+  { account:"HDFC",    type:"Deposit",     sub:"Fixed Deposit",  value:500000,   units:"",      remarks:"Ramyaa",                   owner:"Ramyaa", purchaseDate:"2023-06-01", purchasePrice:500000   , _id:"fd-hdfc" },
+  { account:"SBI",     type:"Deposit",     sub:"Fixed Deposit",  value:340026,   units:"",      remarks:"Yuvan",                    owner:"Yuvan",  purchaseDate:"2023-03-01", purchasePrice:340026   , _id:"fd-sbi" },
+  { account:"HDFC",    type:"Deposit",     sub:"Fixed Deposit",  value:3500000,  units:"",      remarks:"Yuvan",                    owner:"Yuvan",  purchaseDate:"2024-01-01", purchasePrice:3500000  , _id:"fd-hdfc2" },
+  { account:"SSY",     type:"Account",     sub:"SSY Account",    value:873501,   units:"",      remarks:"ICICI – Sana",             owner:"Sana",   purchaseDate:"2017-04-17", purchasePrice:873501   , _id:"ssy-sana" },
+  { account:"SSY",     type:"Account",     sub:"SSY Account",    value:873501,   units:"",      remarks:"ICICI – Tara",             owner:"Tara",   purchaseDate:"2020-01-11", purchasePrice:873501   , _id:"ssy-tara" },
+  { account:"SBI",     type:"ULIP",        sub:"Insurance",      value:344340,   units:"",      remarks:"1K365542004",              owner:"Yuvan",  purchaseDate:"2018-01-01", purchasePrice:200000   , _id:"ins-sbi" },
+  { account:"ICICI",   type:"Insurance",   sub:"Insurance",      value:918076,   units:"",      remarks:"Tara – A3067570",          owner:"Tara",   purchaseDate:"2021-01-11", purchasePrice:500000   , _id:"ins-icici" },
+  { account:"ICICI",   type:"PMS",         sub:"PMS",            value:5800849,  units:"",      remarks:"",                         owner:"Yuvan",  purchaseDate:"2022-04-01", purchasePrice:5000000  , _id:"pms-icici" },
+  { account:"ICICI",   type:"NPS",         sub:"NPS",            value:268923,   units:"",      remarks:"",                         owner:"Yuvan",  purchaseDate:"2018-01-01", purchasePrice:200000   , _id:"nps-icici" },
+  { account:"ICICI",   type:"SGB",         sub:"SGB",            value:1129240,  units:"70g",   remarks:"Matures 14-Aug-2027",      owner:"Yuvan",  purchaseDate:"2019-08-14", purchasePrice:244930   , _id:"sgb-1" },
+  { account:"ICICI",   type:"SGB",         sub:"SGB",            value:806600,   units:"50g",   remarks:"Matures 10-Dec-2027",      owner:"Yuvan",  purchaseDate:"2019-12-10", purchasePrice:189750   , _id:"sgb-2" },
+  { account:"ICICI",   type:"SGB",         sub:"SGB",            value:1613200,  units:"100g",  remarks:"Matures 08-Sep-2028",      owner:"Yuvan",  purchaseDate:"2020-09-08", purchasePrice:511700   , _id:"sgb-3" },
+  { account:"ICICI",   type:"SGB",         sub:"SGB",            value:483960,   units:"30g",   remarks:"Matures 05-Jan-2029",      owner:"Yuvan",  purchaseDate:"2021-01-05", purchasePrice:150000   , _id:"sgb-4" },
+  { account:"ICICI",   type:"SGB",         sub:"SGB",            value:806600,   units:"50g",   remarks:"Matures 19-Jan-2029",      owner:"Yuvan",  purchaseDate:"2021-01-19", purchasePrice:252700   , _id:"sgb-5" },
+  { account:"ICICI",   type:"SGB",         sub:"SGB",            value:1613200,  units:"100g",  remarks:"Matures 09-Mar-2029",      owner:"Yuvan",  purchaseDate:"2021-03-09", purchasePrice:461200   , _id:"sgb-6" },
+  { account:"ICICI",   type:"SGB",         sub:"SGB",            value:1613200,  units:"100g",  remarks:"Matures 25-May-2029",      owner:"Yuvan",  purchaseDate:"2021-05-25", purchasePrice:472700   , _id:"sgb-7" },
+  { account:"CAMS+KFin", type:"Mutual Fund", sub:"Mutual Fund",  value:0,        units:"",      remarks:"Yuvan · 45 schemes",       owner:"Yuvan",  purchaseDate:"2019-01-01", purchasePrice:23900753, _mfComputed:true,  _mfOwner:"Yuvan"  , _id:"mf-yuvan" },
+  { account:"CAMS+KFin", type:"Mutual Fund", sub:"Mutual Fund",  value:0,        units:"",      remarks:"Ramyaa · 2 schemes",        owner:"Ramyaa", purchaseDate:"2021-01-01", purchasePrice:400000,   _mfComputed:true,  _mfOwner:"Ramyaa" , _id:"mf-ramyaa" },
+  { account:"ICICI",   type:"Shares",      sub:"ETF & Stocks",   value:2892904,  units:"",      remarks:"Demat",                    owner:"Yuvan",  purchaseDate:"2020-01-01", purchasePrice:2000000  , _id:"etf-icici" },
+  { account:"Kite",    type:"Shares",      sub:"Mixed Shares",   value:349265,   units:"",      remarks:"Zerodha",                  owner:"Yuvan",  purchaseDate:"2021-01-01", purchasePrice:300000   , _id:"kite-zerodha" },
+  { account:"360ONE",  type:"AIF",         sub:"AIF",            value:5000000,  units:"",      remarks:"Alternative",              owner:"Yuvan",  purchaseDate:"2022-01-01", purchasePrice:5000000  , _id:"aif-360one" },
+  { account:"ICICI",   type:"Shares",      sub:"Unlisted",       value:975000,   units:"500",   remarks:"NSE @ ₹1950",             owner:"Yuvan",  purchaseDate:"2022-01-01", purchasePrice:975000   , _id:"unl-nse" },
+  { account:"ICICI",   type:"Shares",      sub:"Unlisted",       value:525000,   units:"25000", remarks:"Sunday Protech @ ₹20.75", owner:"Yuvan",  purchaseDate:"2022-01-01", purchasePrice:518750   , _id:"unl-sunday" },
+  { account:"ICICI",   type:"Shares",      sub:"Unlisted",       value:700000,   units:"25000", remarks:"OYO @ ₹28",              owner:"Yuvan",  purchaseDate:"2022-01-01", purchasePrice:700000   , _id:"unl-oyo" },
+  { account:"ICICI",   type:"Shares",      sub:"Unlisted",       value:555000,   units:"15000", remarks:"Ecosure @ ₹37",          owner:"Yuvan",  purchaseDate:"2023-01-01", purchasePrice:555000   , _id:"unl-ecosure" },
+  { account:"ICICI",   type:"Shares",      sub:"Unlisted",       value:240000,   units:"5000",  remarks:"AITMC Drone @ ₹48",      owner:"Yuvan",  purchaseDate:"2024-01-01", purchasePrice:240000   , _id:"unl-aitmc" },
+  { account:"ICICI",   type:"REIT",        sub:"REIT",           value:3087645,  units:"",      remarks:"Embassy / Nexus",          owner:"Yuvan",  purchaseDate:"2021-01-01", purchasePrice:2500000  , _id:"reit-icici" },
+  { account:"Bitcoin", type:"Crypto",      sub:"Crypto",         value:179490,   units:"",      remarks:"BTC",                      owner:"Yuvan",  purchaseDate:"2021-01-01", purchasePrice:100000   , _id:"crypto-btc" },
+  { account:"Au",      type:"Coin",        sub:"Coin",           value:1856156,  units:"124g",  remarks:"Gold coins",               owner:"Yuvan",  purchaseDate:"2020-01-01", purchasePrice:620000   , _id:"coin-au" },
+  { account:"Ag",      type:"Coin",        sub:"Coin",           value:450000,   units:"1500g", remarks:"Silver coins",             owner:"Yuvan",  purchaseDate:"2021-01-01", purchasePrice:225000   , _id:"coin-ag" },
+  { account:"Lq",      type:"Savings",     sub:"Savings",        value:1000000,  units:"",      remarks:"Liquid",                   owner:"Yuvan",  purchaseDate:"2024-01-01", purchasePrice:1000000  , _id:"savings-lq" },
 ];
 
 const DEFAULT_SNAPSHOTS = [
@@ -1718,9 +1718,27 @@ async function loadAndInit() {
       );
     }
 
+    // Deduplicate: remove any extra rows beyond what DEFAULT_HOLDINGS expects
+    // This cleans up duplicates introduced by the old injection bug
+    // Strategy: for each sub+account combination, keep only as many rows as DEFAULT has
+    const subAccountCount = {};
+    DEFAULT_HOLDINGS.forEach(def => {
+      const key = `${def.account}|${def.sub}|${def.type}`;
+      subAccountCount[key] = (subAccountCount[key] || 0) + 1;
+    });
+    const seenCount = {};
+    normalized = normalized.filter(h => {
+      if(h._mfComputed) return true; // always keep (migration handles count)
+      const key = `${h.account}|${h.sub}|${h.type}`;
+      const allowed = subAccountCount[key] || 1;
+      seenCount[key] = (seenCount[key] || 0) + 1;
+      return seenCount[key] <= allowed;
+    });
+
     // Also ensure existing _mfComputed rows get _mfOwner if missing
     portfolio.holdings = normalized.map((h, i) => ({
       ...h,
+      _id:           h._id           || (DEFAULT_HOLDINGS[i]||{})._id           || undefined,
       owner:         h.owner         || (DEFAULT_HOLDINGS[i]||{}).owner         || 'Yuvan',
       purchaseDate:  h.purchaseDate  || (DEFAULT_HOLDINGS[i]||{}).purchaseDate  || '2020-01-01',
       purchasePrice: h.purchasePrice || (DEFAULT_HOLDINGS[i]||{}).purchasePrice || h.value,
@@ -1729,19 +1747,16 @@ async function loadAndInit() {
     }));
 
     // Inject any DEFAULT_HOLDINGS rows missing from loaded data
-    // Match by remarks field (most stable identifier per holding)
-    // NOTE: never inject _mfComputed rows — migration handles those
+    // Match by stable _id field — never inject _mfComputed rows (migration handles those)
     DEFAULT_HOLDINGS.forEach(def => {
-      if(!def.remarks) return;
       if(def._mfComputed) return;  // MF rows managed by migration only
-      const exists = portfolio.holdings.some(h =>
-        h.remarks === def.remarks && h.sub === def.sub && h.account === def.account
-      );
+      if(!def._id) return;
+      const exists = portfolio.holdings.some(h => h._id === def._id);
       if(!exists) {
-        const defIdx  = DEFAULT_HOLDINGS.indexOf(def);
+        const defIdx   = DEFAULT_HOLDINGS.indexOf(def);
         const insertAt = Math.min(defIdx, portfolio.holdings.length);
         portfolio.holdings.splice(insertAt, 0, { ...def });
-        console.log(`Injected missing holding: ${def.account} ${def.remarks}`);
+        console.log(`Injected missing holding: ${def._id}`);
       }
     });
     portfolio.asOf      = ghData.asOf        || '16 Sep 2025';
