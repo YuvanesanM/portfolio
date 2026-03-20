@@ -11,7 +11,8 @@
       "owner": "Yuvan",
       "purchaseDate": "2023-01-01",
       "purchasePrice": 2519467,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "fd-icici1"
     },
     {
       "account": "ICICI",
@@ -23,7 +24,8 @@
       "owner": "Ramyaa",
       "purchaseDate": "2023-01-01",
       "purchasePrice": 0,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "fd-icici2"
     },
     {
       "account": "HDFC",
@@ -35,7 +37,8 @@
       "owner": "Ramyaa",
       "purchaseDate": "2023-06-01",
       "purchasePrice": 500000,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "fd-hdfc"
     },
     {
       "account": "SBI",
@@ -47,7 +50,8 @@
       "owner": "Yuvan",
       "purchaseDate": "2023-03-01",
       "purchasePrice": 340026,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "fd-sbi"
     },
     {
       "account": "HDFC",
@@ -59,7 +63,8 @@
       "owner": "Yuvan",
       "purchaseDate": "2024-01-01",
       "purchasePrice": 3500000,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "fd-hdfc2"
     },
     {
       "account": "SSY",
@@ -71,7 +76,8 @@
       "owner": "Sana",
       "purchaseDate": "2017-04-17",
       "purchasePrice": 873501,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "ssy-sana"
     },
     {
       "account": "SSY",
@@ -83,7 +89,8 @@
       "owner": "Tara",
       "purchaseDate": "2020-01-11",
       "purchasePrice": 873501,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "ssy-tara"
     },
     {
       "account": "SBI",
@@ -95,7 +102,8 @@
       "owner": "Yuvan",
       "purchaseDate": "2018-01-01",
       "purchasePrice": 200000,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "ins-sbi"
     },
     {
       "account": "ICICI",
@@ -107,7 +115,8 @@
       "owner": "Tara",
       "purchaseDate": "2021-01-11",
       "purchasePrice": 500000,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "ins-icici"
     },
     {
       "account": "ICICI",
@@ -119,7 +128,8 @@
       "owner": "Yuvan",
       "purchaseDate": "2022-04-01",
       "purchasePrice": 5000000,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "pms-icici"
     },
     {
       "account": "ICICI",
@@ -131,7 +141,8 @@
       "owner": "Yuvan",
       "purchaseDate": "2018-01-01",
       "purchasePrice": 200000,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "nps-icici"
     },
     {
       "account": "ICICI",
@@ -143,7 +154,8 @@
       "owner": "Yuvan",
       "purchaseDate": "2019-08-14",
       "purchasePrice": 244930,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "sgb-1"
     },
     {
       "account": "ICICI",
@@ -155,7 +167,8 @@
       "owner": "Yuvan",
       "purchaseDate": "2019-12-10",
       "purchasePrice": 189750,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "sgb-2"
     },
     {
       "account": "ICICI",
@@ -167,7 +180,8 @@
       "owner": "Yuvan",
       "purchaseDate": "2020-09-08",
       "purchasePrice": 511700,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "sgb-3"
     },
     {
       "account": "ICICI",
@@ -179,7 +193,8 @@
       "owner": "Yuvan",
       "purchaseDate": "2021-01-05",
       "purchasePrice": 150000,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "sgb-4"
     },
     {
       "account": "ICICI",
@@ -191,7 +206,8 @@
       "owner": "Yuvan",
       "purchaseDate": "2021-01-19",
       "purchasePrice": 252700,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "sgb-5"
     },
     {
       "account": "ICICI",
@@ -203,7 +219,8 @@
       "owner": "Yuvan",
       "purchaseDate": "2021-03-09",
       "purchasePrice": 461200,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "sgb-6"
     },
     {
       "account": "ICICI",
@@ -215,7 +232,8 @@
       "owner": "Yuvan",
       "purchaseDate": "2021-05-25",
       "purchasePrice": 472700,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "sgb-7"
     },
     {
       "account": "CAMS+KFin",
@@ -223,12 +241,13 @@
       "sub": "Mutual Fund",
       "value": 24767637,
       "units": "",
-      "remarks": "Yuvan Â· 45 schemes",
+      "remarks": "Yuvan · 45 schemes",
       "owner": "Yuvan",
       "purchaseDate": "2019-01-01",
       "purchasePrice": 23875755,
       "_mfComputed": true,
-      "_mfOwner": "Yuvan"
+      "_mfOwner": "Yuvan",
+      "_id": "mf-yuvan"
     },
     {
       "account": "CAMS+KFin",
@@ -236,12 +255,13 @@
       "sub": "Mutual Fund",
       "value": 367478,
       "units": "",
-      "remarks": "Ramyaa Â· 2 schemes",
+      "remarks": "Ramyaa · 2 schemes",
       "owner": "Ramyaa",
       "purchaseDate": "2021-01-01",
       "purchasePrice": 400000,
       "_mfComputed": true,
-      "_mfOwner": "Ramyaa"
+      "_mfOwner": "Ramyaa",
+      "_id": "mf-ramyaa"
     },
     {
       "account": "ICICI",
@@ -253,7 +273,8 @@
       "owner": "Yuvan",
       "purchaseDate": "2020-01-01",
       "purchasePrice": 2000000,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "etf-icici"
     },
     {
       "account": "Kite",
@@ -265,7 +286,8 @@
       "owner": "Yuvan",
       "purchaseDate": "2021-01-01",
       "purchasePrice": 300000,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "kite-zerodha"
     },
     {
       "account": "360ONE",
@@ -277,7 +299,8 @@
       "owner": "Yuvan",
       "purchaseDate": "2022-01-01",
       "purchasePrice": 5000000,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "aif-360one"
     },
     {
       "account": "ICICI",
@@ -289,7 +312,8 @@
       "owner": "Yuvan",
       "purchaseDate": "2022-01-01",
       "purchasePrice": 975000,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "unl-nse"
     },
     {
       "account": "ICICI",
@@ -301,7 +325,8 @@
       "owner": "Yuvan",
       "purchaseDate": "2022-01-01",
       "purchasePrice": 518750,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "unl-sunday"
     },
     {
       "account": "ICICI",
@@ -313,7 +338,8 @@
       "owner": "Yuvan",
       "purchaseDate": "2022-01-01",
       "purchasePrice": 700000,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "unl-oyo"
     },
     {
       "account": "ICICI",
@@ -325,7 +351,21 @@
       "owner": "Yuvan",
       "purchaseDate": "2023-01-01",
       "purchasePrice": 555000,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "unl-ecosure"
+    },
+    {
+      "account": "ICICI",
+      "type": "Shares",
+      "sub": "Unlisted",
+      "value": 240000,
+      "units": "5000",
+      "remarks": "AITMC Drone @ 48",
+      "owner": "Yuvan",
+      "purchaseDate": "2024-01-01",
+      "purchasePrice": 240000,
+      "_mfComputed": false,
+      "_id": "unl-aitmc"
     },
     {
       "account": "ICICI",
@@ -337,7 +377,8 @@
       "owner": "Yuvan",
       "purchaseDate": "2024-01-01",
       "purchasePrice": 240000,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "reit-icici"
     },
     {
       "account": "Bitcoin",
@@ -349,7 +390,8 @@
       "owner": "Yuvan",
       "purchaseDate": "2021-01-01",
       "purchasePrice": 2500000,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "crypto-btc"
     },
     {
       "account": "Au",
@@ -361,7 +403,8 @@
       "owner": "Yuvan",
       "purchaseDate": "2021-01-01",
       "purchasePrice": 100000,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "coin-au"
     },
     {
       "account": "Ag",
@@ -373,7 +416,8 @@
       "owner": "Yuvan",
       "purchaseDate": "2020-01-01",
       "purchasePrice": 620000,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "coin-ag"
     },
     {
       "account": "Lq",
@@ -385,7 +429,8 @@
       "owner": "Yuvan",
       "purchaseDate": "2021-01-01",
       "purchasePrice": 225000,
-      "_mfComputed": false
+      "_mfComputed": false,
+      "_id": "savings-lq"
     }
   ],
   "snapshots": [
