@@ -3165,11 +3165,17 @@ async function fetchCommodityPrice(candidates, type, goldPricePerGram = 0) {
       const nav = await fetchLatestNAV(code);
       if(!nav || isNaN(nav) || nav <= 0) continue;
       if(type === 'gold') {
-        if(nav >= 100 && nav <= 250)   return { price: Math.round(nav * 100), nav, code, src: 'ETF×100' };
-        if(nav >= 10000 && nav <= 25000) return { price: Math.round(nav),     nav, code, src: 'ETF×1' };
+        // Gold ~₹14000-16000/g (Mar 2026). Check which multiplier gives a valid result.
+        const x100 = Math.round(nav * 100);
+        const x1   = Math.round(nav);
+        if(x100 >= 10000 && x100 <= 22000) return { price: x100, nav, code, src: 'ETF×100' };
+        if(x1  >= 10000 && x1  <= 22000)  return { price: x1,   nav, code, src: 'ETF×1'   };
       } else {
-        if(nav >= 50 && nav <= 500)   return { price: Math.round(nav),         nav, code, src: 'ETF×1' };
-        if(nav >= 0.5 && nav <= 5)    return { price: Math.round(nav * 100),   nav, code, src: 'ETF×100' };
+        // Silver ~₹150-200/g (Mar 2026)
+        const x1   = Math.round(nav);
+        const x100 = Math.round(nav * 100);
+        if(x1  >= 100 && x1  <= 350)  return { price: x1,   nav, code, src: 'ETF×1'   };
+        if(x100 >= 100 && x100 <= 350) return { price: x100, nav, code, src: 'ETF×100' };
       }
     } catch(e) { /* try next */ }
   }
@@ -3211,7 +3217,7 @@ const MF_ISIN_MAP = {
   'INF205KA1AF4': { code:'152068', units:59997.000,  name:'Invesco Business Cycle Regular' },
   'INF205KA1460': { code:'145255', units:41896.897,  name:'Invesco Flexi Cap Regular' },
   'INF205K01247': { code:'100733', units:9074.780,   name:'Invesco Large & Mid Cap Regular' },
-  'INF174K01DS9': { code:'119533', units:1946.104,   name:'Kotak Midcap Regular' },
+  'INF174K01DS9': { code:'120503', units:1946.104,   name:'Kotak Emerging Equity Regular' },
   'INF174K01153': { code:'100228', units:128.174,    name:'Kotak Large Cap Regular' },
   'INF174K01187': { code:'100225', units:265.031,    name:'Kotak Large & Midcap Regular' },
   'INF247L01411': { code:'135800', units:8454.902,   name:'Motilal Midcap Regular' },         // combined both folios
@@ -3249,27 +3255,57 @@ async function autoFetchPrices() {
 
   try {
     // ── Step 1: Gold & Silver ──────────────────────
-    setFetchStatus('Fetching Gold & Silver prices…', 'var(--gold)');
+    setFetchStatus('Fetching Gold & Silver prices (Chennai)…', 'var(--gold)');
 
-    // Run both fetches but don't let silver failure block gold/SGB
-    const goldResult = await fetchCommodityPrice(GOLD_ETF_CANDIDATES, 'gold');
-    if(!goldResult) throw new Error('Could not fetch gold price — all ETF codes failed');
-
-    const goldPerGram = goldResult.price;
-
-    // Silver fetch — tries ETF codes, falls back to gold/60 ratio estimate
+    // PRIMARY: Proxy → goodreturns.in Chennai prices
+    // FALLBACK: MFAPI ETF NAV calculation
+    let goldPerGram = 0;
     let silverPerGram = 0;
     let silverSrc = '';
+    let goldSrc   = 'ETF';
+
     try {
-      const silverResult = await fetchCommodityPrice(SILVER_ETF_CANDIDATES, 'silver', goldPerGram);
-      if(silverResult) {
-        silverPerGram = silverResult.price;
-        silverSrc = silverResult.src;
+      const goldRes = await fetchWithTimeout(`${PROXY_URL}/gold-price`, {}, 12000);
+      if(goldRes.ok) {
+        const goldData = await goldRes.json();
+        if(goldData.ok && goldData.price > 0) {
+          goldPerGram = goldData.price;
+          goldSrc = 'goodreturns.in';
+        }
       }
-    } catch(e) { /* silver unavailable */ }
+    } catch(e) { /* fall through to ETF */ }
+
+    // Fallback to ETF NAV if goodreturns failed
+    if(goldPerGram === 0) {
+      const goldResult = await fetchCommodityPrice(GOLD_ETF_CANDIDATES, 'gold');
+      if(!goldResult) throw new Error('Could not fetch gold price — all sources failed');
+      goldPerGram = goldResult.price;
+      goldSrc = `ETF (${goldResult.src})`;
+    }
+
+    // Silver — try proxy first, then ETF fallback
+    try {
+      const silverRes = await fetchWithTimeout(`${PROXY_URL}/silver-price`, {}, 12000);
+      if(silverRes.ok) {
+        const silverData = await silverRes.json();
+        if(silverData.ok && silverData.price > 0) {
+          silverPerGram = silverData.price;
+          silverSrc = 'goodreturns.in';
+        }
+      }
+    } catch(e) { /* fall through */ }
 
     if(silverPerGram === 0) {
-      setFetchStatus(`⚠ Silver ETFs unavailable — Gold ₹${goldPerGram.toLocaleString('en-IN')}/g · SGB updating…`, 'var(--gold)');
+      try {
+        const silverResult = await fetchCommodityPrice(SILVER_ETF_CANDIDATES, 'silver', goldPerGram);
+        if(silverResult) { silverPerGram = silverResult.price; silverSrc = silverResult.src; }
+      } catch(e) { /* silver unavailable */ }
+    }
+
+    if(silverPerGram === 0) {
+      // Last resort: gold/silver ratio ~90:1
+      silverPerGram = Math.round(goldPerGram / 90);
+      silverSrc = 'GSR-derived';
     }
 
     portfolio.holdings.forEach((h, i) => {
@@ -3296,7 +3332,7 @@ async function autoFetchPrices() {
       }
     });
 
-    setFetchStatus(`Gold ₹${goldPerGram.toLocaleString('en-IN')}/g${silverPerGram > 0 ? ` · Silver ₹${silverPerGram.toLocaleString('en-IN')}/g${silverSrc==='GSR-derived'?' (est.)':''}` : ''} · fetching MF…`, 'var(--gold)');
+    setFetchStatus(`Gold ₹${goldPerGram.toLocaleString('en-IN')}/g (${goldSrc}) · fetching MF…`, 'var(--gold)');
 
     // ── Step 2: Mutual Funds ──────────────────────
     // Get unique MFAPI codes to fetch
@@ -3360,9 +3396,9 @@ async function autoFetchPrices() {
 
     recalcNewTotal();
 
-    const fetchedMF = Object.keys(navMap).length;
-    const silverStr = silverPerGram > 0
-      ? ` · Silver ₹${silverPerGram.toLocaleString('en-IN')}/g${silverSrc==='GSR-derived'?' (est. from gold ratio)':''}`
+    const fetchedMF   = Object.keys(navMap).length;
+    const silverStr   = silverPerGram > 0
+      ? ` · Silver ₹${silverPerGram.toLocaleString('en-IN')}/g${silverSrc==='GSR-derived'?' (est.)':silverSrc==='goodreturns.in'?' (Chennai)':''}`
       : ' · Silver unavailable';
 
     // ── Step 3: Unlisted Share Prices ──────────────────────
@@ -3406,21 +3442,20 @@ async function autoFetchPrices() {
           }
         });
 
-        // Count errors
         unlistedErrors = Object.values(prices).filter(p => !p.ok).length;
       }
     } catch(e) {
-      unlistedErrors = 5; // all failed
+      unlistedErrors = 5;
     }
 
     recalcNewTotal();
 
     const unlistedStr = unlistedFilled > 0
-      ? ` · ${unlistedFilled} unlisted updated`
+      ? ` · ${unlistedFilled}/5 unlisted updated`
       : unlistedErrors > 0 ? ` · unlisted fetch failed` : '';
 
     setFetchStatus(
-      `✓ Gold ₹${goldPerGram.toLocaleString('en-IN')}/g${silverStr} · MF ₹${(MF_SCHEMES.reduce((a,s)=>a+(s.value||0),0)/10000000).toFixed(2)}Cr (${fetchedMF}/${totalCodes} NAVs)${unlistedStr} · ${filled + unlistedFilled} rows filled`,
+      `✓ Gold ₹${goldPerGram.toLocaleString('en-IN')}/g${silverStr} · MF ₹${(MF_SCHEMES.reduce((a,s)=>a+(s.value||0),0)/10000000).toFixed(2)}Cr (${fetchedMF}/${totalCodes} NAVs)${unlistedStr} · ${filled + unlistedFilled} rows updated`,
       unlistedErrors > 0 && unlistedFilled === 0 ? 'var(--gold)' : 'var(--green)'
     );
 
