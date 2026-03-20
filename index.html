@@ -1689,14 +1689,17 @@ async function loadAndInit() {
     // into any GitHub-loaded holdings that are missing them (backwards compatibility)
     const loaded = ghData.holdings || DEFAULT_HOLDINGS;
 
-    // Migration 1: old 2-row MF (ICICI + HDFC) → new 2-row _mfComputed split
-    const mfRows = loaded.filter(h => h.sub === 'Mutual Fund');
-    const hasTwoOldRows   = mfRows.length >= 2 && !loaded.some(h => h._mfComputed);
-    // Migration 2: old single _mfComputed (no _mfOwner) → new 2-row split
-    const hasOneMFRow = loaded.filter(h => h._mfComputed).length === 1;
+    // Migration: ensure exactly 2 correctly-formed _mfComputed rows exist
+    const mfRows        = loaded.filter(h => h.sub === 'Mutual Fund');
+    const mfCompRows    = loaded.filter(h => h._mfComputed);
+    const hasTwoOldRows = mfRows.length >= 2 && mfCompRows.length === 0;
+    // Old single _mfComputed row OR 2 rows with wrong remarks → rebuild
+    const needsMigration = hasTwoOldRows
+      || mfCompRows.length === 1
+      || (mfCompRows.length === 2 && !mfCompRows.some(h => h._mfOwner));
 
     let normalized = loaded;
-    if(hasTwoOldRows || hasOneMFRow) {
+    if(needsMigration) {
       const firstMFIdx = loaded.findIndex(h => h.sub === 'Mutual Fund' || h._mfComputed);
       const yuvanCost  = hasTwoOldRows
         ? (mfRows.find(h => h.owner !== 'Ramyaa')?.purchasePrice || 23900753)
@@ -1727,14 +1730,15 @@ async function loadAndInit() {
 
     // Inject any DEFAULT_HOLDINGS rows missing from loaded data
     // Match by remarks field (most stable identifier per holding)
+    // NOTE: never inject _mfComputed rows — migration handles those
     DEFAULT_HOLDINGS.forEach(def => {
       if(!def.remarks) return;
+      if(def._mfComputed) return;  // MF rows managed by migration only
       const exists = portfolio.holdings.some(h =>
         h.remarks === def.remarks && h.sub === def.sub && h.account === def.account
       );
       if(!exists) {
-        // Find the right position (after the preceding row)
-        const defIdx = DEFAULT_HOLDINGS.indexOf(def);
+        const defIdx  = DEFAULT_HOLDINGS.indexOf(def);
         const insertAt = Math.min(defIdx, portfolio.holdings.length);
         portfolio.holdings.splice(insertAt, 0, { ...def });
         console.log(`Injected missing holding: ${def.account} ${def.remarks}`);
