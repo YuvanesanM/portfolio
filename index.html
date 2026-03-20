@@ -1440,6 +1440,9 @@ function fmtShort(n) {
 
 // Compute total MF value from MF_SCHEMES (both Yuvan + Ramyaa)
 // and sync into the single _mfComputed holding row
+// Track whether MF NAVs have been freshly fetched this session
+let mfFetchedThisSession = false;
+
 function syncMFTotal() {
   const yuvanTotal  = MF_SCHEMES.filter(s => !s.owner || s.owner === 'Yuvan').reduce((a,s) => a+(s.value||0), 0);
   const ramyaaTotal = MF_SCHEMES.filter(s => s.owner === 'Ramyaa').reduce((a,s) => a+(s.value||0), 0);
@@ -1449,12 +1452,20 @@ function syncMFTotal() {
 
   portfolio.holdings.forEach(h => {
     if(!h._mfComputed) return;
-    if(h._mfOwner === 'Yuvan' || (!h._mfOwner && h.owner === 'Yuvan')) {
-      h.value = Math.round(yuvanTotal);
-      h.purchasePrice = Math.round(yuvanCost);
-    } else if(h._mfOwner === 'Ramyaa' || h.owner === 'Ramyaa') {
-      h.value = Math.round(ramyaaTotal);
-      h.purchasePrice = Math.round(ramyaaCost);
+    const isYuvan = h._mfOwner === 'Yuvan' || (!h._mfOwner && h.owner === 'Yuvan');
+
+    if(mfFetchedThisSession) {
+      // Fresh fetch has run — overwrite with live MF_SCHEMES values
+      h.value         = Math.round(isYuvan ? yuvanTotal  : ramyaaTotal);
+      h.purchasePrice = Math.round(isYuvan ? yuvanCost   : ramyaaCost);
+    } else {
+      // No fetch yet — preserve GitHub-saved value if non-zero
+      // Only fall back to MF_SCHEMES if row has no saved value
+      if(!h.value || h.value === 0) {
+        h.value         = Math.round(isYuvan ? yuvanTotal  : ramyaaTotal);
+        h.purchasePrice = Math.round(isYuvan ? yuvanCost   : ramyaaCost);
+      }
+      // else: keep the saved GitHub value as-is
     }
   });
   return Math.round(total);
@@ -3331,6 +3342,7 @@ async function autoFetchPrices() {
     });
 
     // Sync the computed MF holdings from MF_SCHEMES totals
+    mfFetchedThisSession = true;  // mark that live NAVs have been fetched
     syncMFTotal();
 
     // Update both _mfComputed rows in the modal (Yuvan + Ramyaa)
