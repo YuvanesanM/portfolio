@@ -1751,12 +1751,13 @@ async function loadAndInit() {
       return noIdGroupSeen[key] <= remaining;
     });
 
-    // Merge fields from DEFAULT_HOLDINGS — use h._id only if it already exists on the row
-    // NEVER assign _id by index — index alignment is unreliable when rows are missing
+    // Bootstrap _id assignment:
+    // If NO rows have _id (pre-save state), assign by index — order matches DEFAULT
+    // If ANY rows have _id (post-save state), only carry existing _id — never derive from index
+    const anyHasId = normalized.some(h => h._id);
     portfolio.holdings = normalized.map((h, i) => ({
       ...h,
-      // Only carry _id if the row already has one (from prior save) — never derive from index
-      _id:           h._id           || undefined,
+      _id:           h._id || (anyHasId ? undefined : (DEFAULT_HOLDINGS[i]||{})._id || undefined),
       owner:         h.owner         || (DEFAULT_HOLDINGS[i]||{}).owner         || 'Yuvan',
       purchaseDate:  h.purchaseDate  || (DEFAULT_HOLDINGS[i]||{}).purchaseDate  || '2020-01-01',
       purchasePrice: h.purchasePrice || (DEFAULT_HOLDINGS[i]||{}).purchasePrice || h.value,
@@ -1765,17 +1766,21 @@ async function loadAndInit() {
     }));
 
     // Inject any DEFAULT_HOLDINGS rows missing from loaded data
-    // Match by stable _id field — never inject _mfComputed rows (migration handles those)
-    DEFAULT_HOLDINGS.forEach(def => {
-      if(def._mfComputed) return;  // MF rows managed by migration only
-      if(!def._id) return;
-      const exists = portfolio.holdings.some(h => h._id === def._id);
-      if(!exists) {
-        const defIdx   = DEFAULT_HOLDINGS.indexOf(def);
-        const insertAt = Math.min(defIdx, portfolio.holdings.length);
-        portfolio.holdings.splice(insertAt, 0, { ...def });
-      }
-    });
+    // Only runs when at least some rows have _id (post-save state)
+    // If no rows have _id at all (pure pre-save), skip — dedup handles count control
+    const anyLoadedHasId = portfolio.holdings.some(h => h._id && !h._mfComputed);
+    if(anyLoadedHasId) {
+      DEFAULT_HOLDINGS.forEach(def => {
+        if(def._mfComputed) return;  // MF rows managed by migration only
+        if(!def._id) return;
+        const exists = portfolio.holdings.some(h => h._id === def._id);
+        if(!exists) {
+          const defIdx   = DEFAULT_HOLDINGS.indexOf(def);
+          const insertAt = Math.min(defIdx, portfolio.holdings.length);
+          portfolio.holdings.splice(insertAt, 0, { ...def });
+        }
+      });
+    }
     portfolio.asOf      = ghData.asOf        || '16 Sep 2025';
     snapshots           = ghData.snapshots   || DEFAULT_SNAPSHOTS;
     sgbTranches         = ghData.sgbTranches || DEFAULT_SGB;
