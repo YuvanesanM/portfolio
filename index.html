@@ -250,6 +250,7 @@
   .card-label { font-size: 11px; font-weight: 500; letter-spacing: 1.5px; color: var(--text3); text-transform: uppercase; margin-bottom: 12px; }
   .card-value { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 28px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
   .card-sub { font-size: 12px; color: var(--text2); }
+  .stat-val { font-size:22px; font-weight:800; color:var(--text); font-family:'Plus Jakarta Sans',sans-serif; margin-bottom:2px; }
   .card-accent { position: absolute; top: 0; left: 0; width: 3px; height: 100%; border-radius: 16px 0 0 16px; }
   .card-icon { font-size: 28px; margin-bottom: 12px; }
   .card h3 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 20px; }
@@ -618,7 +619,7 @@
         <div class="card-accent" style="background:var(--blue)"></div>
         <div style="font-size:22px;margin-bottom:8px">📊</div>
         <div class="card-label">Mutual Funds</div>
-        <div style="font-size:22px;font-weight:800;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:2px" id="statMF">—</div>
+        <div class="stat-val" id="statMF">—</div>
         <div class="card-sub" id="statMFsub">—</div>
         <div class="card-arrow">→</div>
       </div>
@@ -626,7 +627,7 @@
         <div class="card-accent" style="background:var(--green)"></div>
         <div style="font-size:22px;margin-bottom:8px">🏛️</div>
         <div class="card-label">Fixed Deposits</div>
-        <div style="font-size:22px;font-weight:800;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:2px" id="statFD">—</div>
+        <div class="stat-val" id="statFD">—</div>
         <div class="card-sub" id="statFDsub">—</div>
         <div class="card-arrow">→</div>
       </div>
@@ -634,7 +635,7 @@
         <div class="card-accent" style="background:var(--gold)"></div>
         <div style="font-size:22px;margin-bottom:8px">🥇</div>
         <div class="card-label">SGB</div>
-        <div style="font-size:22px;font-weight:800;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:2px" id="statSGB">—</div>
+        <div class="stat-val" id="statSGB">—</div>
         <div class="card-sub" id="statSGBsub">—</div>
         <div class="card-arrow">→</div>
       </div>
@@ -642,49 +643,49 @@
         <div class="card-accent" style="background:var(--purple)"></div>
         <div style="font-size:22px;margin-bottom:8px">🏦</div>
         <div class="card-label">PMS</div>
-        <div style="font-size:22px;font-weight:800;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:2px" id="statPMS">—</div>
+        <div class="stat-val" id="statPMS">—</div>
         <div class="card-sub">Portfolio Mgmt Service</div>
       </div>
       <div class="card" style="padding:16px">
         <div class="card-accent" style="background:var(--orange)"></div>
         <div style="font-size:22px;margin-bottom:8px">🔒</div>
         <div class="card-label">AIF</div>
-        <div style="font-size:22px;font-weight:800;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:2px" id="statAIF">—</div>
+        <div class="stat-val" id="statAIF">—</div>
         <div class="card-sub">Alternative Inv. Fund</div>
       </div>
       <div class="card" style="padding:16px">
         <div class="card-accent" style="background:var(--teal)"></div>
         <div style="font-size:22px;margin-bottom:8px">🏢</div>
         <div class="card-label">REIT</div>
-        <div style="font-size:22px;font-weight:800;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:2px" id="statREIT">—</div>
+        <div class="stat-val" id="statREIT">—</div>
         <div class="card-sub">Embassy · Nexus</div>
       </div>
       <div class="card" style="padding:16px">
         <div class="card-accent" style="background:#00c4b4"></div>
         <div style="font-size:22px;margin-bottom:8px">📈</div>
         <div class="card-label">Stocks</div>
-        <div style="font-size:22px;font-weight:800;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:2px" id="statStocks">—</div>
+        <div class="stat-val" id="statStocks">—</div>
         <div class="card-sub">ICICI Demat · Zerodha</div>
       </div>
       <div class="card" style="padding:16px">
         <div class="card-accent" style="background:#9b59b6"></div>
         <div style="font-size:22px;margin-bottom:8px">🔓</div>
         <div class="card-label">Unlisted Shares</div>
-        <div style="font-size:22px;font-weight:800;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:2px" id="statUnlisted">—</div>
+        <div class="stat-val" id="statUnlisted">—</div>
         <div class="card-sub" id="statUnlistedSub">NSE · OYO · others</div>
       </div>
       <div class="card" style="padding:16px">
         <div class="card-accent" style="background:var(--gold)"></div>
         <div style="font-size:22px;margin-bottom:8px">🪙</div>
         <div class="card-label">Physical Gold/Silver</div>
-        <div style="font-size:22px;font-weight:800;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:2px" id="statCoins">—</div>
+        <div class="stat-val" id="statCoins">—</div>
         <div class="card-sub">Gold coins · Silver coins</div>
       </div>
       <div class="card" style="padding:16px">
         <div class="card-accent" style="background:#f39c12"></div>
         <div style="font-size:22px;margin-bottom:8px">₿</div>
         <div class="card-label">Crypto</div>
-        <div style="font-size:22px;font-weight:800;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:2px" id="statCrypto">—</div>
+        <div class="stat-val" id="statCrypto">—</div>
         <div class="card-sub">Bitcoin</div>
       </div>
     </div>
@@ -1383,6 +1384,7 @@ let portfolio   = { total: 0, asOf: '16 Sep 2025', holdings: [] };
 let snapshots   = [];
 let sgbTranches = [];
 let summary     = [];
+let summaryMap  = {};
 
 const TYPE_COLORS = {
   'Fixed Deposit':'#2ecc8f','Mutual Fund':'#4f7fff','SGB':'#d4a843',
@@ -1404,9 +1406,6 @@ const CHART_SCALES_YX = {  // for horizontal bar charts (indexAxis:'y')
   x:{ grid:{color:'rgba(99,140,255,0.06)'}, ticks:{color:'#4a5a7a',font:{size:10},callback:v=>fmtShort(v)} },
   y:{ grid:{display:false}, ticks:{color:'#8a9bbf',font:{size:11}} }
 };
-function chartTooltip(labelFn) {
-  return { ...CHART_TOOLTIP, callbacks:{ label: labelFn || (ctx=>` ${fmt(ctx.raw)}`) } };
-}
 function destroyChart(canvasId) {
   const el = document.getElementById(canvasId);
   if(el) { const ex = Chart.getChart(el); if(ex) ex.destroy(); }
@@ -1441,11 +1440,15 @@ function fmtShort(n) {
 // Compute total MF value from MF_SCHEMES (both Yuvan + Ramyaa)
 // and sync into the single _mfComputed holding row
 function syncMFTotal() {
-  const yuvanTotal  = MF_SCHEMES.filter(s => !s.owner || s.owner === 'Yuvan').reduce((a,s) => a+(s.value||0), 0);
-  const ramyaaTotal = MF_SCHEMES.filter(s => s.owner === 'Ramyaa').reduce((a,s) => a+(s.value||0), 0);
+  // Always use MF_SCHEMES as source of truth — never use GitHub-saved _mfComputed values
+  // MF_SCHEMES holds per-scheme values (hardcoded from CAS, updated by live fetch)
+  const yuvan  = MF_SCHEMES.filter(s => !s.owner || s.owner === 'Yuvan');
+  const ramyaa = MF_SCHEMES.filter(s => s.owner === 'Ramyaa');
+  const yuvanTotal  = yuvan.reduce((a,s) => a+(s.value||0), 0);
+  const ramyaaTotal = ramyaa.reduce((a,s) => a+(s.value||0), 0);
   const total       = yuvanTotal + ramyaaTotal;
-  const yuvanCost   = MF_SCHEMES.filter(s => !s.owner || s.owner === 'Yuvan').reduce((a,s) => a+(s.cost||0), 0);
-  const ramyaaCost  = MF_SCHEMES.filter(s => s.owner === 'Ramyaa').reduce((a,s) => a+(s.cost||0), 0);
+  const yuvanCost   = yuvan.reduce((a,s) => a+(s.cost||0), 0);
+  const ramyaaCost  = ramyaa.reduce((a,s) => a+(s.cost||0), 0);
 
   // Always use MF_SCHEMES as the source of truth for _mfComputed rows.
   // MF_SCHEMES holds the per-scheme values (updated by fetch or at load).
@@ -1718,21 +1721,34 @@ async function loadAndInit() {
       );
     }
 
-    // Deduplicate: remove any extra rows beyond what DEFAULT_HOLDINGS expects
-    // This cleans up duplicates introduced by the old injection bug
-    // Strategy: for each sub+account combination, keep only as many rows as DEFAULT has
-    const subAccountCount = {};
+    // Deduplicate: remove extra rows beyond what DEFAULT_HOLDINGS expects
+    // Prefer _id-matched rows; fill remaining slots with unmatched rows
+    const groupAllowed = {};
     DEFAULT_HOLDINGS.forEach(def => {
       const key = `${def.account}|${def.sub}|${def.type}`;
-      subAccountCount[key] = (subAccountCount[key] || 0) + 1;
+      groupAllowed[key] = (groupAllowed[key]||0) + 1;
     });
-    const seenCount = {};
-    normalized = normalized.filter(h => {
-      if(h._mfComputed) return true; // always keep (migration handles count)
+    // Count _id-matched rows per group
+    const idMatchedCount = {};
+    normalized.forEach(h => {
+      if(!h._id) return;
+      if(!DEFAULT_HOLDINGS.some(d => d._id === h._id)) return;
       const key = `${h.account}|${h.sub}|${h.type}`;
-      const allowed = subAccountCount[key] || 1;
-      seenCount[key] = (seenCount[key] || 0) + 1;
-      return seenCount[key] <= allowed;
+      idMatchedCount[key] = (idMatchedCount[key]||0) + 1;
+    });
+    // Filter
+    const noIdGroupSeen = {};
+    normalized = normalized.filter(h => {
+      if(h._mfComputed) return true;
+      const key = `${h.account}|${h.sub}|${h.type}`;
+      // _id-matched rows: always keep (they are the canonical rows)
+      if(h._id && DEFAULT_HOLDINGS.some(d => d._id === h._id)) return true;
+      // Non-_id row: keep only if remaining slots after _id rows
+      const allowed  = groupAllowed[key] || 99;
+      const matched  = idMatchedCount[key] || 0;
+      const remaining = allowed - matched;
+      noIdGroupSeen[key] = (noIdGroupSeen[key]||0) + 1;
+      return noIdGroupSeen[key] <= remaining;
     });
 
     // Also ensure existing _mfComputed rows get _mfOwner if missing
@@ -1756,7 +1772,6 @@ async function loadAndInit() {
         const defIdx   = DEFAULT_HOLDINGS.indexOf(def);
         const insertAt = Math.min(defIdx, portfolio.holdings.length);
         portfolio.holdings.splice(insertAt, 0, { ...def });
-        console.log(`Injected missing holding: ${def._id}`);
       }
     });
     portfolio.asOf      = ghData.asOf        || '16 Sep 2025';
@@ -2029,18 +2044,18 @@ function downloadSummaryCard() {
 // ═══════════════════════════════════════════════════
 function renderStats() {
   const h = portfolio.holdings;
-  const mf       = summary.find(s=>s.name==='Mutual Fund')?.value||0;
+  const mf       = summaryMap['Mutual Fund']||0;
   const fdHoldings = h.filter(x=>x.sub==='Fixed Deposit' && x.value>0);
   const fdTotal  = fdHoldings.reduce((a,b)=>a+(b.value||0),0);
   const liquid   = summary.filter(s=>['Mutual Fund','Fixed Deposit','Savings','Crypto'].includes(s.name)).reduce((a,b)=>a+b.value,0);
   const illiquid = summary.filter(s=>['SGB','PMS','AIF','SSY Account','Insurance','NPS'].includes(s.name)).reduce((a,b)=>a+b.value,0);
   const sgbTotal = sgbTranches.reduce((a,b)=>a+b.value,0);
   const sgbGrams = sgbTranches.reduce((a,b)=>a+b.units,0);
-  const pms      = summary.find(s=>s.name==='PMS')?.value||0;
-  const aif      = summary.find(s=>s.name==='AIF')?.value||0;
-  const reit     = summary.find(s=>s.name==='REIT')?.value||0;
-  const coins    = summary.find(s=>s.name==='Coin')?.value||0;
-  const crypto   = summary.find(s=>s.name==='Crypto')?.value||0;
+  const pms      = summaryMap['PMS']||0;
+  const aif      = summaryMap['AIF']||0;
+  const reit     = summaryMap['REIT']||0;
+  const coins    = summaryMap['Coin']||0;
+  const crypto   = summaryMap['Crypto']||0;
   const stocks   = h.filter(x=>x.sub==='ETF & Stocks'||x.sub==='Mixed Shares').reduce((a,b)=>a+(b.value||0),0);
   const unlisted = h.filter(x=>x.sub==='Unlisted').reduce((a,b)=>a+(b.value||0),0);
   const unlistedCount = h.filter(x=>x.sub==='Unlisted').length;
@@ -2070,6 +2085,7 @@ function initDashboard() {
   syncMFTotal();
   portfolio.total = portfolio.holdings.reduce((a,b)=>a+(b.value||0),0);
   summary         = buildSummary(portfolio.holdings);
+  summaryMap       = Object.fromEntries(summary.map(s => [s.name, s.value]));
   document.getElementById('heroTotal').textContent   = fmt(portfolio.total);
   document.getElementById('heroDate').textContent    = portfolio.asOf;
   document.getElementById('lastUpdated').textContent = 'Updated: '+portfolio.asOf;
@@ -2093,6 +2109,7 @@ function refreshDashboard() {
   syncMFTotal();
   portfolio.total = portfolio.holdings.reduce((a,b)=>a+(b.value||0),0);
   summary         = buildSummary(portfolio.holdings);
+  summaryMap       = Object.fromEntries(summary.map(s => [s.name, s.value]));
   document.getElementById('heroTotal').textContent   = fmt(portfolio.total);
   document.getElementById('heroDate').textContent    = portfolio.asOf;
   document.getElementById('lastUpdated').textContent = 'Updated: ' + portfolio.asOf;
@@ -2953,7 +2970,7 @@ function updateTarget(name, val) {
   const key = name.replace(/[\s/]/g,'_');
   const tEl = document.getElementById(`reb_${key}_tgt`);
   if(tEl) tEl.innerHTML = `${val}%<br><span style="font-size:10px;color:var(--text3)">target</span>`;
-  const current = (summary.find(s=>s.name===name)?.value)||0;
+  const current = (summaryMap[name]||0)||0;
   const diff = current - (val/100*portfolio.total);
   const diffLabel = Math.abs(diff)<5000 ? 'On target'
                   : diff>0 ? `↓ Sell ${fmtShort(Math.abs(diff))}`
@@ -2977,7 +2994,7 @@ function updateRebalanceTotals() {
 
   let over=0, under=0, on=0, toMove=0;
   Object.entries(userTargets).forEach(([name,tgt]) => {
-    const curr    = (summary.find(s=>s.name===name)?.value||0);
+    const curr    = (summaryMap[name]||0);
     const tgtAmt  = tgt/100*portfolio.total;
     const diff    = Math.abs(curr-tgtAmt);
     const currPct = curr/portfolio.total*100;
@@ -2996,7 +3013,7 @@ function renderRebTable() {
   if(!tb) return;
   tb.innerHTML = Object.entries(DEFAULT_TARGETS)
     .map(([name]) => {
-      const current    = summary.find(s=>s.name===name)?.value || 0;
+      const current    = summaryMap[name]||0 || 0;
       const currentPct = (current/portfolio.total*100).toFixed(1);
       const target     = userTargets[name]||0;
       const targetAmt  = target/100*portfolio.total;
@@ -3030,7 +3047,7 @@ function renderSIPAlloc() {
   // Only allocate SIP to underweight assets
   const buyItems = Object.entries(userTargets)
     .map(([name,tgt]) => {
-      const current = summary.find(s=>s.name===name)?.value||0;
+      const current = summaryMap[name]||0;
       const tgtAmt  = tgt/100*portfolio.total;
       return { name, tgt, diff: tgtAmt-current };
     })
@@ -3064,7 +3081,7 @@ function renderSIPAlloc() {
 
 function setTargetsFromCurrent() {
   Object.keys(userTargets).forEach(name => {
-    const curr = summary.find(s=>s.name===name)?.value||0;
+    const curr = summaryMap[name]||0;
     userTargets[name] = Math.round(curr/portfolio.total*100);
   });
   renderRebalance();
@@ -3080,7 +3097,7 @@ function applyRebalance() {
   if(!ra) return;
 
   const actions = Object.entries(userTargets).map(([name, tgt]) => {
-    const current  = summary.find(s=>s.name===name)?.value||0;
+    const current  = summaryMap[name]||0;
     const targetAmt = tgt/100*portfolio.total;
     const diff = targetAmt - current;
     return { name, diff, current, targetAmt, action: diff>0?'BUY':'SELL', amt: Math.abs(diff) };
