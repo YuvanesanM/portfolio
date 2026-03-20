@@ -1464,19 +1464,20 @@ function syncMFTotal() {
 function buildSummary(holdings) {
   const map = {};
   holdings.forEach(h => {
-    const key = h.sub === 'SSY Account' ? 'SSY Account'
+    const key = h.sub === 'SSY Account'                                         ? 'SSY Account'
               : h.sub === 'Insurance' || h.type === 'ULIP' || h.type === 'Insurance' ? 'Insurance'
-              : h.sub === 'Fixed Deposit' ? 'Fixed Deposit'
-              : h.sub === 'Mutual Fund' ? 'Mutual Fund'
-              : h.sub === 'SGB' ? 'SGB'
-              : h.sub === 'PMS' ? 'PMS'
-              : h.sub === 'AIF' ? 'AIF'
-              : (h.sub === 'ETF & Stocks' || h.sub === 'Mixed Shares' || h.sub === 'Unlisted') ? 'Shares'
-              : h.sub === 'REIT' ? 'REIT'
-              : h.sub === 'Crypto' ? 'Crypto'
-              : h.sub === 'Coin' ? 'Coin'
-              : h.sub === 'NPS' ? 'NPS'
-              : h.sub === 'Savings' ? 'Savings'
+              : h.sub === 'Fixed Deposit'                                        ? 'Fixed Deposit'
+              : h.sub === 'Mutual Fund'                                          ? 'Mutual Fund'
+              : h.sub === 'SGB'                                                  ? 'SGB'
+              : h.sub === 'PMS'                                                  ? 'PMS'
+              : h.sub === 'AIF'                                                  ? 'AIF'
+              : h.sub === 'Unlisted'                                             ? 'Unlisted'
+              : (h.sub === 'ETF & Stocks' || h.sub === 'Mixed Shares')          ? 'Shares'
+              : h.sub === 'REIT'                                                 ? 'REIT'
+              : h.sub === 'Crypto'                                               ? 'Crypto'
+              : h.sub === 'Coin'                                                 ? 'Coin'
+              : h.sub === 'NPS'                                                  ? 'NPS'
+              : h.sub === 'Savings'                                              ? 'Savings'
               : h.type;
     map[key] = (map[key]||0) + (h.value||0);
   });
@@ -2181,7 +2182,7 @@ function renderCharts() {
 
   const liq = {
     liquid:    summary.filter(s=>['Mutual Fund','Fixed Deposit','Savings','Crypto'].includes(s.name)).reduce((a,b)=>a+b.value,0),
-    semiLiquid:summary.filter(s=>['Shares','REIT','Coin'].includes(s.name)).reduce((a,b)=>a+b.value,0),
+    semiLiquid:summary.filter(s=>['Shares','Unlisted','REIT','Coin'].includes(s.name)).reduce((a,b)=>a+b.value,0),
     illiquid:  summary.filter(s=>['SGB','PMS','AIF','SSY Account','Insurance','NPS'].includes(s.name)).reduce((a,b)=>a+b.value,0),
   };
   new Chart(document.getElementById('liquidityChart').getContext('2d'),{
@@ -2941,9 +2942,6 @@ function renderRebalance() {
   const total = portfolio.total;
   set_('rebTotal', fmt(total));
 
-  const currentMap = {};
-  summary.forEach(s => { currentMap[s.name] = s.value; });
-
   const sl = document.getElementById('rebSliders');
   if(!sl) return;
 
@@ -2955,7 +2953,7 @@ function renderRebalance() {
   };
 
   sl.innerHTML = Object.entries(DEFAULT_TARGETS).map(([name]) => {
-    const current    = currentMap[name] || 0;
+    const current    = summaryMap[name] || 0;
     const currentPct = (current / total * 100);
     const target     = userTargets[name] || 0;
     const diff       = current - (target / 100 * total);
@@ -3046,7 +3044,7 @@ function renderRebTable() {
   if(!tb) return;
   tb.innerHTML = Object.entries(DEFAULT_TARGETS)
     .map(([name]) => {
-      const current    = summaryMap[name]||0 || 0;
+      const current    = summaryMap[name] || 0;
       const currentPct = (current/portfolio.total*100).toFixed(1);
       const target     = userTargets[name]||0;
       const targetAmt  = target/100*portfolio.total;
@@ -3086,7 +3084,7 @@ function renderSIPAlloc() {
     })
     .filter(x => x.diff > 5000 && x.tgt > 0);
 
-  const totalBuyPct = buyItems.reduce((a,x)=>a+x.tgt, 0);
+  const totalShortfall = buyItems.reduce((a,x)=>a+x.diff, 0);
   if(buyItems.length === 0) {
     el.innerHTML = `<div style="color:var(--green);font-size:12px;padding:12px 0">✓ Portfolio is on target — no SIP reallocation needed</div>`;
     return;
@@ -3095,8 +3093,8 @@ function renderSIPAlloc() {
   el.innerHTML = buyItems
     .sort((a,b)=>b.diff-a.diff)
     .map(x => {
-      const alloc = Math.round((x.tgt/totalBuyPct)*sipAmt);
-      const pct   = ((x.tgt/totalBuyPct)*100).toFixed(0);
+      const alloc = Math.round((x.diff/totalShortfall)*sipAmt);
+      const pct   = ((x.diff/totalShortfall)*100).toFixed(0);
       return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
         <div style="flex:1;font-size:12px;font-weight:600">${x.name}</div>
         <div style="width:80px;height:4px;background:var(--surface3);border-radius:99px;overflow:hidden">
@@ -3113,10 +3111,18 @@ function renderSIPAlloc() {
 }
 
 function setTargetsFromCurrent() {
+  // Round each asset's current % individually
+  let sum = 0;
+  let largestName = null, largestVal = 0;
   Object.keys(userTargets).forEach(name => {
-    const curr = summaryMap[name]||0;
-    userTargets[name] = Math.round(curr/portfolio.total*100);
+    const curr = summaryMap[name] || 0;
+    const pct  = Math.round(curr / portfolio.total * 100);
+    userTargets[name] = pct;
+    sum += pct;
+    if(curr > largestVal) { largestVal = curr; largestName = name; }
   });
+  // Adjust largest asset to ensure total = exactly 100%
+  if(largestName && sum !== 100) userTargets[largestName] += (100 - sum);
   renderRebalance();
 }
 
@@ -3134,7 +3140,7 @@ function applyRebalance() {
     const targetAmt = tgt/100*portfolio.total;
     const diff = targetAmt - current;
     return { name, diff, current, targetAmt, action: diff>0?'BUY':'SELL', amt: Math.abs(diff) };
-  }).filter(a => a.amt > 10000);
+  }).filter(a => a.amt > 5000);
 
   actions.sort((a,b) => b.amt - a.amt);
 
