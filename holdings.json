@@ -1,5 +1,5 @@
 {
-  "asOf": "19 Mar 2026",
+  "asOf": "20 Mar 2026",
   "holdings": [
     {
       "account": "ICICI",
@@ -137,7 +137,7 @@
       "account": "ICICI",
       "type": "SGB",
       "sub": "SGB",
-      "value": 1163750,
+      "value": 1125740,
       "units": "70g",
       "remarks": "Matures 14-Aug-2027",
       "owner": "Yuvan",
@@ -149,7 +149,7 @@
       "account": "ICICI",
       "type": "SGB",
       "sub": "SGB",
-      "value": 831250,
+      "value": 804100,
       "units": "50g",
       "remarks": "Matures 10-Dec-2027",
       "owner": "Yuvan",
@@ -161,7 +161,7 @@
       "account": "ICICI",
       "type": "SGB",
       "sub": "SGB",
-      "value": 1662500,
+      "value": 1608200,
       "units": "100g",
       "remarks": "Matures 08-Sep-2028",
       "owner": "Yuvan",
@@ -173,7 +173,7 @@
       "account": "ICICI",
       "type": "SGB",
       "sub": "SGB",
-      "value": 498750,
+      "value": 482460,
       "units": "30g",
       "remarks": "Matures 05-Jan-2029",
       "owner": "Yuvan",
@@ -185,7 +185,7 @@
       "account": "ICICI",
       "type": "SGB",
       "sub": "SGB",
-      "value": 831250,
+      "value": 804100,
       "units": "50g",
       "remarks": "Matures 19-Jan-2029",
       "owner": "Yuvan",
@@ -197,7 +197,7 @@
       "account": "ICICI",
       "type": "SGB",
       "sub": "SGB",
-      "value": 1662500,
+      "value": 1608200,
       "units": "100g",
       "remarks": "Matures 09-Mar-2029",
       "owner": "Yuvan",
@@ -209,7 +209,7 @@
       "account": "ICICI",
       "type": "SGB",
       "sub": "SGB",
-      "value": 1662500,
+      "value": 1608200,
       "units": "100g",
       "remarks": "Matures 25-May-2029",
       "owner": "Yuvan",
@@ -223,7 +223,7 @@
       "sub": "Mutual Fund",
       "value": 24767637,
       "units": "",
-      "remarks": "Yuvan · 45 schemes",
+      "remarks": "Yuvan Â· 45 schemes",
       "owner": "Yuvan",
       "purchaseDate": "2019-01-01",
       "purchasePrice": 23875755,
@@ -236,7 +236,7 @@
       "sub": "Mutual Fund",
       "value": 367478,
       "units": "",
-      "remarks": "Ramyaa · 2 schemes",
+      "remarks": "Ramyaa Â· 2 schemes",
       "owner": "Ramyaa",
       "purchaseDate": "2021-01-01",
       "purchasePrice": 400000,
@@ -355,7 +355,7 @@
       "account": "Au",
       "type": "Coin",
       "sub": "Coin",
-      "value": 2061500,
+      "value": 1994168,
       "units": "124g",
       "remarks": "Gold coins",
       "owner": "Yuvan",
@@ -367,7 +367,7 @@
       "account": "Ag",
       "type": "Coin",
       "sub": "Coin",
-      "value": 415500,
+      "value": 402000,
       "units": "1500g",
       "remarks": "Silver coins",
       "owner": "Yuvan",
@@ -444,6 +444,10 @@
     {
       "date": "2026-03-19",
       "value": 67127602
+    },
+    {
+      "date": "2026-03-20",
+      "value": 66775270
     }
   ],
   "sgbTranches": [
@@ -451,43 +455,43 @@
       "units": 70,
       "maturity": "14 Aug 2027",
       "cost": 244930,
-      "value": 1163750
+      "value": 1125740
     },
     {
       "units": 50,
       "maturity": "10 Dec 2027",
       "cost": 189750,
-      "value": 831250
+      "value": 804100
     },
     {
       "units": 100,
       "maturity": "08 Sep 2028",
       "cost": 511700,
-      "value": 1662500
+      "value": 1608200
     },
     {
       "units": 30,
       "maturity": "05 Jan 2029",
       "cost": 150000,
-      "value": 498750
+      "value": 482460
     },
     {
       "units": 50,
       "maturity": "19 Jan 2029",
       "cost": 252700,
-      "value": 831250
+      "value": 804100
     },
     {
       "units": 100,
       "maturity": "09 Mar 2029",
       "cost": 461200,
-      "value": 1662500
+      "value": 1608200
     },
     {
       "units": 100,
       "maturity": "25 May 2029",
       "cost": 472700,
-      "value": 1662500
+      "value": 1608200
     }
   ]
 }
