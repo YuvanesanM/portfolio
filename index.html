@@ -3352,9 +3352,64 @@ async function autoFetchPrices() {
     const silverStr = silverPerGram > 0
       ? ` · Silver ₹${silverPerGram.toLocaleString('en-IN')}/g${silverSrc==='GSR-derived'?' (est. from gold ratio)':''}`
       : ' · Silver unavailable';
+
+    // ── Step 3: Unlisted Share Prices ──────────────────────
+    setFetchStatus(`✓ Gold & MF done · Fetching unlisted share prices…`, 'var(--purple)');
+
+    let unlistedFilled = 0;
+    let unlistedErrors = 0;
+    try {
+      const unlistedRes = await fetch(`${PROXY_URL}/unlisted-prices`);
+      if(unlistedRes.ok) {
+        const unlistedData = await unlistedRes.json();
+        const prices = unlistedData.results || {};
+
+        portfolio.holdings.forEach((h, i) => {
+          const upc = getUnitPriceConfig(h);
+          if(!upc || h.sub !== 'Unlisted') return;
+
+          const r = (h.remarks||'').toLowerCase();
+          const key = r.includes('nse')    ? 'nse'
+                    : r.includes('sunday') ? 'sunday'
+                    : r.includes('oyo')    ? 'oyo'
+                    : r.includes('ecosure')? 'ecosure'
+                    : r.includes('aitmc')  ? 'aitmc'
+                    : null;
+
+          if(!key || !prices[key]?.ok || !prices[key].price) return;
+
+          const price = prices[key].price;
+          const priceInput = document.getElementById(`up_${i}`);
+          const hiddenVal  = document.getElementById(`nv_${i}`);
+          const calcLabel  = document.getElementById(`calc_${i}`);
+
+          if(priceInput) {
+            priceInput.value = price;
+            priceInput.style.borderColor = 'var(--purple)';
+            priceInput.style.color       = 'var(--purple)';
+            const total = Math.round(price * upc.qty);
+            if(hiddenVal)  { hiddenVal.value = total; }
+            if(calcLabel)  { calcLabel.textContent = `= ${fmt(total)}`; calcLabel.style.color = 'var(--purple)'; }
+            unlistedFilled++;
+          }
+        });
+
+        // Count errors
+        unlistedErrors = Object.values(prices).filter(p => !p.ok).length;
+      }
+    } catch(e) {
+      unlistedErrors = 5; // all failed
+    }
+
+    recalcNewTotal();
+
+    const unlistedStr = unlistedFilled > 0
+      ? ` · ${unlistedFilled} unlisted updated`
+      : unlistedErrors > 0 ? ` · unlisted fetch failed` : '';
+
     setFetchStatus(
-      `✓ Gold ₹${goldPerGram.toLocaleString('en-IN')}/g${silverStr} · MF ₹${(MF_SCHEMES.reduce((a,s)=>a+(s.value||0),0)/10000000).toFixed(2)}Cr (${fetchedMF}/${totalCodes} NAVs) · ${filled} rows filled`,
-      'var(--green)'
+      `✓ Gold ₹${goldPerGram.toLocaleString('en-IN')}/g${silverStr} · MF ₹${(MF_SCHEMES.reduce((a,s)=>a+(s.value||0),0)/10000000).toFixed(2)}Cr (${fetchedMF}/${totalCodes} NAVs)${unlistedStr} · ${filled + unlistedFilled} rows filled`,
+      unlistedErrors > 0 && unlistedFilled === 0 ? 'var(--gold)' : 'var(--green)'
     );
 
   } catch(e) {
