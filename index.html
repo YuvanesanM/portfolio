@@ -607,6 +607,7 @@
         <div class="hero-label">Total Portfolio Value</div>
         <div class="hero-value" id="heroTotal">₹6.80 Cr</div>
         <div class="hero-sub">As of <span id="heroDate">16 Sep 2025</span> · <span style="color:var(--blue2)">14 asset classes</span></div>
+        <div id="heroDelta" style="margin-top:6px;font-size:13px;font-weight:600;display:none"></div>
       </div>
       <div class="hero-right">
         <div class="hero-stat">
@@ -700,6 +701,10 @@
         <div class="card-sub">Bitcoin</div>
       </div>
     </div>
+
+    <!-- RISK SIGNALS + SGB ALERT -->
+    <div id="riskSignals" style="margin-bottom:20px"></div>
+    <div id="sgbAlert" style="margin-bottom:20px"></div>
 
     <!-- CHART + ALLOCATION -->
     <div class="grid-52">
@@ -1073,6 +1078,11 @@
         <div id="retWaterfall"></div>
       </div>
     </div>
+    <div class="card" style="margin-bottom:24px">
+      <h3>XIRR by Asset Class</h3>
+      <div id="xirrTable"></div>
+    </div>
+
     <div class="card">
       <h3>Holding-level Returns</h3>
       <div class="table-wrap">
@@ -1340,6 +1350,7 @@
             <th style="text-align:right;">Current Value</th>
             <th style="text-align:right;color:var(--gold);">New Value · or Unit Price ₹</th>
             <th style="text-align:right;">Units</th>
+            <th style="color:var(--text3);">Note</th>
           </tr>
         </thead>
         <tbody id="updateTbody"></tbody>
@@ -1893,6 +1904,7 @@ async function loadAndInit() {
       });
     }
     portfolio.asOf      = ghData.asOf        || '16 Sep 2025';
+    holdingNotes        = ghData.notes         || {};
     snapshots           = ghData.snapshots   || DEFAULT_SNAPSHOTS;
     sgbTranches         = ghData.sgbTranches || DEFAULT_SGB;
   } else {
@@ -2199,6 +2211,268 @@ function renderStats() {
   set('statIlliquid',     fmt(illiquid));
 }
 
+
+// ═══════════════════════════════════════════════════
+//  FEATURE: ASSET CLASS NOTES
+// ═══════════════════════════════════════════════════
+let holdingNotes = {};  // { _id: "note text" }
+
+function saveNote(id, val) {
+  if(val.trim()) holdingNotes[id] = val.trim();
+  else delete holdingNotes[id];
+}
+
+// ═══════════════════════════════════════════════════
+//  FEATURE: NET WORTH DELTA
+// ═══════════════════════════════════════════════════
+function renderDelta() {
+  const el = document.getElementById('heroDelta');
+  if(!el || snapshots.length < 2) return;
+  const last = snapshots[snapshots.length - 2];  // second-to-last = previous save
+  if(!last) return;
+  const delta = portfolio.total - last.value;
+  const pct   = ((delta / last.value) * 100).toFixed(1);
+  const sign  = delta >= 0 ? '+' : '';
+  const color = delta >= 0 ? 'var(--green)' : 'var(--red)';
+  el.style.display = 'block';
+  el.innerHTML = `<span style="color:${color}">${sign}${fmt(delta)} (${sign}${pct}%)</span>` +
+    `<span style="color:var(--text3);font-weight:400;font-size:11px;margin-left:6px">since last update (${last.date})</span>`;
+}
+
+// ═══════════════════════════════════════════════════
+//  FEATURE: SGB MATURITY ALERT
+// ═══════════════════════════════════════════════════
+function renderSGBAlert() {
+  const el = document.getElementById('sgbAlert');
+  if(!el) return;
+
+  const today = new Date();
+  const ALERT_DAYS = 548;  // 18 months
+
+  const upcoming = sgbTranches
+    .map(t => {
+      const mat = new Date(t.maturity.replace(/(\d+)-(\w+)-(\d+)/, '$1 $2 $3'));
+      const days = Math.ceil((mat - today) / 86400000);
+      return { ...t, mat, days };
+    })
+    .filter(t => t.days > 0 && t.days <= ALERT_DAYS)
+    .sort((a, b) => a.days - b.days);
+
+  if(upcoming.length === 0) { el.innerHTML = ''; return; }
+
+  const nearest = upcoming[0];
+  const months  = (nearest.days / 30.44).toFixed(1);
+  const gain    = nearest.value - nearest.cost;
+
+  el.innerHTML = `
+    <div style="padding:16px 20px;border-radius:14px;border:1px solid rgba(212,168,67,0.4);
+                background:linear-gradient(135deg,rgba(212,168,67,0.08),rgba(212,168,67,0.03));
+                display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap">
+      <div style="font-size:28px">🔔</div>
+      <div style="flex:1;min-width:200px">
+        <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:4px;letter-spacing:0.5px">
+          SGB MATURITY ALERT
+        </div>
+        <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px">
+          ${nearest.units}g tranche matures on ${nearest.mat.toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})}
+        </div>
+        <div style="font-size:12px;color:var(--text2)">
+          <span style="color:var(--gold);font-weight:700">${nearest.days} days</span> · ${months} months remaining ·
+          Value: <strong>${fmt(nearest.value)}</strong> ·
+          Gain: <span style="color:var(--green);font-weight:700">+${fmt(gain)} TAX FREE</span>
+        </div>
+        ${upcoming.length > 1 ? `<div style="font-size:11px;color:var(--text3);margin-top:6px">${upcoming.length - 1} more tranche${upcoming.length > 2 ? 's' : ''} maturing within 18 months</div>` : ''}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${upcoming.map(t => {
+          const w = Math.min(100, ((ALERT_DAYS - t.days) / ALERT_DAYS * 100));
+          const urgency = t.days < 90 ? 'var(--red)' : t.days < 180 ? 'var(--orange)' : 'var(--gold)';
+          return `<div style="background:var(--surface2);border-radius:8px;padding:8px 12px;border:1px solid var(--border);min-width:180px">
+            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+              <span style="color:var(--text2);font-weight:600">${t.units}g · ${t.maturity}</span>
+              <span style="color:${urgency};font-weight:700">${t.days}d</span>
+            </div>
+            <div style="height:4px;background:var(--surface3);border-radius:99px;overflow:hidden">
+              <div style="width:${w.toFixed(1)}%;height:100%;background:${urgency};border-radius:99px"></div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════
+//  FEATURE: RISK SIGNALS
+// ═══════════════════════════════════════════════════
+function renderRiskSignals() {
+  const el = document.getElementById('riskSignals');
+  if(!el) return;
+
+  const signals = [];
+  const total = portfolio.total;
+  const h = portfolio.holdings;
+
+  // 1. Zero debt in MF sleeve
+  const mfTotal = summaryMap['Mutual Fund'] || 0;
+  const debtSchemes = MF_SCHEMES.filter(s => ['Debt','Liquid','Money Market','Short Duration','Corporate Bond'].includes(s.cat));
+  const debtValue = debtSchemes.reduce((a,s) => a+(s.value||0), 0);
+  if(debtValue / mfTotal < 0.05) {
+    signals.push({
+      icon:'⚠️', color:'var(--orange)', title:'Zero debt allocation in MF',
+      body:`All ${fmt(mfTotal)} of mutual funds are in equity. Consider 10-15% debt for stability.`,
+      severity:'warn'
+    });
+  }
+
+  // 2. Crypto deep loss
+  const cryptoH = h.find(x => x.sub === 'Crypto');
+  if(cryptoH && cryptoH.purchasePrice > 0) {
+    const cryptoLoss = cryptoH.value - cryptoH.purchasePrice;
+    const lossePct = (cryptoLoss / cryptoH.purchasePrice * 100).toFixed(0);
+    if(cryptoLoss < -500000) {
+      signals.push({
+        icon:'₿', color:'var(--red)', title:`Crypto: ${lossePct}% loss (₹${(Math.abs(cryptoLoss)/100000).toFixed(1)}L unrealised)`,
+        body:`BTC cost ₹${(cryptoH.purchasePrice/100000).toFixed(1)}L, now ${fmt(cryptoH.value)}. Tax-loss harvesting before 31 Mar could offset other gains.`,
+        severity:'alert'
+      });
+    }
+  }
+
+  // 3. SGB concentration
+  const sgbPct = (summaryMap['SGB'] || 0) / total * 100;
+  if(sgbPct > 10) {
+    signals.push({
+      icon:'🥇', color:'var(--gold)', title:`High gold concentration: ${sgbPct.toFixed(1)}% in SGB`,
+      body:`Typical max gold allocation is 5-10%. At ${sgbPct.toFixed(1)}% you are overweight gold.`,
+      severity:'info'
+    });
+  }
+
+  // 4. Single asset class >40%
+  Object.entries(summaryMap).forEach(([name, val]) => {
+    const pct = val / total * 100;
+    if(pct > 40) {
+      signals.push({
+        icon:'🎯', color:'var(--red)', title:`Concentration risk: ${name} is ${pct.toFixed(1)}% of portfolio`,
+        body:`A single asset class above 40% creates high concentration risk. Consider gradual rebalancing.`,
+        severity:'alert'
+      });
+    }
+  });
+
+  // 5. FD maturity not tracked
+  const fdNoDate = h.filter(x => x.sub === 'Fixed Deposit' && x.value > 0 &&
+    (!x.purchaseDate || x.purchaseDate === '2023-01-01'));
+  if(fdNoDate.length > 0) {
+    signals.push({
+      icon:'🏛️', color:'var(--blue2)', title:`${fdNoDate.length} FD(s) with no maturity date tracked`,
+      body:`Update FD maturity dates via Update Holdings to track auto-renewal risk.`,
+      severity:'info'
+    });
+  }
+
+  if(signals.length === 0) {
+    el.innerHTML = `<div style="padding:14px 18px;border-radius:12px;border:1px solid rgba(46,204,143,0.3);background:rgba(46,204,143,0.05);display:flex;align-items:center;gap:12px;font-size:13px;color:var(--green)">
+      <span style="font-size:20px">✅</span> No critical risk signals detected — portfolio looks healthy.
+    </div>`;
+    return;
+  }
+
+  const severityOrder = { alert:0, warn:1, info:2 };
+  signals.sort((a,b) => severityOrder[a.severity] - severityOrder[b.severity]);
+
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <h3 style="margin:0;color:var(--text)">⚡ Risk Signals</h3>
+      <span style="font-size:11px;color:var(--text3)">${signals.length} signal${signals.length>1?'s':''} detected</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px">
+      ${signals.map(s => `
+        <div style="padding:14px 16px;border-radius:12px;border:1px solid ${s.color}33;background:${s.color}08;
+                    display:flex;gap:12px;align-items:flex-start">
+          <span style="font-size:20px;flex-shrink:0">${s.icon}</span>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:${s.color};margin-bottom:4px">${s.title}</div>
+            <div style="font-size:11px;color:var(--text3);line-height:1.5">${s.body}</div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════
+//  FEATURE: XIRR PER ASSET CLASS
+// ═══════════════════════════════════════════════════
+function renderXIRRTable() {
+  const el = document.getElementById('xirrTable');
+  if(!el) return;
+
+  const h = portfolio.holdings;
+
+  // Group holdings by asset class (same as classMap in renderReturns)
+  const groups = {};
+  h.forEach(hh => {
+    const key = hh.sub === 'SSY Account'                                               ? 'SSY Account'
+              : (hh.sub === 'ETF & Stocks' || hh.sub === 'Mixed Shares')               ? 'Shares'
+              : hh.sub === 'Unlisted'                                                   ? 'Unlisted'
+              : (hh.sub === 'Insurance' || hh.type === 'ULIP' || hh.type==='Insurance') ? 'Insurance'
+              : hh.sub === 'Fixed Deposit'                                              ? 'Fixed Deposit'
+              : hh.sub;
+    if(!groups[key]) groups[key] = [];
+    groups[key].push(hh);
+  });
+
+  const rows = Object.entries(groups)
+    .map(([name, items]) => {
+      const cost  = items.reduce((a,h) => a+(h.purchasePrice||0), 0);
+      const value = items.reduce((a,h) => a+(h.value||0), 0);
+      const gain  = value - cost;
+      const xirr  = parseFloat(estimateXIRR(items));
+      const absReturn = cost > 0 ? ((gain/cost)*100).toFixed(1) : null;
+      return { name, cost, value, gain, xirr, absReturn };
+    })
+    .filter(r => r.value > 0)
+    .sort((a,b) => b.xirr - a.xirr);
+
+  const maxXIRR = Math.max(...rows.map(r => Math.abs(r.xirr)));
+
+  el.innerHTML = `<div class="table-wrap"><table>
+    <thead><tr>
+      <th>Asset Class</th>
+      <th style="text-align:right">Cost</th>
+      <th style="text-align:right">Current</th>
+      <th style="text-align:right">Gain</th>
+      <th style="text-align:right">Abs Return</th>
+      <th style="text-align:right">Est. XIRR</th>
+      <th style="min-width:120px">XIRR bar</th>
+    </tr></thead>
+    <tbody>
+      ${rows.map(r => {
+        const gc     = r.gain >= 0 ? 'var(--green)' : 'var(--red)';
+        const xc     = r.xirr >= 0 ? 'var(--green)' : 'var(--red)';
+        const barW   = maxXIRR > 0 ? Math.abs(r.xirr) / maxXIRR * 100 : 0;
+        const xirrStr = r.xirr ? `${r.xirr > 0 ? '+' : ''}${r.xirr}%` : '—';
+        const absStr  = r.absReturn ? `${parseFloat(r.absReturn) >= 0 ? '+' : ''}${r.absReturn}%` : '—';
+        return `<tr>
+          <td style="font-weight:600">${r.name}</td>
+          <td style="text-align:right;color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:12px">${fmt(r.cost)}</td>
+          <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px">${fmt(r.value)}</td>
+          <td style="text-align:right;color:${gc};font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600">${r.gain>=0?'+':''}${fmt(Math.abs(r.gain))}</td>
+          <td style="text-align:right;color:${gc};font-family:'JetBrains Mono',monospace;font-size:12px">${absStr}</td>
+          <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:${xc}">${xirrStr}</td>
+          <td>
+            <div style="height:6px;background:var(--surface3);border-radius:99px;overflow:hidden">
+              <div style="width:${barW.toFixed(1)}%;height:100%;background:${xc};border-radius:99px;opacity:0.8"></div>
+            </div>
+          </td>
+        </tr>`;
+      }).join('')}
+    </tbody>
+  </table></div>
+  <div style="font-size:11px;color:var(--text3);margin-top:10px;padding:10px 14px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)">
+    ℹ️ XIRR is estimated using weighted average holding period. Actual XIRR may differ for assets with multiple purchase dates or SIPs.
+  </div>`;
+}
+
 function initDashboard() {
   syncMFTotal();
   portfolio.total = portfolio.holdings.reduce((a,b)=>a+(b.value||0),0);
@@ -2209,6 +2483,12 @@ function initDashboard() {
   document.getElementById('lastUpdated').textContent = 'Updated: '+portfolio.asOf;
   renderStats();
   renderAlloc();
+  renderDelta();
+  renderSGBAlert();
+  renderRiskSignals();
+  renderDelta();
+  renderSGBAlert();
+  renderRiskSignals();
   renderCharts();
   renderHoldingCards();
   renderHoldings();
@@ -2531,7 +2811,10 @@ function renderHoldings() {
     return `<tr style="border-left:3px solid ${c}44;transition:background 0.1s" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background=''">
       <td style="font-weight:600;font-size:12px">${h.account}</td>
       <td><span class="badge" style="background:${c}22;color:${c};border-color:${c}44;font-size:10px">${h.sub}</span></td>
-      <td style="color:var(--text3);font-size:11px">${h.remarks||'—'}</td>
+      <td style="color:var(--text3);font-size:11px">
+        ${h.remarks||'—'}
+        ${h._id && holdingNotes[h._id] ? `<div style="font-size:10px;color:var(--blue2);font-style:italic;margin-top:2px">📝 ${holdingNotes[h._id]}</div>` : ''}
+      </td>
       <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700">
         ${h.value > 0 ? fmt(h.value) : '<span style="color:var(--text3)">—</span>'}
         ${gain !== null && h.value > 0 ? `<div style="font-size:10px;color:${gainColor};font-weight:600">${gainStr}</div>` : ''}
@@ -3047,6 +3330,8 @@ function renderReturns() {
     .map(([name,d]) => ({ name, gain: d.value-d.cost, gainPct: d.cost>0?((d.value-d.cost)/d.cost*100).toFixed(1):0, value:d.value }))
     .filter(c => c.value > 0 || c.gain !== 0)
     .sort((a,b) => b.gain - a.gain);
+
+  renderXIRRTable();
 
   const rc = destroyChart('returnsChart');
   if(rc) {
@@ -3981,6 +4266,16 @@ function renderUpdateTable() {
           </div>
           <input type="hidden" id="nv_${i}" value="">
         </td>
+        <td style="padding:4px 8px;">
+          <input type="text" id="note_${i}"
+            value="${h._id ? (holdingNotes[h._id]||'') : ''}"
+            placeholder="Add note…"
+            oninput="if(portfolio.holdings[${i}]?._id) saveNote(portfolio.holdings[${i}]._id, this.value)"
+            style="width:130px;background:var(--surface3);border:1px solid var(--border);border-radius:8px;
+                   padding:6px 8px;color:var(--text2);font-size:11px;font-style:italic;outline:none;"
+            onfocus="this.style.borderColor='var(--blue2)'"
+            onblur="this.style.borderColor='var(--border)'">
+        </td>
       </tr>`;
     } else {
       // ── Normal direct-value row ──
@@ -4020,6 +4315,15 @@ function renderUpdateTable() {
                 onfocus="this.style.borderColor='var(--blue2)'"
                 onblur="this.style.borderColor='var(--border)'">`
           }
+        </td>
+        <td style="padding:4px 8px;">
+          <input type="text" id="note_${i}"
+            value="${h._id ? (holdingNotes[h._id]||'') : ''}"
+            placeholder="Add note…"
+            oninput="if(portfolio.holdings[${i}]?._id) saveNote(portfolio.holdings[${i}]._id, this.value)"
+            style="width:130px;background:var(--surface3);border:1px solid var(--border);border-radius:8px;padding:6px 8px;color:var(--text2);font-size:11px;font-style:italic;outline:none;"
+            onfocus="this.style.borderColor='var(--blue2)'"
+            onblur="this.style.borderColor='var(--border)'">
         </td>
       </tr>`;
     }
@@ -4124,7 +4428,7 @@ async function applyUpdate() {
   // Keep history capped at 100 entries
   if(snapshots.length > 100) snapshots.splice(0, snapshots.length - 100);
 
-  const payload = { asOf, holdings: portfolio.holdings, snapshots, sgbTranches };
+  const payload = { asOf, holdings: portfolio.holdings, snapshots, sgbTranches, notes: holdingNotes };
   try {
     await saveToGitHub(payload);
     showModalSuccess(`✓ Saved to GitHub! Portfolio updated to ${fmt(portfolio.total)} as of ${asOf}`);
