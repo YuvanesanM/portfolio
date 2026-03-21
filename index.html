@@ -702,10 +702,6 @@
       </div>
     </div>
 
-    <!-- RISK SIGNALS + SGB ALERT -->
-    <div id="riskSignals" style="margin-bottom:20px"></div>
-    <div id="sgbAlert" style="margin-bottom:20px"></div>
-
     <!-- CHART + ALLOCATION -->
     <div class="grid-52">
       <div class="card">
@@ -982,6 +978,10 @@
         <div class="card-sub" id="sgbGainSub">Unrealised gain: ₹57.84 L</div>
       </div>
     </div>
+
+    <!-- SGB MATURITY ALERT -->
+    <div id="sgbAlert" style="margin-bottom:20px"></div>
+
     <div class="card">
       <h3>SGB Tranche Details</h3>
       <div style="margin-bottom:12px">
@@ -2302,104 +2302,6 @@ function renderSGBAlert() {
 }
 
 // ═══════════════════════════════════════════════════
-//  FEATURE: RISK SIGNALS
-// ═══════════════════════════════════════════════════
-function renderRiskSignals() {
-  const el = document.getElementById('riskSignals');
-  if(!el) return;
-
-  const signals = [];
-  const total = portfolio.total;
-  const h = portfolio.holdings;
-
-  // 1. Zero debt in MF sleeve
-  const mfTotal = summaryMap['Mutual Fund'] || 0;
-  const debtSchemes = MF_SCHEMES.filter(s => ['Debt','Liquid','Money Market','Short Duration','Corporate Bond'].includes(s.cat));
-  const debtValue = debtSchemes.reduce((a,s) => a+(s.value||0), 0);
-  if(debtValue / mfTotal < 0.05) {
-    signals.push({
-      icon:'⚠️', color:'var(--orange)', title:'Zero debt allocation in MF',
-      body:`All ${fmt(mfTotal)} of mutual funds are in equity. Consider 10-15% debt for stability.`,
-      severity:'warn'
-    });
-  }
-
-  // 2. Crypto deep loss
-  const cryptoH = h.find(x => x.sub === 'Crypto');
-  if(cryptoH && cryptoH.purchasePrice > 0) {
-    const cryptoLoss = cryptoH.value - cryptoH.purchasePrice;
-    const lossePct = (cryptoLoss / cryptoH.purchasePrice * 100).toFixed(0);
-    if(cryptoLoss < -500000) {
-      signals.push({
-        icon:'₿', color:'var(--red)', title:`Crypto: ${lossePct}% loss (₹${(Math.abs(cryptoLoss)/100000).toFixed(1)}L unrealised)`,
-        body:`BTC cost ₹${(cryptoH.purchasePrice/100000).toFixed(1)}L, now ${fmt(cryptoH.value)}. Tax-loss harvesting before 31 Mar could offset other gains.`,
-        severity:'alert'
-      });
-    }
-  }
-
-  // 3. SGB concentration
-  const sgbPct = (summaryMap['SGB'] || 0) / total * 100;
-  if(sgbPct > 10) {
-    signals.push({
-      icon:'🥇', color:'var(--gold)', title:`High gold concentration: ${sgbPct.toFixed(1)}% in SGB`,
-      body:`Typical max gold allocation is 5-10%. At ${sgbPct.toFixed(1)}% you are overweight gold.`,
-      severity:'info'
-    });
-  }
-
-  // 4. Single asset class >40%
-  Object.entries(summaryMap).forEach(([name, val]) => {
-    const pct = val / total * 100;
-    if(pct > 40) {
-      signals.push({
-        icon:'🎯', color:'var(--red)', title:`Concentration risk: ${name} is ${pct.toFixed(1)}% of portfolio`,
-        body:`A single asset class above 40% creates high concentration risk. Consider gradual rebalancing.`,
-        severity:'alert'
-      });
-    }
-  });
-
-  // 5. FD maturity not tracked
-  const fdNoDate = h.filter(x => x.sub === 'Fixed Deposit' && x.value > 0 &&
-    (!x.purchaseDate || x.purchaseDate === '2023-01-01'));
-  if(fdNoDate.length > 0) {
-    signals.push({
-      icon:'🏛️', color:'var(--blue2)', title:`${fdNoDate.length} FD(s) with no maturity date tracked`,
-      body:`Update FD maturity dates via Update Holdings to track auto-renewal risk.`,
-      severity:'info'
-    });
-  }
-
-  if(signals.length === 0) {
-    el.innerHTML = `<div style="padding:14px 18px;border-radius:12px;border:1px solid rgba(46,204,143,0.3);background:rgba(46,204,143,0.05);display:flex;align-items:center;gap:12px;font-size:13px;color:var(--green)">
-      <span style="font-size:20px">✅</span> No critical risk signals detected — portfolio looks healthy.
-    </div>`;
-    return;
-  }
-
-  const severityOrder = { alert:0, warn:1, info:2 };
-  signals.sort((a,b) => severityOrder[a.severity] - severityOrder[b.severity]);
-
-  el.innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <h3 style="margin:0;color:var(--text)">⚡ Risk Signals</h3>
-      <span style="font-size:11px;color:var(--text3)">${signals.length} signal${signals.length>1?'s':''} detected</span>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px">
-      ${signals.map(s => `
-        <div style="padding:14px 16px;border-radius:12px;border:1px solid ${s.color}33;background:${s.color}08;
-                    display:flex;gap:12px;align-items:flex-start">
-          <span style="font-size:20px;flex-shrink:0">${s.icon}</span>
-          <div>
-            <div style="font-size:12px;font-weight:700;color:${s.color};margin-bottom:4px">${s.title}</div>
-            <div style="font-size:11px;color:var(--text3);line-height:1.5">${s.body}</div>
-          </div>
-        </div>`).join('')}
-    </div>`;
-}
-
-// ═══════════════════════════════════════════════════
 //  FEATURE: XIRR PER ASSET CLASS
 // ═══════════════════════════════════════════════════
 function renderXIRRTable() {
@@ -2485,10 +2387,8 @@ function initDashboard() {
   renderAlloc();
   renderDelta();
   renderSGBAlert();
-  renderRiskSignals();
   renderDelta();
   renderSGBAlert();
-  renderRiskSignals();
   renderCharts();
   renderHoldingCards();
   renderHoldings();
@@ -2514,6 +2414,8 @@ function refreshDashboard() {
   document.getElementById('lastUpdated').textContent = 'Updated: ' + portfolio.asOf;
   renderStats();
   renderAlloc();
+  renderDelta();
+  renderSGBAlert();
   renderCharts();
   renderHoldingCards();
   renderHoldings();
