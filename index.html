@@ -4,8 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Yuvan · Portfolio Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://www.google.com/recaptcha/api.js?render=6LfskdwqAAAAAKFybSmhi2Zf3hAwCKuvxHNSA-NE" async></script>
 <style>
   :root {
@@ -1375,7 +1377,6 @@
   </div>
 </div>
 
-<script src="config.js"></script>
 <script>
 // ═══════════════════════════════════════════════════
 //  CONFIG — proxy server (token lives on Render, never in this file)
@@ -1635,7 +1636,7 @@ function runCaptchaCheck() {
     return;
   }
   grecaptcha.ready(() => {
-    grecaptcha.execute('6LfskdwqAAAAAKFybSmhi2Zf3hAwCKuvxHNSA-NE', { action: 'portfolio_login' })
+    grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'portfolio_login' })
       .then(token => evaluateScore(token))
       .catch(err => {
         console.warn('reCAPTCHA execute failed:', err);
@@ -1916,8 +1917,6 @@ async function loadAndInit() {
   }
   portfolio.total = portfolio.holdings.reduce((a,b)=>a+(b.value||0),0);
   summary         = buildSummary(portfolio.holdings);
-
-  await new Promise(r => setTimeout(r, 400));
 
   document.getElementById('loadingOverlay').style.display = 'none';
   const db = document.getElementById('dashboard');
@@ -2385,8 +2384,6 @@ function initDashboard() {
   document.getElementById('lastUpdated').textContent = 'Updated: '+portfolio.asOf;
   renderStats();
   renderAlloc();
-  renderDelta();
-  renderSGBAlert();
   renderDelta();
   renderSGBAlert();
   renderCharts();
