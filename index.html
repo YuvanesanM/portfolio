@@ -1421,7 +1421,7 @@ const DEFAULT_HOLDINGS = [
   { account:"ICICI",   type:"SGB",         sub:"SGB",            value:806600,   units:"50g",   remarks:"Matures 19-Jan-2029",      owner:"Yuvan",  purchaseDate:"2021-01-19", purchasePrice:252700   , _id:"sgb-5" },
   { account:"ICICI",   type:"SGB",         sub:"SGB",            value:1613200,  units:"100g",  remarks:"Matures 09-Mar-2029",      owner:"Yuvan",  purchaseDate:"2021-03-09", purchasePrice:461200   , _id:"sgb-6" },
   { account:"ICICI",   type:"SGB",         sub:"SGB",            value:1613200,  units:"100g",  remarks:"Matures 25-May-2029",      owner:"Yuvan",  purchaseDate:"2021-05-25", purchasePrice:472700   , _id:"sgb-7" },
-  { account:"CAMS+KFin", type:"Mutual Fund", sub:"Mutual Fund",  value:0,        units:"",      remarks:"Yuvan · 45 schemes",       owner:"Yuvan",  purchaseDate:"2019-01-01", purchasePrice:23900753, _mfComputed:true,  _mfOwner:"Yuvan"  , _id:"mf-yuvan" },
+  { account:"CAMS+KFin", type:"Mutual Fund", sub:"Mutual Fund",  value:0,        units:"",      remarks:"Yuvan · 46 schemes",       owner:"Yuvan",  purchaseDate:"2019-01-01", purchasePrice:24474203, _mfComputed:true,  _mfOwner:"Yuvan"  , _id:"mf-yuvan" },
   { account:"CAMS+KFin", type:"Mutual Fund", sub:"Mutual Fund",  value:0,        units:"",      remarks:"Ramyaa · 2 schemes",        owner:"Ramyaa", purchaseDate:"2021-01-01", purchasePrice:400000,   _mfComputed:true,  _mfOwner:"Ramyaa" , _id:"mf-ramyaa" },
   { account:"ICICI",   type:"Shares",      sub:"ETF & Stocks",   value:2892904,  units:"",      remarks:"Demat",                    owner:"Yuvan",  purchaseDate:"2020-01-01", purchasePrice:2000000  , _id:"etf-icici" },
   { account:"Kite",    type:"Shares",      sub:"Mixed Shares",   value:349265,   units:"",      remarks:"Zerodha",                  owner:"Yuvan",  purchaseDate:"2021-01-01", purchasePrice:300000   , _id:"kite-zerodha" },
@@ -2513,7 +2513,7 @@ function renderHoldingCards() {
   const cards = [
     { key:'Mutual Fund',  label:'Mutual Funds',   icon:'📊', accent:'#4f7fff',
       value: fsMap['Mutual Fund']||0,
-      sub: function(){ var v=fsMap['Mutual Fund']||0; var cnt=holdingsOwnerFilter==='All'?47:MF_SCHEMES.filter(function(s){return holdingsOwnerFilter==='Ramyaa'?s.owner==='Ramyaa':(!s.owner||s.owner==='Yuvan');}).length; return cnt+' schemes · '+(filteredTotal>0?(v/portfolio.total*100).toFixed(1):0)+'%'; },
+      sub: function(){ var v=fsMap['Mutual Fund']||0; var cnt=holdingsOwnerFilter==='All'?48:MF_SCHEMES.filter(function(s){return holdingsOwnerFilter==='Ramyaa'?s.owner==='Ramyaa':(!s.owner||s.owner==='Yuvan');}).length; return cnt+' schemes · '+(filteredTotal>0?(v/portfolio.total*100).toFixed(1):0)+'%'; },
       gainSubs:['Mutual Fund'] },
     { key:'SGB',          label:'SGB',            icon:'🥇', accent:'#d4a843',
       value: fsMap['SGB']||0,
@@ -2758,63 +2758,64 @@ function renderHoldings() {
 
 // ─── MF SCHEME DATA from CAS Statement 17-Mar-2026 ───────────────────────────
 const MF_SCHEMES = [
-  // Axis
-  {house:'Axis',      scheme:'NIFTY Next 50 Index Fund Direct Growth',       cat:'Index',       cost:250000,   value:219908,  reg:'KFintech', owner:'Yuvan'},
-  {house:'Axis',      scheme:'Greater China Equity FOF Direct Growth',        cat:'FOF',         cost:100000,   value:129170,  reg:'KFintech', owner:'Yuvan'},
+  // Axis (CAMS+KFin CAS · 02-Apr-2026)
+  {house:'Axis',      scheme:'NIFTY Next 50 Index Fund Direct Growth',       cat:'Index',       cost:250000,   value:211671,  reg:'KFintech', owner:'Yuvan'},
+  {house:'Axis',      scheme:'Global Equity Alpha Fund of Fund Direct Growth',cat:'FOF',         cost:300000,   value:299985,  reg:'KFintech', owner:'Yuvan'},
+  {house:'Axis',      scheme:'Greater China Equity FOF Direct Growth',        cat:'FOF',         cost:100000,   value:123792,  reg:'KFintech', owner:'Yuvan'},
   // Bajaj Finserv
-  {house:'Bajaj',     scheme:'Consumption Fund Regular Growth',               cat:'Thematic',    cost:1082957,  value:935601,  reg:'KFintech', owner:'Yuvan'},
-  {house:'Bajaj',     scheme:'Flexi Cap Fund Regular Growth',                 cat:'Flexi Cap',   cost:100000,   value:96512,   reg:'KFintech', owner:'Yuvan'},
+  {house:'Bajaj',     scheme:'Consumption Fund Regular Growth',               cat:'Thematic',    cost:1082957,  value:928334,  reg:'KFintech', owner:'Yuvan'},
+  {house:'Bajaj',     scheme:'Flexi Cap Fund Regular Growth',                 cat:'Flexi Cap',   cost:100000,   value:95204,   reg:'KFintech', owner:'Yuvan'},
   // Bandhan
-  {house:'Bandhan',   scheme:'Large & Mid Cap Fund Regular Growth',           cat:'Large & Mid', cost:1253982,  value:1205429, reg:'CAMS', owner:'Yuvan'},
+  {house:'Bandhan',   scheme:'Large & Mid Cap Fund Regular Growth',           cat:'Large & Mid', cost:1253982,  value:1186010, reg:'CAMS', owner:'Yuvan'},
   // Franklin
-  {house:'Franklin',  scheme:'Small Cap Fund Growth',                         cat:'Small Cap',   cost:100000,   value:102106,  reg:'CAMS', owner:'Yuvan'},
-  {house:'Franklin',  scheme:'Focused Equity Fund Growth',                    cat:'Focused',     cost:200000,   value:177750,  reg:'CAMS', owner:'Yuvan'},
-  {house:'Franklin',  scheme:'Flexi Cap Fund Growth',                         cat:'Flexi Cap',   cost:275000,   value:253340,  reg:'CAMS', owner:'Yuvan'},
+  {house:'Franklin',  scheme:'Small Cap Fund Growth',                         cat:'Small Cap',   cost:100000,   value:101938,  reg:'CAMS', owner:'Yuvan'},
+  {house:'Franklin',  scheme:'Focused Equity Fund Growth',                    cat:'Focused',     cost:200000,   value:172653,  reg:'CAMS', owner:'Yuvan'},
+  {house:'Franklin',  scheme:'Flexi Cap Fund Growth',                         cat:'Flexi Cap',   cost:275000,   value:247146,  reg:'CAMS', owner:'Yuvan'},
   // HDFC
-  {house:'HDFC',      scheme:'Silver ETF Fund of Fund Regular Growth',        cat:'Commodity',   cost:200000,   value:524768,  reg:'CAMS', owner:'Yuvan'},
-  {house:'HDFC',      scheme:'Large and Mid Cap Fund Regular Growth',         cat:'Large & Mid', cost:325000,   value:369833,  reg:'CAMS', owner:'Yuvan'},
-  {house:'HDFC',      scheme:'Focused Fund Regular Growth',                   cat:'Focused',     cost:50000,    value:83037,   reg:'CAMS', owner:'Yuvan'},
-  {house:'HDFC',      scheme:'Flexi Cap Fund Regular Growth (F1)',            cat:'Flexi Cap',   cost:75000,    value:89698,   reg:'CAMS', owner:'Yuvan'},
-  {house:'HDFC',      scheme:'Banking & Financial Services Regular Growth',   cat:'Sectoral',    cost:25000,    value:29559,   reg:'CAMS', owner:'Yuvan'},
-  {house:'HDFC',      scheme:'Flexi Cap Fund Regular Growth (F2)',            cat:'Flexi Cap',   cost:75000,    value:88793,   reg:'CAMS', owner:'Yuvan'},
-  {house:'HDFC',      scheme:'Pharma and Healthcare Regular Growth',          cat:'Sectoral',    cost:575000,   value:591498,  reg:'CAMS', owner:'Yuvan'},
+  {house:'HDFC',      scheme:'Silver ETF Fund of Fund Regular Growth',        cat:'Commodity',   cost:200000,   value:486015,  reg:'CAMS', owner:'Yuvan'},
+  {house:'HDFC',      scheme:'Large and Mid Cap Fund Regular Growth',         cat:'Large & Mid', cost:325000,   value:359172,  reg:'CAMS', owner:'Yuvan'},
+  {house:'HDFC',      scheme:'Focused Fund Regular Growth',                   cat:'Focused',     cost:50000,    value:80493,   reg:'CAMS', owner:'Yuvan'},
+  {house:'HDFC',      scheme:'Flexi Cap Fund Regular Growth (F1)',            cat:'Flexi Cap',   cost:75000,    value:87533,   reg:'CAMS', owner:'Yuvan'},
+  {house:'HDFC',      scheme:'Banking & Financial Services Regular Growth',   cat:'Sectoral',    cost:25000,    value:28043,   reg:'CAMS', owner:'Yuvan'},
+  {house:'HDFC',      scheme:'Flexi Cap Fund Regular Growth (F2)',            cat:'Flexi Cap',   cost:75000,    value:86650,   reg:'CAMS', owner:'Yuvan'},
+  {house:'HDFC',      scheme:'Pharma and Healthcare Regular Growth',          cat:'Sectoral',    cost:575000,   value:583902,  reg:'CAMS', owner:'Yuvan'},
   // HSBC
-  {house:'HSBC',      scheme:'Multi Cap Fund Regular Growth (F1)',            cat:'Multi Cap',   cost:50000,    value:53906,   reg:'CAMS', owner:'Yuvan'},
-  {house:'HSBC',      scheme:'Multi Cap Fund Regular Growth (F2)',            cat:'Multi Cap',   cost:50000,    value:56459,   reg:'CAMS', owner:'Yuvan'},
+  {house:'HSBC',      scheme:'Multi Cap Fund Regular Growth (F1)',            cat:'Multi Cap',   cost:50000,    value:53239,   reg:'CAMS', owner:'Yuvan'},
+  {house:'HSBC',      scheme:'Multi Cap Fund Regular Growth (F2)',            cat:'Multi Cap',   cost:50000,    value:55760,   reg:'CAMS', owner:'Yuvan'},
   // ICICI Prudential
-  {house:'ICICI',     scheme:'Business Cycle Fund Growth (F1)',               cat:'Thematic',    cost:300000,   value:363050,  reg:'CAMS', owner:'Yuvan'},
-  {house:'ICICI',     scheme:'Manufacturing Fund Growth',                     cat:'Thematic',    cost:500000,   value:497784,  reg:'CAMS', owner:'Yuvan'},
-  {house:'ICICI',     scheme:'Thematic Advantage FOF Growth',                 cat:'FOF',         cost:2011685,  value:1877424, reg:'CAMS',     owner:'Yuvan'},
-  {house:'ICICI',     scheme:'Multi-Asset Fund Growth (F1)',                  cat:'Multi Asset', cost:800000,   value:1012804, reg:'CAMS', owner:'Yuvan'},
-  {house:'ICICI',     scheme:'Large & Mid Cap Fund Growth (F1)',              cat:'Large & Mid', cost:425000,   value:489966,  reg:'CAMS', owner:'Yuvan'},
-  {house:'ICICI',     scheme:'Dynamic Asset Allocation Active FOF Growth',    cat:'FOF',         cost:4000000,  value:4171185, reg:'CAMS', owner:'Yuvan'},
-  {house:'ICICI',     scheme:'Business Cycle Fund Growth (F2)',               cat:'Thematic',    cost:500000,   value:588103,  reg:'CAMS', owner:'Yuvan'},
-  {house:'ICICI',     scheme:'Multi-Asset Fund Growth (F2)',                  cat:'Multi Asset', cost:700000,   value:877856,  reg:'CAMS', owner:'Yuvan'},
-  {house:'ICICI',     scheme:'Large & Mid Cap Fund Growth (F2)',              cat:'Large & Mid', cost:75000,    value:87085,   reg:'CAMS', owner:'Yuvan'},
-  {house:'ICICI',     scheme:'Balanced Advantage Fund Growth',                cat:'Hybrid',      cost:210160,   value:212283,  reg:'CAMS', owner:'Yuvan'},
-  {house:'ICICI',     scheme:'Multi-Asset Fund Growth (F3)',                  cat:'Multi Asset', cost:750000,   value:884277,  reg:'CAMS', owner:'Yuvan'},
+  {house:'ICICI',     scheme:'Business Cycle Fund Growth (F1)',               cat:'Thematic',    cost:300000,   value:351274,  reg:'CAMS', owner:'Yuvan'},
+  {house:'ICICI',     scheme:'Manufacturing Fund Growth',                     cat:'Thematic',    cost:500000,   value:488728,  reg:'CAMS', owner:'Yuvan'},
+  {house:'ICICI',     scheme:'Thematic Advantage FOF Growth',                 cat:'FOF',         cost:2011685,  value:1851515, reg:'CAMS',     owner:'Yuvan'},
+  {house:'ICICI',     scheme:'Multi-Asset Fund Growth (F1)',                  cat:'Multi Asset', cost:800000,   value:993192,  reg:'CAMS', owner:'Yuvan'},
+  {house:'ICICI',     scheme:'Large & Mid Cap Fund Growth (F1)',              cat:'Large & Mid', cost:425000,   value:481559,  reg:'CAMS', owner:'Yuvan'},
+  {house:'ICICI',     scheme:'Dynamic Asset Allocation Active FOF Growth',    cat:'FOF',         cost:4000000,  value:4112263, reg:'CAMS', owner:'Yuvan'},
+  {house:'ICICI',     scheme:'Business Cycle Fund Growth (F2)',               cat:'Thematic',    cost:500000,   value:569027,  reg:'CAMS', owner:'Yuvan'},
+  {house:'ICICI',     scheme:'Multi-Asset Fund Growth (F2)',                  cat:'Multi Asset', cost:700000,   value:860857,  reg:'CAMS', owner:'Yuvan'},
+  {house:'ICICI',     scheme:'Large & Mid Cap Fund Growth (F2)',              cat:'Large & Mid', cost:75000,    value:85591,   reg:'CAMS', owner:'Yuvan'},
+  {house:'ICICI',     scheme:'Balanced Advantage Fund Growth',                cat:'Hybrid',      cost:210160,   value:209745,  reg:'CAMS', owner:'Yuvan'},
+  {house:'ICICI',     scheme:'Multi-Asset Fund Growth (F3)',                  cat:'Multi Asset', cost:750000,   value:867153,  reg:'CAMS', owner:'Yuvan'},
   // Invesco
-  {house:'Invesco',   scheme:'Business Cycle Fund Regular Growth',            cat:'Thematic',    cost:600000,   value:681566,  reg:'KFintech', owner:'Yuvan'},
-  {house:'Invesco',   scheme:'Flexi Cap Fund Regular Growth',                 cat:'Flexi Cap',   cost:800000,   value:688366,  reg:'KFintech',  owner:'Yuvan'},
-  {house:'Invesco',   scheme:'Large & Mid Cap Fund Regular Growth',           cat:'Large & Mid', cost:900000,   value:818727,  reg:'KFintech', owner:'Yuvan'},
+  {house:'Invesco',   scheme:'Business Cycle Fund Regular Growth',            cat:'Thematic',    cost:600000,   value:670166,  reg:'KFintech', owner:'Yuvan'},
+  {house:'Invesco',   scheme:'Flexi Cap Fund Regular Growth',                 cat:'Flexi Cap',   cost:898450,   value:771875,  reg:'KFintech',  owner:'Yuvan'},
+  {house:'Invesco',   scheme:'Large & Mid Cap Fund Regular Growth',           cat:'Large & Mid', cost:1000000,  value:900079,  reg:'KFintech', owner:'Yuvan'},
   // Kotak
-  {house:'Kotak',     scheme:'Midcap Fund Growth Regular',                    cat:'Mid Cap',     cost:150000,   value:244425,  reg:'CAMS', owner:'Yuvan'},
-  {house:'Kotak',     scheme:'Large Cap Fund Growth Regular',                 cat:'Large Cap',   cost:50000,    value:69113,   reg:'CAMS', owner:'Yuvan'},
-  {house:'Kotak',     scheme:'Large & Midcap Fund Growth Regular',            cat:'Large & Mid', cost:75000,    value:86729,   reg:'CAMS', owner:'Yuvan'},
+  {house:'Kotak',     scheme:'Midcap Fund Growth Regular',                    cat:'Mid Cap',     cost:150000,   value:241480,  reg:'CAMS', owner:'Yuvan'},
+  {house:'Kotak',     scheme:'Large Cap Fund Growth Regular',                 cat:'Large Cap',   cost:50000,    value:67100,   reg:'CAMS', owner:'Yuvan'},
+  {house:'Kotak',     scheme:'Large & Midcap Fund Growth Regular',            cat:'Large & Mid', cost:75000,    value:84144,   reg:'CAMS', owner:'Yuvan'},
   // Motilal Oswal
-  {house:'Motilal',   scheme:'Midcap Fund Regular Growth (F1)',               cat:'Mid Cap',     cost:100000,   value:110343,  reg:'KFintech', owner:'Yuvan'},
-  {house:'Motilal',   scheme:'Large and Midcap Fund Regular Growth',          cat:'Large & Mid', cost:501030,   value:439879,  reg:'KFintech', owner:'Yuvan'},
-  {house:'Motilal',   scheme:'Midcap Fund Regular Growth (F2)',               cat:'Mid Cap',     cost:725000,   value:590797,  reg:'KFintech', owner:'Yuvan'},
-  {house:'Motilal',   scheme:'Gold and Silver Passive FOF Direct Growth',     cat:'Commodity',   cost:300000,   value:311760,  reg:'KFintech', owner:'Yuvan'},
+  {house:'Motilal',   scheme:'Midcap Fund Regular Growth (F1)',               cat:'Mid Cap',     cost:100000,   value:109587,  reg:'KFintech', owner:'Yuvan'},
+  {house:'Motilal',   scheme:'Large and Midcap Fund Regular Growth',          cat:'Large & Mid', cost:501030,   value:436446,  reg:'KFintech', owner:'Yuvan'},
+  {house:'Motilal',   scheme:'Midcap Fund Regular Growth (F2)',               cat:'Mid Cap',     cost:800000,   value:692958,  reg:'KFintech', owner:'Yuvan'},
+  {house:'Motilal',   scheme:'Gold and Silver Passive FOF Direct Growth',     cat:'Commodity',   cost:300000,   value:294401,  reg:'KFintech', owner:'Yuvan'},
   // Nippon
-  {house:'Nippon',    scheme:'Multi Cap Fund Growth (F1)',                     cat:'Multi Cap',   cost:75000,    value:86502,   reg:'KFintech', owner:'Yuvan'},
-  {house:'Nippon',    scheme:'Large Cap Fund Direct Growth',                  cat:'Large Cap',   cost:2115941,  value:2060828, reg:'KFintech', owner:'Yuvan'},
-  {house:'Nippon',    scheme:'Banking & Financial Services Fund Growth',      cat:'Sectoral',    cost:200000,   value:217135,  reg:'KFintech', owner:'Yuvan'},
-  {house:'Nippon',    scheme:'Multi Cap Fund Growth (F2)',                    cat:'Multi Cap',   cost:875000,   value:813516,  reg:'KFintech', owner:'Yuvan'},
+  {house:'Nippon',    scheme:'Multi Cap Fund Growth (F1)',                     cat:'Multi Cap',   cost:75000,    value:84768,   reg:'KFintech', owner:'Yuvan'},
+  {house:'Nippon',    scheme:'Large Cap Fund Direct Growth',                  cat:'Large Cap',   cost:2115941,  value:2002661, reg:'KFintech', owner:'Yuvan'},
+  {house:'Nippon',    scheme:'Banking & Financial Services Fund Growth',      cat:'Sectoral',    cost:200000,   value:205388,  reg:'KFintech', owner:'Yuvan'},
+  {house:'Nippon',    scheme:'Multi Cap Fund Growth (F2)',                    cat:'Multi Cap',   cost:875000,   value:797201,  reg:'KFintech', owner:'Yuvan'},
   // SBI
-  {house:'SBI',       scheme:'Multi Asset Allocation Fund Regular Growth',    cat:'Multi Asset', cost:500000,   value:562173,  reg:'CAMS', owner:'Yuvan'},
-  {house:'SBI',       scheme:'Contra Fund Regular Growth',                    cat:'Contra',      cost:750000,   value:762589,  reg:'CAMS', owner:'Yuvan'},
-  {house:'SBI',       scheme:'Large & Midcap Fund Regular Growth',            cat:'Large & Mid', cost:100000,   value:154005,  reg:'CAMS', owner:'Yuvan'},
+  {house:'SBI',       scheme:'Multi Asset Allocation Fund Regular Growth',    cat:'Multi Asset', cost:500000,   value:551318,  reg:'CAMS', owner:'Yuvan'},
+  {house:'SBI',       scheme:'Contra Fund Regular Growth',                    cat:'Contra',      cost:750000,   value:739707,  reg:'CAMS', owner:'Yuvan'},
+  {house:'SBI',       scheme:'Large & Midcap Fund Regular Growth',            cat:'Large & Mid', cost:100000,   value:149483,  reg:'CAMS', owner:'Yuvan'},
   // ── Ramyaa's schemes (CAMS CAS · 19-Mar-2026) ──
   {house:'ICICI',     scheme:'Thematic Advantage FOF Growth',                 cat:'FOF',         cost:100000,   value:95657,   reg:'CAMS',     units:449.123,   mfapiCode:'101026', owner:'Ramyaa'},
   {house:'Invesco',   scheme:'Flexi Cap Fund Regular Growth',                 cat:'Flexi Cap',   cost:300000,   value:271821,  reg:'KFintech',  units:16093.616, mfapiCode:'145255', owner:'Ramyaa'},
@@ -2848,7 +2849,7 @@ function renderMF() {
 
   const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
   set('mfTotalValue',   fmt(casTotal));
-  set('mfAsOf',         portfolio.asOf || '19 Mar 2026');
+  set('mfAsOf',         portfolio.asOf || '02 Apr 2026');
   set('mfSchemeCount',  `${schemeCount} schemes · Yuvan (${yuvanSchemes.length}) + Ramyaa (${ramyaaSchemes.length})`);
   set('mfCost',         fmt(casCost));
   set('mfGain',         (gain>=0?'+':'')+fmt(gain));
