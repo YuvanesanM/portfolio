@@ -874,14 +874,22 @@
 
     <!-- Full scheme table -->
     <div class="card" style="margin-bottom:24px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-        <h3 style="margin-bottom:0">All Schemes</h3>
-        <div style="display:flex;gap:8px">
-          <button onclick="mfFilterAll()" id="mfBtnAll" style="padding:6px 14px;border-radius:8px;border:1px solid var(--gold);background:var(--gold);color:#080c10;font-size:12px;font-weight:700;cursor:pointer;">All</button>
-          <button onclick="mfFilter('ICICI')" id="mfBtnICICI" style="padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer;">ICICI</button>
-          <button onclick="mfFilter('SBI')" id="mfBtnSBI" style="padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer;">SBI</button>
-          <button onclick="mfFilter('Nippon')" id="mfBtnNippon" style="padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer;">Nippon</button>
-          <button onclick="mfFilter('Motilal')" id="mfBtnMotilal" style="padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer;">Motilal</button>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap">
+        <h3 style="margin-bottom:0;white-space:nowrap">All Schemes</h3>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end">
+          <button onclick="mfFilterAll()" id="mfBtnAll" style="padding:5px 13px;border-radius:8px;border:1px solid var(--gold);background:var(--gold);color:#080c10;font-size:12px;font-weight:700;cursor:pointer;">All</button>
+          <button onclick="mfFilter('Axis')" id="mfBtnAxis" style="padding:5px 13px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer;">Axis</button>
+          <button onclick="mfFilter('Bajaj')" id="mfBtnBajaj" style="padding:5px 13px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer;">Bajaj</button>
+          <button onclick="mfFilter('Bandhan')" id="mfBtnBandhan" style="padding:5px 13px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer;">Bandhan</button>
+          <button onclick="mfFilter('Franklin')" id="mfBtnFranklin" style="padding:5px 13px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer;">Franklin</button>
+          <button onclick="mfFilter('HDFC')" id="mfBtnHDFC" style="padding:5px 13px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer;">HDFC</button>
+          <button onclick="mfFilter('HSBC')" id="mfBtnHSBC" style="padding:5px 13px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer;">HSBC</button>
+          <button onclick="mfFilter('ICICI')" id="mfBtnICICI" style="padding:5px 13px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer;">ICICI</button>
+          <button onclick="mfFilter('Invesco')" id="mfBtnInvesco" style="padding:5px 13px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer;">Invesco</button>
+          <button onclick="mfFilter('Kotak')" id="mfBtnKotak" style="padding:5px 13px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer;">Kotak</button>
+          <button onclick="mfFilter('Motilal')" id="mfBtnMotilal" style="padding:5px 13px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer;">Motilal</button>
+          <button onclick="mfFilter('Nippon')" id="mfBtnNippon" style="padding:5px 13px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer;">Nippon</button>
+          <button onclick="mfFilter('SBI')" id="mfBtnSBI" style="padding:5px 13px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);font-size:12px;cursor:pointer;">SBI</button>
         </div>
       </div>
       <div class="table-wrap">
@@ -2922,7 +2930,7 @@ function mfRenderTable(filter) {
   if(!tb) return;
 
   // Update filter button styles
-  ['All','ICICI','SBI','Nippon','Motilal'].forEach(f=>{
+  ['All','Axis','Bajaj','Bandhan','Franklin','HDFC','HSBC','ICICI','Invesco','Kotak','Motilal','Nippon','SBI'].forEach(f=>{
     const btn = document.getElementById('mfBtn'+f);
     if(!btn) return;
     if(f===filter) {
