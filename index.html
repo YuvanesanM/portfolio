@@ -1434,11 +1434,14 @@ const DEFAULT_HOLDINGS = [
   { account:"ICICI",   type:"Shares",      sub:"ETF & Stocks",   value:2892904,  units:"",      remarks:"Demat",                    owner:"Yuvan",  purchaseDate:"2020-01-01", purchasePrice:2000000  , _id:"etf-icici" },
   { account:"Kite",    type:"Shares",      sub:"Mixed Shares",   value:349265,   units:"",      remarks:"Zerodha",                  owner:"Yuvan",  purchaseDate:"2021-01-01", purchasePrice:300000   , _id:"kite-zerodha" },
   { account:"360ONE",  type:"AIF",         sub:"AIF",            value:5000000,  units:"",      remarks:"Alternative",              owner:"Yuvan",  purchaseDate:"2022-01-01", purchasePrice:5000000  , _id:"aif-360one" },
-  { account:"ICICI",   type:"Shares",      sub:"Unlisted",       value:975000,   units:"500",   remarks:"NSE @ ₹1950",             owner:"Yuvan",  purchaseDate:"2022-01-01", purchasePrice:975000   , _id:"unl-nse" },
-  { account:"ICICI",   type:"Shares",      sub:"Unlisted",       value:525000,   units:"25000", remarks:"Sunday Protech @ ₹20.75", owner:"Yuvan",  purchaseDate:"2022-01-01", purchasePrice:518750   , _id:"unl-sunday" },
-  { account:"ICICI",   type:"Shares",      sub:"Unlisted",       value:700000,   units:"25000", remarks:"OYO @ ₹28",              owner:"Yuvan",  purchaseDate:"2022-01-01", purchasePrice:700000   , _id:"unl-oyo" },
-  { account:"ICICI",   type:"Shares",      sub:"Unlisted",       value:555000,   units:"15000", remarks:"Ecosure @ ₹37",          owner:"Yuvan",  purchaseDate:"2023-01-01", purchasePrice:555000   , _id:"unl-ecosure" },
-  { account:"ICICI",   type:"Shares",      sub:"Unlisted",       value:240000,   units:"5000",  remarks:"AITMC Drone @ ₹48",      owner:"Yuvan",  purchaseDate:"2024-01-01", purchasePrice:240000   , _id:"unl-aitmc" },
+  { account:"ICICI",   type:"Shares",      sub:"Unlisted",       value:975000,   units:"500",   remarks:"NSE @ ₹1950",             owner:"Yuvan",  purchaseDate:"2025-11-20", purchasePrice:975000   , _id:"unl-nse" },
+  { account:"ICICI",   type:"Shares",      sub:"Unlisted",       value:518750,   units:"25000", remarks:"Sunday Protech @ ₹20.75", owner:"Yuvan",  purchaseDate:"2025-11-24", purchasePrice:518750   , _id:"unl-sunday" },
+  { account:"ICICI",   type:"Shares",      sub:"Unlisted",       value:700000,   units:"25000", remarks:"OYO @ ₹28",              owner:"Yuvan",  purchaseDate:"2025-12-04", purchasePrice:700000   , _id:"unl-oyo" },
+  { account:"ICICI",   type:"Shares",      sub:"Unlisted",       value:555000,   units:"15000", remarks:"Ecosure @ ₹37",          owner:"Yuvan",  purchaseDate:"2025-12-08", purchasePrice:555000   , _id:"unl-ecosure" },
+  { account:"ICICI",   type:"Shares",      sub:"Unlisted",       value:240000,   units:"5000",  remarks:"Avpl Drone @ ₹48",       owner:"Yuvan",  purchaseDate:"2026-01-14", purchasePrice:240000   , _id:"unl-avpl" },
+  { account:"ICICI",   type:"Shares",      sub:"Unlisted",       value:330000,   units:"10000", remarks:"Delta Galaxy @ ₹33",     owner:"Yuvan",  purchaseDate:"2026-04-25", purchasePrice:330000   , _id:"unl-deltagalaxy" },
+  { account:"ICICI",   type:"Shares",      sub:"Unlisted",       value:252000,   units:"40000", remarks:"MSEI @ ₹6.3",            owner:"Yuvan",  purchaseDate:"2026-04-07", purchasePrice:252000   , _id:"unl-msei" },
+  { account:"ICICI",   type:"Shares",      sub:"Unlisted",       value:395000,   units:"10000", remarks:"Zepto @ ₹39.5",          owner:"Yuvan",  purchaseDate:"2026-06-02", purchasePrice:395000   , _id:"unl-zepto" },
   { account:"ICICI",   type:"REIT",        sub:"REIT",           value:3087645,  units:"",      remarks:"Embassy / Nexus",          owner:"Yuvan",  purchaseDate:"2021-01-01", purchasePrice:3232000  , _id:"reit-icici" },
   { account:"Bitcoin", type:"Crypto",      sub:"Crypto",         value:179490,   units:"",      remarks:"BTC",                      owner:"Yuvan",  purchaseDate:"2021-01-01", purchasePrice:100000   , _id:"crypto-btc" },
   { account:"Au",      type:"Coin",        sub:"Coin",           value:1856156,  units:"124g",  remarks:"Gold coins",               owner:"Yuvan",  purchaseDate:"2020-01-01", purchasePrice:868000   , _id:"coin-au" },
@@ -4037,11 +4040,14 @@ async function autoFetchPrices() {
           if(!upc || h.sub !== 'Unlisted') return;
 
           const r = (h.remarks||'').toLowerCase();
-          const key = r.includes('nse')    ? 'nse'
-                    : r.includes('sunday') ? 'sunday'
-                    : r.includes('oyo')    ? 'oyo'
-                    : r.includes('ecosure')? 'ecosure'
-                    : r.includes('aitmc')  ? 'aitmc'
+          const key = r.includes('nse')          ? 'nse'
+                    : r.includes('sunday')       ? 'sunday'
+                    : r.includes('oyo')          ? 'oyo'
+                    : r.includes('ecosure')      ? 'ecosure'
+                    : r.includes('avpl')         ? 'avpl'
+                    : r.includes('delta galaxy') ? 'deltagalaxy'
+                    : r.includes('msei')         ? 'msei'
+                    : r.includes('zepto')        ? 'zepto'
                     : null;
 
           if(!key || !prices[key]?.ok || !prices[key].price) return;
@@ -4136,8 +4142,14 @@ function getUnitPriceConfig(h) {
     return { label:'OYO Price', unitLabel:'₹/share', qty: qty||25000 };
   if(s === 'unlisted' && r.includes('ecosure'))
     return { label:'Ecosure Price', unitLabel:'₹/share', qty: qty||15000 };
-  if(s === 'unlisted' && r.includes('aitmc'))
-    return { label:'AITMC Drone Price', unitLabel:'₹/share', qty: qty||5000 };
+  if(s === 'unlisted' && r.includes('avpl'))
+    return { label:'Avpl Drone Price', unitLabel:'₹/share', qty: qty||5000 };
+  if(s === 'unlisted' && r.includes('delta galaxy'))
+    return { label:'Delta Galaxy Price', unitLabel:'₹/share', qty: qty||10000 };
+  if(s === 'unlisted' && r.includes('msei'))
+    return { label:'MSEI Price', unitLabel:'₹/share', qty: qty||40000 };
+  if(s === 'unlisted' && r.includes('zepto'))
+    return { label:'Zepto Price', unitLabel:'₹/share', qty: qty||10000 };
   return null;
 }
 
