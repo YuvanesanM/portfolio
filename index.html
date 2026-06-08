@@ -1890,15 +1890,20 @@ async function loadAndInit() {
     // If NO rows have _id (pre-save state), assign by index — order matches DEFAULT
     // If ANY rows have _id (post-save state), only carry existing _id — never derive from index
     const anyHasId = normalized.some(h => h._id);
-    portfolio.holdings = normalized.map((h, i) => ({
-      ...h,
-      _id:           h._id || (anyHasId ? undefined : (DEFAULT_HOLDINGS[i]||{})._id || undefined),
-      owner:         h.owner         || (DEFAULT_HOLDINGS[i]||{}).owner         || 'Yuvan',
-      purchaseDate:  h.purchaseDate  || (DEFAULT_HOLDINGS[i]||{}).purchaseDate  || '2020-01-01',
-      purchasePrice: h.purchasePrice || (DEFAULT_HOLDINGS[i]||{}).purchasePrice || h.value,
-      _mfComputed:   h._mfComputed   || false,
-      _mfOwner:      h._mfOwner      || (h._mfComputed ? (h.owner||'Yuvan') : undefined),
-    }));
+    portfolio.holdings = normalized.map((h, i) => {
+      const defById = h._id ? DEFAULT_HOLDINGS.find(d => d._id === h._id) : null;
+      const defByIdx = DEFAULT_HOLDINGS[i] || {};
+      return {
+        ...h,
+        _id:           h._id || (anyHasId ? undefined : defByIdx._id || undefined),
+        owner:         h.owner         || defByIdx.owner         || 'Yuvan',
+        purchaseDate:  h.purchaseDate  || defByIdx.purchaseDate  || '2020-01-01',
+        purchasePrice: h.purchasePrice || defByIdx.purchasePrice || h.value,
+        units:         defById ? (defById.units !== undefined ? defById.units : h.units) : h.units,
+        _mfComputed:   h._mfComputed   || false,
+        _mfOwner:      h._mfOwner      || (h._mfComputed ? (h.owner||'Yuvan') : undefined),
+      };
+    });
 
     // Inject any DEFAULT_HOLDINGS rows missing from loaded data
     // Only runs when at least some rows have _id (post-save state)
