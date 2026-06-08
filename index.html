@@ -1848,7 +1848,7 @@ async function loadAndInit() {
       normalized = loaded.filter(h => h.sub !== 'Mutual Fund' && !h._mfComputed);
       normalized.splice(firstMFIdx, 0,
         { account:'CAMS+KFin', type:'Mutual Fund', sub:'Mutual Fund', value:0, units:'',
-          remarks:'Yuvan · 45 schemes', owner:'Yuvan', purchaseDate:'2019-01-01',
+          remarks:'Yuvan · 46 schemes', owner:'Yuvan', purchaseDate:'2019-01-01',
           purchasePrice: yuvanCost,  _mfComputed:true, _mfOwner:'Yuvan'  },
         { account:'CAMS+KFin', type:'Mutual Fund', sub:'Mutual Fund', value:0, units:'',
           remarks:'Ramyaa · 2 schemes', owner:'Ramyaa', purchaseDate:'2021-01-01',
@@ -1899,7 +1899,7 @@ async function loadAndInit() {
         owner:         h.owner         || defByIdx.owner         || 'Yuvan',
         purchaseDate:  h.purchaseDate  || defByIdx.purchaseDate  || '2020-01-01',
         purchasePrice: h.purchasePrice || defByIdx.purchasePrice || h.value,
-        units:         defById ? (defById.units !== undefined ? defById.units : h.units) : h.units,
+        units:         defById && defById.units !== undefined && defById.units !== '' ? defById.units : h.units,
         _mfComputed:   h._mfComputed   || false,
         _mfOwner:      h._mfOwner      || (h._mfComputed ? (h.owner||'Yuvan') : undefined),
       };
@@ -2212,7 +2212,7 @@ function renderStats() {
   const set = (id,val) => { const e=document.getElementById(id); if(e) e.textContent=val; };
   set('statMF',           fmt(mf));
   set('statMFhero',       fmt(mf));
-  set('statMFsub',        `47 schemes · ${(mf/portfolio.total*100).toFixed(1)}%`);
+  set('statMFsub',        `${MF_SCHEMES.length} schemes · ${(mf/portfolio.total*100).toFixed(1)}%`);
   set('statFD',           fmt(fdTotal));
   set('statFDsub',        `${fdHoldings.length} deposits · ${(fdTotal/portfolio.total*100).toFixed(1)}%`);
   set('statSGB',          fmt(sgbTotal));
@@ -2531,7 +2531,7 @@ function renderHoldingCards() {
   const cards = [
     { key:'Mutual Fund',  label:'Mutual Funds',   icon:'📊', accent:'#4f7fff',
       value: fsMap['Mutual Fund']||0,
-      sub: function(){ var v=fsMap['Mutual Fund']||0; var cnt=holdingsOwnerFilter==='All'?48:MF_SCHEMES.filter(function(s){return holdingsOwnerFilter==='Ramyaa'?s.owner==='Ramyaa':(!s.owner||s.owner==='Yuvan');}).length; return cnt+' schemes · '+(filteredTotal>0?(v/portfolio.total*100).toFixed(1):0)+'%'; },
+      sub: function(){ var v=fsMap['Mutual Fund']||0; var cnt=holdingsOwnerFilter==='All'?MF_SCHEMES.length:MF_SCHEMES.filter(function(s){return holdingsOwnerFilter==='Ramyaa'?s.owner==='Ramyaa':(!s.owner||s.owner==='Yuvan');}).length; return cnt+' schemes · '+(filteredTotal>0?(v/portfolio.total*100).toFixed(1):0)+'%'; },
       gainSubs:['Mutual Fund'] },
     { key:'SGB',          label:'SGB',            icon:'🥇', accent:'#d4a843',
       value: fsMap['SGB']||0,
@@ -4144,9 +4144,9 @@ function getUnitPriceConfig(h) {
   if(s === 'unlisted' && r.includes('nse'))
     return { label:'NSE Share Price', unitLabel:'₹/share', qty: qty||500 };
   if(s === 'unlisted' && r.includes('sunday'))
-    return { label:'Sunday Protech Price', unitLabel:'₹/share', qty: qty||25000 };
+    return { label:'Sunday Protech Price', unitLabel:'₹/share', qty: qty||100000 };
   if(s === 'unlisted' && r.includes('oyo'))
-    return { label:'OYO Price', unitLabel:'₹/share', qty: qty||25000 };
+    return { label:'OYO Price', unitLabel:'₹/share', qty: qty||26316 };
   if(s === 'unlisted' && r.includes('ecosure'))
     return { label:'Ecosure Price', unitLabel:'₹/share', qty: qty||15000 };
   if(s === 'unlisted' && r.includes('avpl'))
