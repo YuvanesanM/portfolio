@@ -1876,8 +1876,8 @@ async function loadAndInit() {
     normalized = normalized.filter(h => {
       if(h._mfComputed) return true;
       const key = `${h.account}|${h.sub}|${h.type}`;
-      // _id-matched rows: always keep (they are the canonical rows)
-      if(h._id && DEFAULT_HOLDINGS.some(d => d._id === h._id)) return true;
+      // _id-matched rows: keep only if _id still exists in DEFAULT_HOLDINGS; drop if removed
+      if(h._id) return DEFAULT_HOLDINGS.some(d => d._id === h._id);
       // Non-_id row: keep only if remaining slots after _id rows
       const allowed  = groupAllowed[key] || 99;
       const matched  = idMatchedCount[key] || 0;
