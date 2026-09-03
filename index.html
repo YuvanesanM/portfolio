@@ -1625,13 +1625,11 @@ async function saveToGitHub(payload) {
 // ═══════════════════════════════════════════════════
 //  GOOGLE IDENTITY SERVICES AUTH
 //  Requires an OAuth 2.0 Client ID from Google Cloud Console:
-//  console.cloud.google.com → APIs & Services → Credentials
-//  → Create OAuth Client ID (Web application)
-//  → Authorised JS origins: https://yuvanesanm.github.io  (and any custom domain)
+// CLIENT_ID is fetched from the proxy at runtime (stored in Render env CLIENT_ID)
 // ═══════════════════════════════════════════════════
-const GOOGLE_CLIENT_ID = '760185424832-s8vnmknmjt4c4n3o84ftmb88lus4kfj8.apps.googleusercontent.com';
+let GOOGLE_CLIENT_ID = '';
 
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
   // If a valid unexpired token exists (e.g. page refresh), skip lock screen
   const expiry = getStoredTokenExpiry();
   if(expiry > Date.now()) {
@@ -1641,6 +1639,22 @@ window.addEventListener('load', () => {
     return;
   }
   clearToken();
+
+  // Fetch client ID from proxy, then wait for GIS to load
+  try {
+    const cfg = await fetchWithTimeout(`${PROXY_URL}/config`, {}, 10000);
+    const { clientId } = await cfg.json();
+    GOOGLE_CLIENT_ID = clientId || '';
+  } catch(e) {
+    document.getElementById('lockErr').textContent = 'Could not reach auth server — try again.';
+    return;
+  }
+
+  if(!GOOGLE_CLIENT_ID) {
+    document.getElementById('lockErr').textContent = 'Auth not configured on server.';
+    return;
+  }
+
   // Wait for Google Identity Services to load, then render button
   const tryGIS = setInterval(() => {
     if(typeof google !== 'undefined' && google.accounts) {
