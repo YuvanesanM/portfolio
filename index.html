@@ -9,7 +9,7 @@
 <title>Yuvan · Portfolio Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://www.google.com/recaptcha/api.js?render=6LfskdwqAAAAAKFybSmhi2Zf3hAwCKuvxHNSA-NE" async></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
   :root {
     --bg: #090d12;
@@ -496,46 +496,12 @@
 <div id="lockScreen">
   <div class="lock-glow"></div>
   <div class="lock-box">
-
-    <!-- STEP 1: Bot check (invisible v3) -->
-    <div id="step-captcha">
-      <div class="lock-icon">🛡️</div>
-      <div class="lock-title">Portfolio Dashboard</div>
-      <div class="lock-sub">Running security check…</div>
-      <div style="margin:28px 0 8px;display:flex;justify-content:center;">
-        <div id="captchaSpinner" style="width:40px;height:40px;border:3px solid rgba(212,168,67,0.2);border-top-color:var(--gold);border-radius:50%;animation:spin 0.9s linear infinite;"></div>
-      </div>
-      <div class="lock-error" id="captchaErr"></div>
-      <div class="lock-hint" style="margin-top:16px;">Protected by Google reCAPTCHA v3</div>
-    </div>
-
-    <!-- STEP 2: Password (shown after captcha passes) -->
-    <div id="step-password" style="display:none;opacity:0;transition:opacity 0.4s ease, transform 0.4s ease;transform:translateY(12px);">
-      <div class="lock-icon">🔐</div>
-      <div class="lock-title">Portfolio Dashboard</div>
-      <div class="lock-sub">Security verified · Enter your password</div>
-
-      <!-- Step badges -->
-      <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:28px;">
-        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--green);font-weight:600;">
-          <div style="width:20px;height:20px;border-radius:50%;background:rgba(46,204,143,0.15);border:1.5px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:11px;">✓</div>
-          Bot Check
-        </div>
-        <div style="width:32px;height:1px;background:var(--border);"></div>
-        <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--gold);font-weight:600;">
-          <div style="width:20px;height:20px;border-radius:50%;background:rgba(212,168,67,0.15);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--gold);">2</div>
-          Password
-        </div>
-      </div>
-
-      <div class="lock-input-wrap">
-        <input type="password" class="lock-input" id="pwdInput" placeholder="••••••••" maxlength="20" autocomplete="off">
-      </div>
-      <button class="lock-btn" id="unlockBtn" onclick="unlock()">UNLOCK DASHBOARD</button>
-      <div class="lock-error" id="lockErr"></div>
-      <div class="lock-hint">2-layer security: reCAPTCHA v3 + Password</div>
-    </div>
-
+    <div class="lock-icon">💼</div>
+    <div class="lock-title">Yuvan's Portfolio</div>
+    <div class="lock-sub">Sign in with your Google account to continue</div>
+    <div id="googleSignInBtn" style="margin:32px 0 16px;display:flex;justify-content:center;min-height:44px;"></div>
+    <div class="lock-error" id="lockErr"></div>
+    <div class="lock-hint">Access restricted to authorised accounts</div>
   </div>
 </div>
 
@@ -1657,30 +1623,16 @@ async function saveToGitHub(payload) {
 }
 
 // ═══════════════════════════════════════════════════
-//  RECAPTCHA v3 + AUTH
+//  GOOGLE IDENTITY SERVICES AUTH
+//  Requires an OAuth 2.0 Client ID from Google Cloud Console:
+//  console.cloud.google.com → APIs & Services → Credentials
+//  → Create OAuth Client ID (Web application)
+//  → Authorised JS origins: https://yuvanesanm.github.io  (and any custom domain)
 // ═══════════════════════════════════════════════════
-const RECAPTCHA_SITE_KEY = '6LfskdwqAAAAAKFybSmhi2Zf3hAwCKuvxHNSA-NE';
-const SCORE_THRESHOLD    = 0.5;   // 0.0 (bot) → 1.0 (human), 0.5 is Google's recommended cutoff
-let captchaVerified      = false;
-
-// Auto-run v3 check as soon as recaptcha is ready
-function runCaptchaCheck() {
-  if(typeof grecaptcha === 'undefined' || typeof grecaptcha.ready === 'undefined') {
-    setTimeout(runCaptchaCheck, 200);
-    return;
-  }
-  grecaptcha.ready(() => {
-    grecaptcha.execute('6LfskdwqAAAAAKFybSmhi2Zf3hAwCKuvxHNSA-NE', { action: 'portfolio_login' })
-      .then(token => evaluateScore(token))
-      .catch(err => {
-        console.warn('reCAPTCHA execute failed:', err);
-        showPasswordStep();
-      });
-  });
-}
+const GOOGLE_CLIENT_ID = '760185424832-s8vnmknmjt4c4n3o84ftmb88lus4kfj8.apps.googleusercontent.com';
 
 window.addEventListener('load', () => {
-  // If a valid unexpired token exists (e.g. page refresh), skip lock screen entirely
+  // If a valid unexpired token exists (e.g. page refresh), skip lock screen
   const expiry = getStoredTokenExpiry();
   if(expiry > Date.now()) {
     document.getElementById('lockScreen').style.display = 'none';
@@ -1688,139 +1640,58 @@ window.addEventListener('load', () => {
     loadAndInit();
     return;
   }
-  // Token expired or missing — clear it and show lock screen normally
   clearToken();
-
-  let attempts = 0;
-  const tryRun = () => {
-    attempts++;
-    if(typeof grecaptcha !== 'undefined') {
-      runCaptchaCheck();
-    } else if(attempts < 20) {
-      setTimeout(tryRun, 300);
-    } else {
-      // Failed to load after 6s — skip and go straight to password
-      console.warn('reCAPTCHA not loaded, skipping bot check.');
-      showPasswordStep();
+  // Wait for Google Identity Services to load, then render button
+  const tryGIS = setInterval(() => {
+    if(typeof google !== 'undefined' && google.accounts) {
+      clearInterval(tryGIS);
+      initGoogleSignIn();
     }
-  };
-  // Start trying after 500ms to let scripts load
-  setTimeout(tryRun, 500);
+  }, 100);
 });
 
-function evaluateScore(token) {
-  // Decode the JWT payload (middle segment) to read the score client-side
-  // Note: this is the client-side score from the token — not server-verified,
-  // but combined with the password it provides solid bot deterrence.
+function initGoogleSignIn() {
+  google.accounts.id.initialize({
+    client_id:            GOOGLE_CLIENT_ID,
+    callback:             handleGoogleCredential,
+    auto_select:          false,
+    cancel_on_tap_outside: false,
+  });
+  google.accounts.id.renderButton(
+    document.getElementById('googleSignInBtn'),
+    { theme: 'filled_black', size: 'large', text: 'signin_with', shape: 'pill', width: 280 }
+  );
+}
+
+async function handleGoogleCredential(response) {
+  const err = document.getElementById('lockErr');
+  err.textContent = 'Verifying…';
+
   try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    const score   = payload.score ?? 0.9; // default high if field absent
-    if(score >= SCORE_THRESHOLD) {
-      captchaVerified = true;
-      showPasswordStep();
+    const res  = await fetchWithTimeout(`${PROXY_URL}/auth`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ credential: response.credential }),
+    }, 40000);
+    const data = await res.json();
+
+    if(data.ok && data.token) {
+      setToken(data.token);
+      document.getElementById('lockScreen').style.display = 'none';
+      document.getElementById('loadingOverlay').style.display = 'flex';
+      loadAndInit();
     } else {
-      // Low score — likely bot
-      document.getElementById('captchaSpinner').style.display = 'none';
-      document.getElementById('captchaErr').textContent =
-        `⛔ Security check failed (score: ${score.toFixed(1)}). Access denied.`;
+      err.textContent = data.error || 'Access denied. Only authorised accounts may sign in.';
+      google.accounts.id.disableAutoSelect();
     }
   } catch(e) {
-    // Token not decodable in this format — pass through (v3 tokens are opaque JWTs)
-    captchaVerified = true;
-    showPasswordStep();
+    err.textContent = 'Server unreachable — try again in a moment.';
   }
 }
 
-function showPasswordStep() {
-  captchaVerified = true;
-  const captchaEl = document.getElementById('step-captcha');
-  const pwEl      = document.getElementById('step-password');
-
-  captchaEl.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-  captchaEl.style.opacity    = '0';
-  captchaEl.style.transform  = 'translateY(-8px)';
-
-  setTimeout(() => {
-    captchaEl.style.display = 'none';
-    pwEl.style.display      = 'block';
-    // Trigger transition
-    requestAnimationFrame(() => {
-      pwEl.style.opacity   = '1';
-      pwEl.style.transform = 'translateY(0)';
-      document.getElementById('pwdInput').focus();
-    });
-  }, 300);
-}
-
-async function unlock() {
-  if(!captchaVerified) return;
-  const v    = document.getElementById('pwdInput').value.trim();
-  const btn  = document.getElementById('unlockBtn');
-  const err  = document.getElementById('lockErr');
-  if(!v) return;
-
-  btn.disabled    = true;
-  btn.textContent = 'Connecting…';
-  err.textContent = '';
-
-  // Proxy may be cold-starting (free Render tier sleeps after inactivity)
-  // Retry POST /auth up to 3 times with escalating wait messages
-  const MESSAGES = [
-    [0,    'Connecting…'],
-    [4000, 'Waking up server (free tier, ~30s)…'],
-    [15000,'Almost there, server is starting up…'],
-    [28000,'Taking longer than usual, please wait…'],
-  ];
-  const timers = MESSAGES.map(([delay, msg]) =>
-    setTimeout(() => { btn.textContent = msg; }, delay)
-  );
-  const clearTimers = () => timers.forEach(clearTimeout);
-
-  const attemptAuth = async (attemptsLeft) => {
-    try {
-      const res  = await fetchWithTimeout(`${PROXY_URL}/auth`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: v })
-      }, 40000);
-      const data = await res.json();
-      clearTimers();
-
-      if(data.ok && data.token) {
-        setToken(data.token);
-        document.getElementById('lockScreen').style.display = 'none';
-        document.getElementById('loadingOverlay').style.display = 'flex';
-        loadAndInit();
-      } else {
-        const inp = document.getElementById('pwdInput');
-        inp.classList.add('error');
-        err.textContent  = 'Incorrect password. Please try again.';
-        btn.disabled     = false;
-        btn.textContent  = 'UNLOCK DASHBOARD';
-        setTimeout(() => inp.classList.remove('error'), 500);
-      }
-    } catch(e) {
-      if(attemptsLeft > 1) {
-        // Server still waking — retry once after a short pause
-        setTimeout(() => attemptAuth(attemptsLeft - 1), 3000);
-      } else {
-        clearTimers();
-        err.textContent  = 'Server unreachable — try again in a moment.';
-        btn.disabled     = false;
-        btn.textContent  = 'UNLOCK DASHBOARD';
-      }
-    }
-  };
-
-  attemptAuth(3);
-}
-
-document.addEventListener('keydown', e => {
-  if(e.key === 'Enter' && captchaVerified) unlock();
-});
-
 function lockDashboard() {
   clearToken();
+  if(typeof google !== 'undefined' && google.accounts) google.accounts.id.disableAutoSelect();
   location.reload();
 }
 
