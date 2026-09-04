@@ -1502,7 +1502,7 @@ const DEFAULT_SGB = [
 // ═══════════════════════════════════════════════════
 //  LIVE DATA (populated from GitHub or defaults)
 // ═══════════════════════════════════════════════════
-let portfolio   = { total: 0, asOf: '16 Sep 2025', holdings: [] };
+let portfolio   = { total: 0, asOf: '04 Sep 2026', holdings: [] };
 let snapshots   = [];
 let sgbTranches = [];
 let summary     = [];
@@ -1767,6 +1767,14 @@ function lockDashboard() {
   location.reload();
 }
 
+// Format an ISO date string "YYYY-MM-DD" → "4 Sep 2026"
+function fmtSnapDate(iso) {
+  if(!iso) return '';
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const [y, m, d] = iso.split('-');
+  return `${parseInt(d)} ${months[parseInt(m)-1]} ${y}`;
+}
+
 async function loadAndInit() {
   const setStatus = msg => {
     const el = document.getElementById('loadingStatus');
@@ -1888,14 +1896,16 @@ async function loadAndInit() {
         }
       });
     }
-    portfolio.asOf      = ghData.asOf        || '04 Sep 2026';
     holdingNotes        = ghData.notes         || {};
     snapshots           = ghData.snapshots   || DEFAULT_SNAPSHOTS;
+    // asOf: use the latest snapshot date (always reflects most recent code update),
+    // falling back to ghData.asOf (the last manual save date)
+    portfolio.asOf      = fmtSnapDate(DEFAULT_SNAPSHOTS[DEFAULT_SNAPSHOTS.length - 1]?.date) || ghData.asOf || '04 Sep 2026';
     sgbTranches         = ghData.sgbTranches || DEFAULT_SGB;
   } else {
     setStatus('Server offline — using local data');
     portfolio.holdings  = DEFAULT_HOLDINGS;
-    portfolio.asOf      = '04 Sep 2026';
+    portfolio.asOf      = fmtSnapDate(DEFAULT_SNAPSHOTS[DEFAULT_SNAPSHOTS.length - 1]?.date) || '04 Sep 2026';
     snapshots           = DEFAULT_SNAPSHOTS;
     sgbTranches         = DEFAULT_SGB;
   }
