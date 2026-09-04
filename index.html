@@ -1489,14 +1489,15 @@ const DEFAULT_SNAPSHOTS = [
   { date:"2026-09-04", value:70198287 },
 ];
 
+// Values aligned with DEFAULT_HOLDINGS SGB entries (gold @ ₹15,135/g · 04-Sep-2026)
 const DEFAULT_SGB = [
-  { units:70,  maturity:"14 Aug 2027", cost:244930,  value:1129240 },
-  { units:50,  maturity:"10 Dec 2027", cost:189750,  value:806600  },
-  { units:100, maturity:"08 Sep 2028", cost:511700,  value:1613200 },
-  { units:30,  maturity:"05 Jan 2029", cost:150000,  value:483960  },
-  { units:50,  maturity:"19 Jan 2029", cost:252700,  value:806600  },
-  { units:100, maturity:"09 Mar 2029", cost:461200,  value:1613200 },
-  { units:100, maturity:"25 May 2029", cost:472700,  value:1613200 },
+  { units:70,  maturity:"14 Aug 2027", cost:244930,  value:1059452 },
+  { units:50,  maturity:"10 Dec 2027", cost:189750,  value:756752  },
+  { units:100, maturity:"08 Sep 2028", cost:511700,  value:1513503 },
+  { units:30,  maturity:"05 Jan 2029", cost:150000,  value:454050  },
+  { units:50,  maturity:"19 Jan 2029", cost:252700,  value:756752  },
+  { units:100, maturity:"09 Mar 2029", cost:461200,  value:1513503 },
+  { units:100, maturity:"25 May 2029", cost:472700,  value:1513503 },
 ];
 
 // ═══════════════════════════════════════════════════
@@ -1767,6 +1768,32 @@ function lockDashboard() {
   location.reload();
 }
 
+// Force-apply _syncValue overrides after the primary merge.
+// The primary merge only overrides when h._id matches a DEFAULT_HOLDINGS _id.
+// Items saved before _id was added to their DEFAULT_HOLDINGS entry will have h._id=undefined,
+// so defById=null and _syncValue is silently skipped.
+// This function covers those items: tries _id first, then falls back to
+// account+sub+type positional matching (in DEFAULT_HOLDINGS order) using a Set to avoid double-applying.
+function syncValueOverrides() {
+  const applied = new Set();
+  DEFAULT_HOLDINGS.forEach(def => {
+    if (!def._syncValue || def._mfComputed) return;
+    // 1. Try exact _id match
+    let target = def._id ? portfolio.holdings.find(h => h._id === def._id) : null;
+    // 2. Fallback: match by account+sub+type; pick first unmatched row
+    if (!target) {
+      target = portfolio.holdings.find(h =>
+        !applied.has(h) &&
+        h.account === def.account && h.sub === def.sub && h.type === def.type
+      );
+    }
+    if (target && !applied.has(target)) {
+      target.value = def.value;
+      applied.add(target);
+    }
+  });
+}
+
 // Format an ISO date string "YYYY-MM-DD" → "4 Sep 2026"
 function fmtSnapDate(iso) {
   if(!iso) return '';
@@ -1901,7 +1928,7 @@ async function loadAndInit() {
     // asOf: use the latest snapshot date (always reflects most recent code update),
     // falling back to ghData.asOf (the last manual save date)
     portfolio.asOf      = fmtSnapDate(DEFAULT_SNAPSHOTS[DEFAULT_SNAPSHOTS.length - 1]?.date) || ghData.asOf || '04 Sep 2026';
-    sgbTranches         = ghData.sgbTranches || DEFAULT_SGB;
+    sgbTranches         = DEFAULT_SGB;  // always code-managed; never use stale ghData.sgbTranches
   } else {
     setStatus('Server offline — using local data');
     portfolio.holdings  = DEFAULT_HOLDINGS;
@@ -1909,6 +1936,7 @@ async function loadAndInit() {
     snapshots           = DEFAULT_SNAPSHOTS;
     sgbTranches         = DEFAULT_SGB;
   }
+  syncValueOverrides();  // force _syncValue for items without _id match in primary merge
   portfolio.total = portfolio.holdings.reduce((a,b)=>a+(b.value||0),0);
   summary         = buildSummary(portfolio.holdings);
 
