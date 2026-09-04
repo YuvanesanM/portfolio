@@ -1376,6 +1376,44 @@ function getStoredTokenExpiry() {
   return parts.length === 2 ? parseInt(parts[0]) || 0 : 0;
 }
 
+// ── Inactivity lock (30 min) ──────────────────────────────────────────
+const ACTIVITY_KEY      = 'portfolio_last_activity';
+const INACTIVITY_MS     = 30 * 60 * 1000; // 30 minutes
+let   _inactivityTimer  = null;
+
+function touchActivity() {
+  try { localStorage.setItem(ACTIVITY_KEY, Date.now()); } catch(e) {}
+  resetInactivityTimer();
+}
+function resetInactivityTimer() {
+  clearTimeout(_inactivityTimer);
+  _inactivityTimer = setTimeout(() => {
+    // Double-check localStorage in case another tab was active
+    const last = parseInt(localStorage.getItem(ACTIVITY_KEY) || '0');
+    if(Date.now() - last >= INACTIVITY_MS) lockDashboard();
+    else resetInactivityTimer(); // another tab was active — reschedule
+  }, INACTIVITY_MS);
+}
+function startActivityTracking() {
+  touchActivity(); // record login moment as first activity
+  ['mousemove','mousedown','keydown','scroll','touchstart','click'].forEach(evt =>
+    document.addEventListener(evt, touchActivity, { passive: true })
+  );
+  // Also re-check when the tab regains focus (user coming back from another tab)
+  document.addEventListener('visibilitychange', () => {
+    if(document.visibilityState === 'visible') {
+      const last = parseInt(localStorage.getItem(ACTIVITY_KEY) || '0');
+      if(Date.now() - last >= INACTIVITY_MS) lockDashboard();
+    }
+  });
+}
+function stopActivityTracking() {
+  clearTimeout(_inactivityTimer);
+  ['mousemove','mousedown','keydown','scroll','touchstart','click'].forEach(evt =>
+    document.removeEventListener(evt, touchActivity)
+  );
+}
+
 // ═══════════════════════════════════════════════════
 //  DEFAULT DATA (fallback if no GitHub file yet)
 // ═══════════════════════════════════════════════════
@@ -1633,10 +1671,18 @@ window.addEventListener('load', async () => {
   // If a valid unexpired token exists (e.g. page refresh), skip lock screen
   const expiry = getStoredTokenExpiry();
   if(expiry > Date.now()) {
-    document.getElementById('lockScreen').style.display = 'none';
-    document.getElementById('loadingOverlay').style.display = 'flex';
-    loadAndInit();
-    return;
+    // Also check inactivity — even if token is valid, lock if idle too long
+    const lastActive = parseInt(localStorage.getItem(ACTIVITY_KEY) || '0');
+    if(lastActive > 0 && Date.now() - lastActive >= INACTIVITY_MS) {
+      clearToken();
+      // fall through to show lock screen
+    } else {
+      document.getElementById('lockScreen').style.display = 'none';
+      document.getElementById('loadingOverlay').style.display = 'flex';
+      startActivityTracking();
+      loadAndInit();
+      return;
+    }
   }
   clearToken();
 
@@ -1693,6 +1739,7 @@ async function handleGoogleCredential(response) {
       setToken(data.token);
       document.getElementById('lockScreen').style.display = 'none';
       document.getElementById('loadingOverlay').style.display = 'flex';
+      startActivityTracking();
       loadAndInit();
     } else {
       err.textContent = data.error || 'Access denied. Only authorised accounts may sign in.';
@@ -1704,7 +1751,9 @@ async function handleGoogleCredential(response) {
 }
 
 function lockDashboard() {
+  stopActivityTracking();
   clearToken();
+  try { localStorage.removeItem(ACTIVITY_KEY); } catch(e) {}
   if(typeof google !== 'undefined' && google.accounts) google.accounts.id.disableAutoSelect();
   location.reload();
 }
