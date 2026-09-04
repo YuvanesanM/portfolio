@@ -1352,7 +1352,6 @@
   </div>
 </div>
 
-<script src="config.js"></script>
 <script>
 // ═══════════════════════════════════════════════════
 //  CONFIG — proxy server (token lives on Render, never in this file)
@@ -1703,11 +1702,19 @@ window.addEventListener('load', async () => {
     return;
   }
 
-  // Wait for Google Identity Services to load, then render button
+  // Wait for Google Identity Services to load, then render button (10s timeout)
+  let gisWaitMs = 0;
   const tryGIS = setInterval(() => {
     if(typeof google !== 'undefined' && google.accounts) {
       clearInterval(tryGIS);
       initGoogleSignIn();
+      return;
+    }
+    gisWaitMs += 100;
+    if(gisWaitMs >= 10000) {
+      clearInterval(tryGIS);
+      document.getElementById('lockErr').textContent =
+        'Google Sign-In failed to load — check your connection or try disabling ad blockers.';
     }
   }, 100);
 });
@@ -1881,14 +1888,14 @@ async function loadAndInit() {
         }
       });
     }
-    portfolio.asOf      = ghData.asOf        || '16 Sep 2025';
+    portfolio.asOf      = ghData.asOf        || '04 Sep 2026';
     holdingNotes        = ghData.notes         || {};
     snapshots           = ghData.snapshots   || DEFAULT_SNAPSHOTS;
     sgbTranches         = ghData.sgbTranches || DEFAULT_SGB;
   } else {
     setStatus('Server offline — using local data');
     portfolio.holdings  = DEFAULT_HOLDINGS;
-    portfolio.asOf      = '16 Sep 2025';
+    portfolio.asOf      = '04 Sep 2026';
     snapshots           = DEFAULT_SNAPSHOTS;
     sgbTranches         = DEFAULT_SGB;
   }
@@ -2363,8 +2370,6 @@ function initDashboard() {
   document.getElementById('lastUpdated').textContent = 'Updated: '+portfolio.asOf;
   renderStats();
   renderAlloc();
-  renderDelta();
-  renderSGBAlert();
   renderDelta();
   renderSGBAlert();
   renderCharts();
