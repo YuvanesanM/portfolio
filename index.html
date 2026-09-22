@@ -499,9 +499,11 @@
     <div class="lock-icon">💼</div>
     <div class="lock-title">Yuvan's Portfolio</div>
     <div class="lock-sub">Sign in with your Google account to continue</div>
-    <div id="googleSignInBtn" style="margin:32px 0 16px;display:flex;justify-content:center;min-height:44px;"></div>
+    <div id="googleSignInBtn" style="margin:32px 0 16px;display:flex;justify-content:center;min-height:44px;">
+      <div id="gisSpinner" style="width:36px;height:36px;border:3px solid rgba(212,168,67,0.2);border-top-color:var(--gold);border-radius:50%;animation:spin 0.9s linear infinite;margin-top:4px;"></div>
+    </div>
     <div class="lock-error" id="lockErr"></div>
-    <div class="lock-hint">Access restricted to authorised accounts</div>
+    <div class="lock-hint" id="lockHint">Connecting to auth server…</div>
   </div>
 </div>
 
@@ -1688,34 +1690,55 @@ window.addEventListener('load', async () => {
   }
   clearToken();
 
-  // Fetch client ID from proxy, then wait for GIS to load
-  try {
-    const cfg = await fetchWithTimeout(`${PROXY_URL}/config`, {}, 10000);
-    const { clientId } = await cfg.json();
-    GOOGLE_CLIENT_ID = clientId || '';
-  } catch(e) {
-    document.getElementById('lockErr').textContent = 'Could not reach auth server — try again.';
+  // Fetch client ID from proxy (Render free tier can take ~30-50s to wake from sleep)
+  const hint = document.getElementById('lockHint');
+  const err  = document.getElementById('lockErr');
+  const wakeTimer = setTimeout(() => {
+    if(hint) hint.textContent = 'Server is waking up — this can take up to 30s…';
+  }, 6000);
+
+  async function fetchConfig() {
+    try {
+      const cfg = await fetchWithTimeout(`${PROXY_URL}/config`, {}, 50000);
+      const { clientId } = await cfg.json();
+      return clientId || '';
+    } catch(e) { return null; }
+  }
+
+  let clientId = await fetchConfig();
+  clearTimeout(wakeTimer);
+
+  // Auto-retry once if first attempt fails (proxy may have been mid-wake)
+  if(!clientId) {
+    if(hint) hint.textContent = 'Retrying connection…';
+    await new Promise(r => setTimeout(r, 3000));
+    clientId = await fetchConfig();
+  }
+
+  if(!clientId) {
+    if(hint) hint.textContent = 'Access restricted to authorised accounts';
+    err.innerHTML = 'Could not reach auth server. <button onclick="location.reload()" style="background:none;border:none;color:var(--gold);cursor:pointer;text-decoration:underline;font-size:inherit;padding:0;">Try again</button>';
+    document.getElementById('gisSpinner')?.remove();
     return;
   }
 
-  if(!GOOGLE_CLIENT_ID) {
-    document.getElementById('lockErr').textContent = 'Auth not configured on server.';
-    return;
-  }
+  GOOGLE_CLIENT_ID = clientId;
+  if(hint) hint.textContent = 'Access restricted to authorised accounts';
 
-  // Wait for Google Identity Services to load, then render button (10s timeout)
+  // Wait for Google Identity Services to load, then render button (15s timeout)
   let gisWaitMs = 0;
   const tryGIS = setInterval(() => {
     if(typeof google !== 'undefined' && google.accounts) {
       clearInterval(tryGIS);
+      document.getElementById('gisSpinner')?.remove();
       initGoogleSignIn();
       return;
     }
     gisWaitMs += 100;
-    if(gisWaitMs >= 10000) {
+    if(gisWaitMs >= 15000) {
       clearInterval(tryGIS);
-      document.getElementById('lockErr').textContent =
-        'Google Sign-In failed to load — check your connection or try disabling ad blockers.';
+      document.getElementById('gisSpinner')?.remove();
+      err.textContent = 'Google Sign-In failed to load — check your connection or try disabling ad blockers.';
     }
   }, 100);
 });
