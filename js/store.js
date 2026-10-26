@@ -79,11 +79,23 @@ export function hydrate(remote) {
   recompute();
 }
 
+// Liquidity buckets come from ASSET_CLASSES.liquidity; each class belongs to exactly one bucket,
+// so the three totals always sum to state.total (no double counting).
+export const LIQUIDITY = {
+  liquid: { label: 'Liquid',       desc: 'Redeemable within days',            color: '#3dd68c' },
+  semi:   { label: 'Semi-liquid',  desc: 'Saleable, but market or buyer dependent', color: '#4c83ff' },
+  locked: { label: 'Locked-in',    desc: 'Maturity, lock-in or exit constraints', color: '#9b7bff' },
+};
 export const liquidity = () => {
   const out = { liquid: 0, semi: 0, locked: 0 };
   for (const c of state.byClass) out[c.liquidity] += c.value;
   return out;
 };
+export const liquidityDetail = () => Object.entries(LIQUIDITY).map(([key, meta]) => {
+  const classes = state.byClass.filter(c => c.liquidity === key);
+  const value = sum(classes, c => c.value);
+  return { key, ...meta, value, pct: state.total ? value / state.total : 0, classes };
+});
 
 export const previousSnapshot = () => {
   const before = state.snapshots.filter(s => s.date < state.asOf);

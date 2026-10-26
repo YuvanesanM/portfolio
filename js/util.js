@@ -36,24 +36,34 @@ export function groupBy(arr, keyFn) {
 }
 
 // ── Money ────────────────────────────────────────────────────────────
+// Display preferences are global so every table, card and chart tooltip agrees.
+export const display = { mask: false, unit: 'auto' };   // unit: auto | lakh | crore | full
+const MASK = '₹ ••••';
+
+function scaled(abs) {
+  const u = display.unit;
+  if (u === 'full') return [Math.round(abs).toLocaleString('en-IN'), ''];
+  if (u === 'crore') return [(abs / 1e7).toFixed(2), ' Cr'];
+  if (u === 'lakh') return [(abs / 1e5).toFixed(abs >= 1e7 ? 0 : 2), ' L'];
+  if (abs >= 1e7) return [(abs / 1e7).toFixed(2), ' Cr'];
+  if (abs >= 1e5) return [(abs / 1e5).toFixed(abs >= 1e6 ? 1 : 2), ' L'];
+  return [Math.round(abs).toLocaleString('en-IN'), ''];
+}
 export function fmt(n) {
   if (n == null || isNaN(n)) return '—';
-  const abs = Math.abs(n);
-  const sign = n < 0 ? '−' : '';
-  if (abs >= 1e7) return `${sign}₹${(abs / 1e7).toFixed(2)} Cr`;
-  if (abs >= 1e5) return `${sign}₹${(abs / 1e5).toFixed(abs >= 1e6 ? 1 : 2)} L`;
-  return `${sign}₹${Math.round(abs).toLocaleString('en-IN')}`;
+  if (display.mask) return MASK;
+  const [num, suffix] = scaled(Math.abs(n));
+  return `${n < 0 ? '−' : ''}₹${num}${suffix}`;
 }
 export function fmtShort(n) {
   if (n == null || isNaN(n)) return '—';
-  const abs = Math.abs(n);
-  const sign = n < 0 ? '−' : '';
-  if (abs >= 1e7) return `${sign}${(abs / 1e7).toFixed(2)} Cr`;
-  if (abs >= 1e5) return `${sign}${(abs / 1e5).toFixed(1)} L`;
-  if (abs >= 1e3) return `${sign}${(abs / 1e3).toFixed(0)}K`;
-  return `${sign}${Math.round(abs)}`;
+  if (display.mask) return '••••';
+  const abs = Math.abs(n), sign = n < 0 ? '−' : '';
+  if (display.unit === 'auto' && abs < 1e5 && abs >= 1e3) return `${sign}${(abs / 1e3).toFixed(0)}K`;
+  const [num, suffix] = scaled(abs);
+  return `${sign}${num}${suffix.trim()}`;
 }
-export const fmtFull = n => n == null || isNaN(n) ? '—' : `₹${Math.round(n).toLocaleString('en-IN')}`;
+export const fmtFull = n => n == null || isNaN(n) ? '—' : display.mask ? MASK : `₹${Math.round(n).toLocaleString('en-IN')}`;
 export const signed  = (n, f = fmt) => (n >= 0 ? '+' : '') + f(n);
 export const pct     = (x, d = 1) => isFinite(x) ? `${(x * 100).toFixed(d)}%` : '—';
 export const signedPct = (x, d = 1) => isFinite(x) ? `${x >= 0 ? '+' : ''}${(x * 100).toFixed(d)}%` : '—';
