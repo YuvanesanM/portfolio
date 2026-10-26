@@ -67,6 +67,7 @@ export const HOLDINGS = [
   { id: 'listed-bhaair',   cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'Bharti Airtel',       qty: 250,  unit: 'sh', price: 1794.60, cost: 498000,  since: '2024-01-01' },
   { id: 'listed-sbifun',   cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'SBI Funds Mgmt',      qty: 26,   unit: 'sh', price: 519.55,  cost: 14404,   since: '2024-01-01' },
   { id: 'listed-tatcov',   cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'Tata Motors PV',      qty: 250,  unit: 'sh', price: 283.40,  cost: 92750,   since: '2024-01-01' },
+  { id: 'unl-nse',         cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'NSE',                 qty: 500,  unit: 'sh', price: 1762.60, cost: 975000,  since: '2025-11-20' },
   // ETFs
   { id: 'etf-ici500', cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'ICICI BSE 500 ETF',      qty: 1500, unit: 'sh', price: 37.17,  cost: 54000,  since: '2024-01-01' },
   { id: 'etf-ici100', cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'ICICI Nifty 100 ETF',    qty: 5000, unit: 'sh', price: 26.79,  cost: 145000, since: '2024-01-01' },
@@ -81,7 +82,6 @@ export const HOLDINGS = [
   { id: 'reit-nexsel',  cls: 'reit', owner: 'Yuvan', account: 'ICICI', name: 'Nexus Select Trust',    qty: 1000,  unit: 'sh', price: 164.84, cost: 165000,  since: '2024-01-01' },
   { id: 'reit-icici',   cls: 'reit', owner: 'Yuvan', account: 'ICICI', name: 'Embassy Office Parks',  qty: 1000,  unit: 'sh', price: 430.52, cost: 439000,  since: '2021-01-01' },
   // Unlisted — fetchKey matches the proxy's /unlisted-prices result keys
-  { id: 'unl-nse',        cls: 'unlisted', owner: 'Yuvan', account: 'ICICI', name: 'NSE',            qty: 500,    unit: 'sh', price: 1762.60, cost: 975000,  since: '2025-11-20', fetchKey: 'nse' },
   { id: 'unl-sunday',     cls: 'unlisted', owner: 'Yuvan', account: 'ICICI', name: 'Sunday Protech', qty: 100000, unit: 'sh', price: 20.75,   cost: 2075000, since: '2025-11-24', fetchKey: 'sunday' },
   { id: 'unl-oyo',        cls: 'unlisted', owner: 'Yuvan', account: 'ICICI', name: 'OYO',            qty: 26316,  unit: 'sh', price: 28,      cost: 736848,  since: '2025-12-04', fetchKey: 'oyo' },
   { id: 'unl-ecosure',    cls: 'unlisted', owner: 'Yuvan', account: 'ICICI', name: 'Ecosure',        qty: 15000,  unit: 'sh', price: 37,      cost: 555000,  since: '2025-12-08', fetchKey: 'ecosure' },
