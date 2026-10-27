@@ -47,6 +47,7 @@ export const saveRemote    = payload => proxy('/holdings', { method: 'PUT', body
 export const fetchGold     = () => proxy('/gold-price',      { auth: false, timeout: 15000 });
 export const fetchSilver   = () => proxy('/silver-price',    { auth: false, timeout: 15000 });
 export const fetchUnlisted = () => proxy('/unlisted-prices', { auth: false, timeout: 40000 });
+export const requestAdvice = (portfolio, context) => proxy('/advise', { method: 'POST', body: { portfolio, context }, timeout: 300000 });
 
 export async function fetchNav(code) {
   const res = await fetchWithTimeout(`https://api.mfapi.in/mf/${code}/latest`, {}, 12000);

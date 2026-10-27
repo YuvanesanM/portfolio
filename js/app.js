@@ -15,14 +15,15 @@ import * as liquidity from './pages/liquidity.js';
 import * as tax from './pages/tax.js';
 import * as rebalance from './pages/rebalance.js';
 import * as insights from './pages/insights.js';
+import * as advisor from './pages/advisor.js';
 import * as goals from './pages/goals.js';
 import * as family from './pages/family.js';
 import * as settings from './pages/settings.js';
 
-const PAGES = { overview, portfolio, assets, mf, performance, liquidity, tax, rebalance, insights, goals, family, settings };
+const PAGES = { overview, portfolio, assets, mf, performance, liquidity, tax, rebalance, insights, advisor, goals, family, settings };
 const NAV = [
   { label: 'Main', items: [['overview', 'Overview', 'grid'], ['portfolio', 'Portfolio', 'list'], ['assets', 'Asset Classes', 'layers'], ['mf', 'Mutual Funds', 'pie']] },
-  { label: 'Analysis', items: [['performance', 'Performance', 'trend'], ['liquidity', 'Liquidity', 'droplet'], ['tax', 'Tax', 'receipt'], ['rebalance', 'Rebalance', 'scale'], ['insights', 'Insights', 'bulb']] },
+  { label: 'Analysis', items: [['performance', 'Performance', 'trend'], ['liquidity', 'Liquidity', 'droplet'], ['tax', 'Tax', 'receipt'], ['rebalance', 'Rebalance', 'scale'], ['insights', 'Insights', 'bulb'], ['advisor', 'AI Advisor', 'sparkle']] },
   { label: 'Planning', items: [['goals', 'Goals', 'target'], ['family', 'Family', 'users'], ['settings', 'Settings', 'settings']] },
 ];
 const TITLES = Object.fromEntries(NAV.flatMap(g => g.items.map(([id, label]) => [id, label])));

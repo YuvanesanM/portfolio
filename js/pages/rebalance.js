@@ -8,6 +8,11 @@ let sipAmount = 50000;
 const TOLERANCE = 5000;
 let root_ = null;
 
+export const getTargets = () => ({ ...targets });
+export function setTargets(map) {
+  for (const key of Object.keys(DEFAULT_TARGETS)) targets[key] = Math.max(0, Math.round(Number(map[key]) || 0));
+}
+
 const classState = key => {
   const current = state.classMap[key] || 0, target = targets[key] || 0;
   const targetAmt = target / 100 * state.total, diff = targetAmt - current;

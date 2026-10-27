@@ -111,6 +111,9 @@ input, select { font: inherit; color: inherit; }
 :root[data-theme="light"] .input { background: var(--surface); }
 .input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .input.num { text-align: right; }
+.input.area { height: auto; padding: 10px 12px; resize: vertical; line-height: 1.5; font-family: inherit; min-height: 120px; }
+.badge.dim { color: var(--text-3); }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; background: var(--surface-3); padding: 1px 5px; border-radius: 4px; }
 .input::placeholder { color: var(--text-3); }
 select.input { appearance: none; padding-right: 30px; background-image: linear-gradient(45deg, transparent 50%, var(--text-3) 50%), linear-gradient(135deg, var(--text-3) 50%, transparent 50%); background-position: calc(100% - 16px) 15px, calc(100% - 11px) 15px; background-size: 5px 5px; background-repeat: no-repeat; }
 .search { position: relative; }
