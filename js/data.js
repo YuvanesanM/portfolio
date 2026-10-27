@@ -67,7 +67,9 @@ export const HOLDINGS = [
   { id: 'listed-bhaair',   cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'Bharti Airtel',       qty: 250,  unit: 'sh', price: 1963.6, cost: 498000,  since: '2024-01-01' },
   { id: 'listed-sbifun',   cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'SBI Funds Mgmt',      qty: 26,   unit: 'sh', price: 458.4,  cost: 14404,   since: '2024-01-01' },
   { id: 'listed-tatcov',   cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'Tata Motors PV',      qty: 250,  unit: 'sh', price: 261.2,  cost: 92750,   since: '2024-01-01' },
-  { id: 'unl-nse',         cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'NSE',                 qty: 500,  unit: 'sh', price: 1764.2, cost: 975000,  since: '2025-11-20' },
+  { id: 'unl-nse',         cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'NSE (pre-IPO, locked till Mar 2027)', qty: 500, unit: 'sh', price: 1764.2, cost: 975000, since: '2025-11-20' },
+  { id: 'listed-nse',      cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'NSE (IPO allotment)',  qty: 66,   unit: 'sh', price: 1764.2,  cost: 117810,  since: '2026-09-22' },
+  { id: 'listed-jiopla',   cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'Jio Platforms',        qty: 23,   unit: 'sh', price: 1119,    cost: 25737,   since: '2026-10-26' },
   // ETFs
   { id: 'etf-ici500', cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'ICICI BSE 500 ETF',      qty: 1500, unit: 'sh', price: 37.3,  cost: 54000,  since: '2024-01-01' },
   { id: 'etf-ici100', cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'ICICI Nifty 100 ETF',    qty: 5000, unit: 'sh', price: 26.33,  cost: 145000, since: '2024-01-01' },
@@ -108,7 +110,7 @@ export const SNAPSHOTS = [
   { date: '2025-12-13', value: 67974466 },
   { date: '2026-09-04', value: 70118797 },
   { date: '2026-10-15', value: 69599403 },
-  { date: '2026-10-27', value: 67691585 },
+  { date: '2026-10-27', value: 67833759 },
 ];
 
 // From CAS statements (Yuvan 18-Aug-2026, Ramyaa 19-Mar-2026).
