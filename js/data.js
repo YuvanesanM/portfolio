@@ -1,6 +1,6 @@
 // Single source of truth for portfolio data. Edit values here; the Update modal
 // only stores dated overrides that win while they are newer than DATA_AS_OF.
-export const DATA_AS_OF = '2026-10-15';
+export const DATA_AS_OF = '2026-10-27';
 export const CAS_AS_OF  = '2026-08-18';
 export const TARGET_NET_WORTH = 100_000_000;
 
@@ -47,53 +47,53 @@ export const HOLDINGS = [
   { id: 'nps-icici', cls: 'nps', owner: 'Yuvan', account: 'ICICI',  name: 'National Pension',     value: 375819,  cost: 200000,  since: '2018-01-01' },
   { id: 'aif-360one',cls: 'aif', owner: 'Yuvan', account: '360ONE', name: 'Alternative Fund',     value: 3678000, cost: 5000000, since: '2022-01-01' },
   // Sovereign Gold Bonds — price is gold ₹/g
-  { id: 'sgb-1', cls: 'sgb', owner: 'Yuvan', account: 'ICICI', name: 'SGB 2019-20 Series III', qty: 70,  unit: 'g', price: 14826, cost: 244930, since: '2019-08-14', maturity: '2027-08-14' },
-  { id: 'sgb-2', cls: 'sgb', owner: 'Yuvan', account: 'ICICI', name: 'SGB 2019-20 Series VII', qty: 50,  unit: 'g', price: 14826, cost: 189750, since: '2019-12-10', maturity: '2027-12-10' },
-  { id: 'sgb-3', cls: 'sgb', owner: 'Yuvan', account: 'ICICI', name: 'SGB 2020-21 Series VI',  qty: 100, unit: 'g', price: 14826, cost: 511700, since: '2020-09-08', maturity: '2028-09-08' },
-  { id: 'sgb-4', cls: 'sgb', owner: 'Yuvan', account: 'ICICI', name: 'SGB 2020-21 Series IX',  qty: 30,  unit: 'g', price: 14826, cost: 150000, since: '2021-01-05', maturity: '2029-01-05' },
-  { id: 'sgb-5', cls: 'sgb', owner: 'Yuvan', account: 'ICICI', name: 'SGB 2020-21 Series X',   qty: 50,  unit: 'g', price: 14826, cost: 252700, since: '2021-01-19', maturity: '2029-01-19' },
-  { id: 'sgb-6', cls: 'sgb', owner: 'Yuvan', account: 'ICICI', name: 'SGB 2020-21 Series XII', qty: 100, unit: 'g', price: 14826, cost: 461200, since: '2021-03-09', maturity: '2029-03-09' },
-  { id: 'sgb-7', cls: 'sgb', owner: 'Yuvan', account: 'ICICI', name: 'SGB 2021-22 Series I',   qty: 100, unit: 'g', price: 14826, cost: 472700, since: '2021-05-25', maturity: '2029-05-25' },
+  { id: 'sgb-1', cls: 'sgb', owner: 'Yuvan', account: 'ICICI', name: 'SGB 2019-20 Series III', qty: 70,  unit: 'g', price: 14291, cost: 244930, since: '2019-08-14', maturity: '2027-08-14' },
+  { id: 'sgb-2', cls: 'sgb', owner: 'Yuvan', account: 'ICICI', name: 'SGB 2019-20 Series VII', qty: 50,  unit: 'g', price: 14291, cost: 189750, since: '2019-12-10', maturity: '2027-12-10' },
+  { id: 'sgb-3', cls: 'sgb', owner: 'Yuvan', account: 'ICICI', name: 'SGB 2020-21 Series VI',  qty: 100, unit: 'g', price: 14291, cost: 511700, since: '2020-09-08', maturity: '2028-09-08' },
+  { id: 'sgb-4', cls: 'sgb', owner: 'Yuvan', account: 'ICICI', name: 'SGB 2020-21 Series IX',  qty: 30,  unit: 'g', price: 14291, cost: 150000, since: '2021-01-05', maturity: '2029-01-05' },
+  { id: 'sgb-5', cls: 'sgb', owner: 'Yuvan', account: 'ICICI', name: 'SGB 2020-21 Series X',   qty: 50,  unit: 'g', price: 14291, cost: 252700, since: '2021-01-19', maturity: '2029-01-19' },
+  { id: 'sgb-6', cls: 'sgb', owner: 'Yuvan', account: 'ICICI', name: 'SGB 2020-21 Series XII', qty: 100, unit: 'g', price: 14291, cost: 461200, since: '2021-03-09', maturity: '2029-03-09' },
+  { id: 'sgb-7', cls: 'sgb', owner: 'Yuvan', account: 'ICICI', name: 'SGB 2021-22 Series I',   qty: 100, unit: 'g', price: 14291, cost: 472700, since: '2021-05-25', maturity: '2029-05-25' },
   // Mutual funds — value and cost come from MF_SCHEMES
   { id: 'mf-yuvan',  cls: 'mf', owner: 'Yuvan',  account: 'CAMS + KFin', name: 'Mutual Funds', mf: 'Yuvan',  since: '2019-01-01' },
   { id: 'mf-ramyaa', cls: 'mf', owner: 'Ramyaa', account: 'CAMS + KFin', name: 'Mutual Funds', mf: 'Ramyaa', since: '2021-01-01' },
   // Listed stocks
-  { id: 'listed-gail',     cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'GAIL India',          qty: 6500, unit: 'sh', price: 167.15,  cost: 1118000, since: '2024-01-01' },
-  { id: 'listed-hdfcbank', cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'HDFC Bank',           qty: 250,  unit: 'sh', price: 710.70,  cost: 181750,  since: '2024-01-01' },
-  { id: 'listed-infy',     cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'Infosys',             qty: 110,  unit: 'sh', price: 1088,    cost: 125840,  since: '2024-01-01' },
-  { id: 'listed-powgri',   cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'Power Grid',          qty: 900,  unit: 'sh', price: 248.95,  cost: 241200,  since: '2024-01-01' },
-  { id: 'listed-relind',   cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'Reliance Industries', qty: 60,   unit: 'sh', price: 1174.60, cost: 78600,   since: '2024-01-01' },
-  { id: 'listed-tatmot',   cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'Tata Motors',         qty: 250,  unit: 'sh', price: 415.25,  cost: 82750,   since: '2024-01-01' },
-  { id: 'listed-bhaair',   cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'Bharti Airtel',       qty: 250,  unit: 'sh', price: 1794.60, cost: 498000,  since: '2024-01-01' },
-  { id: 'listed-sbifun',   cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'SBI Funds Mgmt',      qty: 26,   unit: 'sh', price: 519.55,  cost: 14404,   since: '2024-01-01' },
-  { id: 'listed-tatcov',   cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'Tata Motors PV',      qty: 250,  unit: 'sh', price: 283.40,  cost: 92750,   since: '2024-01-01' },
-  { id: 'unl-nse',         cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'NSE',                 qty: 500,  unit: 'sh', price: 1762.60, cost: 975000,  since: '2025-11-20' },
+  { id: 'listed-gail',     cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'GAIL India',          qty: 6500, unit: 'sh', price: 164,  cost: 1118000, since: '2024-01-01' },
+  { id: 'listed-hdfcbank', cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'HDFC Bank',           qty: 250,  unit: 'sh', price: 680.2,  cost: 181750,  since: '2024-01-01' },
+  { id: 'listed-infy',     cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'Infosys',             qty: 110,  unit: 'sh', price: 1163,    cost: 125840,  since: '2024-01-01' },
+  { id: 'listed-powgri',   cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'Power Grid',          qty: 900,  unit: 'sh', price: 247.4,  cost: 241200,  since: '2024-01-01' },
+  { id: 'listed-relind',   cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'Reliance Industries', qty: 60,   unit: 'sh', price: 1193.6, cost: 78600,   since: '2024-01-01' },
+  { id: 'listed-tatmot',   cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'Tata Motors',         qty: 250,  unit: 'sh', price: 399.1,  cost: 82750,   since: '2024-01-01' },
+  { id: 'listed-bhaair',   cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'Bharti Airtel',       qty: 250,  unit: 'sh', price: 1963.6, cost: 498000,  since: '2024-01-01' },
+  { id: 'listed-sbifun',   cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'SBI Funds Mgmt',      qty: 26,   unit: 'sh', price: 458.4,  cost: 14404,   since: '2024-01-01' },
+  { id: 'listed-tatcov',   cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'Tata Motors PV',      qty: 250,  unit: 'sh', price: 261.2,  cost: 92750,   since: '2024-01-01' },
+  { id: 'unl-nse',         cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'NSE',                 qty: 500,  unit: 'sh', price: 1764.2, cost: 975000,  since: '2025-11-20' },
   // ETFs
-  { id: 'etf-ici500', cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'ICICI BSE 500 ETF',      qty: 1500, unit: 'sh', price: 37.17,  cost: 54000,  since: '2024-01-01' },
-  { id: 'etf-ici100', cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'ICICI Nifty 100 ETF',    qty: 5000, unit: 'sh', price: 26.79,  cost: 145000, since: '2024-01-01' },
-  { id: 'etf-rel150', cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'Nippon Midcap 150 ETF',  qty: 400,  unit: 'sh', price: 224.19, cost: 97200,  since: '2024-01-01' },
+  { id: 'etf-ici500', cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'ICICI BSE 500 ETF',      qty: 1500, unit: 'sh', price: 37.3,  cost: 54000,  since: '2024-01-01' },
+  { id: 'etf-ici100', cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'ICICI Nifty 100 ETF',    qty: 5000, unit: 'sh', price: 26.33,  cost: 145000, since: '2024-01-01' },
+  { id: 'etf-rel150', cls: 'stocks', owner: 'Yuvan', account: 'ICICI', name: 'Nippon Midcap 150 ETF',  qty: 400,  unit: 'sh', price: 221.68, cost: 97200,  since: '2024-01-01' },
   { id: 'kite-zerodha', cls: 'stocks', owner: 'Yuvan', account: 'Zerodha', name: 'Mixed shares', value: 0, cost: 300000, since: '2021-01-01' },
   // InvITs & REITs
-  { id: 'invit-indgri', cls: 'reit', owner: 'Yuvan', account: 'ICICI', name: 'IndiGrid InvIT',        qty: 6500,  unit: 'sh', price: 168.27, cost: 1163500, since: '2024-01-01' },
-  { id: 'invit-irbinv', cls: 'reit', owner: 'Yuvan', account: 'ICICI', name: 'IRB InvIT',             qty: 2500,  unit: 'sh', price: 63.35,  cost: 160000,  since: '2024-01-01' },
-  { id: 'invit-powinf', cls: 'reit', owner: 'Yuvan', account: 'ICICI', name: 'PowerGrid InvIT',       qty: 10000, unit: 'sh', price: 103.80, cost: 1000000, since: '2024-01-01' },
-  { id: 'reit-broind',  cls: 'reit', owner: 'Yuvan', account: 'ICICI', name: 'Brookfield India REIT', qty: 600,   unit: 'sh', price: 322.94, cost: 207000,  since: '2024-01-01' },
-  { id: 'reit-minbus',  cls: 'reit', owner: 'Yuvan', account: 'ICICI', name: 'Mindspace REIT',        qty: 550,   unit: 'sh', price: 494.98, cost: 273350,  since: '2024-01-01' },
-  { id: 'reit-nexsel',  cls: 'reit', owner: 'Yuvan', account: 'ICICI', name: 'Nexus Select Trust',    qty: 1000,  unit: 'sh', price: 164.84, cost: 165000,  since: '2024-01-01' },
-  { id: 'reit-icici',   cls: 'reit', owner: 'Yuvan', account: 'ICICI', name: 'Embassy Office Parks',  qty: 1000,  unit: 'sh', price: 430.52, cost: 439000,  since: '2021-01-01' },
+  { id: 'invit-indgri', cls: 'reit', owner: 'Yuvan', account: 'ICICI', name: 'IndiGrid InvIT',        qty: 6500,  unit: 'sh', price: 166.08, cost: 1163500, since: '2024-01-01' },
+  { id: 'invit-irbinv', cls: 'reit', owner: 'Yuvan', account: 'ICICI', name: 'IRB InvIT',             qty: 2500,  unit: 'sh', price: 61,  cost: 160000,  since: '2024-01-01' },
+  { id: 'invit-powinf', cls: 'reit', owner: 'Yuvan', account: 'ICICI', name: 'PowerGrid InvIT',       qty: 10000, unit: 'sh', price: 102.34, cost: 1000000, since: '2024-01-01' },
+  { id: 'reit-broind',  cls: 'reit', owner: 'Yuvan', account: 'ICICI', name: 'Brookfield India REIT', qty: 600,   unit: 'sh', price: 308, cost: 207000,  since: '2024-01-01' },
+  { id: 'reit-minbus',  cls: 'reit', owner: 'Yuvan', account: 'ICICI', name: 'Mindspace REIT',        qty: 550,   unit: 'sh', price: 485.62, cost: 273350,  since: '2024-01-01' },
+  { id: 'reit-nexsel',  cls: 'reit', owner: 'Yuvan', account: 'ICICI', name: 'Nexus Select Trust',    qty: 1000,  unit: 'sh', price: 159.31, cost: 165000,  since: '2024-01-01' },
+  { id: 'reit-icici',   cls: 'reit', owner: 'Yuvan', account: 'ICICI', name: 'Embassy Office Parks',  qty: 1000,  unit: 'sh', price: 421.94, cost: 439000,  since: '2021-01-01' },
   // Unlisted — fetchKey matches the proxy's /unlisted-prices result keys
-  { id: 'unl-sunday',     cls: 'unlisted', owner: 'Yuvan', account: 'ICICI', name: 'Sunday Protech', qty: 100000, unit: 'sh', price: 20.75,   cost: 2075000, since: '2025-11-24', fetchKey: 'sunday' },
-  { id: 'unl-oyo',        cls: 'unlisted', owner: 'Yuvan', account: 'ICICI', name: 'OYO',            qty: 26316,  unit: 'sh', price: 28,      cost: 736848,  since: '2025-12-04', fetchKey: 'oyo' },
-  { id: 'unl-ecosure',    cls: 'unlisted', owner: 'Yuvan', account: 'ICICI', name: 'Ecosure',        qty: 15000,  unit: 'sh', price: 37,      cost: 555000,  since: '2025-12-08', fetchKey: 'ecosure' },
-  { id: 'unl-avpl',       cls: 'unlisted', owner: 'Yuvan', account: 'ICICI', name: 'AVPL Drone',     qty: 5000,   unit: 'sh', price: 48,      cost: 240000,  since: '2026-01-14', fetchKey: 'avpl' },
-  { id: 'unl-deltagalaxy',cls: 'unlisted', owner: 'Yuvan', account: 'ICICI', name: 'Delta Galaxy',   qty: 10000,  unit: 'sh', price: 33,      cost: 330000,  since: '2026-04-25', fetchKey: 'deltagalaxy' },
-  { id: 'unl-msei',       cls: 'unlisted', owner: 'Yuvan', account: 'ICICI', name: 'MSEI',           qty: 40000,  unit: 'sh', price: 6.3,     cost: 252000,  since: '2026-04-07', fetchKey: 'msei' },
-  { id: 'unl-zepto',      cls: 'unlisted', owner: 'Yuvan', account: 'ICICI', name: 'Zepto',          qty: 10000,  unit: 'sh', price: 39.5,    cost: 395000,  since: '2026-06-02', fetchKey: 'zepto' },
-  { id: 'unl-pharmeasy',  cls: 'unlisted', owner: 'Yuvan', account: 'ICICI', name: 'Pharmeasy',      qty: 20000,  unit: 'sh', price: 6.2,     cost: 124000,  since: '2026-09-03' },
+  { id: 'unl-sunday',     cls: 'unlisted', owner: 'Yuvan', account: 'ICICI', name: 'Sunday Protech', qty: 100000, unit: 'sh', price: 7.95,   cost: 2075000, since: '2025-11-24', fetchKey: 'sunday' },
+  { id: 'unl-oyo',        cls: 'unlisted', owner: 'Yuvan', account: 'ICICI', name: 'OYO',            qty: 26316,  unit: 'sh', price: 21.5,      cost: 736848,  since: '2025-12-04', fetchKey: 'oyo' },
+  { id: 'unl-ecosure',    cls: 'unlisted', owner: 'Yuvan', account: 'ICICI', name: 'Ecosure',        qty: 15000,  unit: 'sh', price: 30,      cost: 555000,  since: '2025-12-08', fetchKey: 'ecosure' },
+  { id: 'unl-avpl',       cls: 'unlisted', owner: 'Yuvan', account: 'ICICI', name: 'AVPL Drone',     qty: 5000,   unit: 'sh', price: 45.15,      cost: 240000,  since: '2026-01-14', fetchKey: 'avpl' },
+  { id: 'unl-deltagalaxy',cls: 'unlisted', owner: 'Yuvan', account: 'ICICI', name: 'Delta Galaxy',   qty: 10000,  unit: 'sh', price: 48,      cost: 330000,  since: '2026-04-25', fetchKey: 'deltagalaxy' },
+  { id: 'unl-msei',       cls: 'unlisted', owner: 'Yuvan', account: 'ICICI', name: 'MSEI',           qty: 40000,  unit: 'sh', price: 6.75,     cost: 252000,  since: '2026-04-07', fetchKey: 'msei' },
+  { id: 'unl-zepto',      cls: 'unlisted', owner: 'Yuvan', account: 'ICICI', name: 'Zepto',          qty: 10000,  unit: 'sh', price: 29.41,    cost: 395000,  since: '2026-06-02', fetchKey: 'zepto' },
+  { id: 'unl-pharmeasy',  cls: 'unlisted', owner: 'Yuvan', account: 'ICICI', name: 'Pharmeasy',      qty: 20000,  unit: 'sh', price: 6.5,     cost: 124000,  since: '2026-09-03' },
   // Other
   { id: 'crypto-btc', cls: 'crypto', owner: 'Yuvan', account: 'Exchange', name: 'Crypto portfolio', value: 100000, cost: 100000, since: '2021-01-01' },
-  { id: 'coin-au',    cls: 'coin',   owner: 'Yuvan', account: 'Physical', name: 'Gold coins',   qty: 124,  unit: 'g', price: 14826, cost: 868000, since: '2020-01-01' },
-  { id: 'coin-ag',    cls: 'coin',   owner: 'Yuvan', account: 'Physical', name: 'Silver coins', qty: 1500, unit: 'g', price: 235,   cost: 140000, since: '2021-01-01' },
+  { id: 'coin-au',    cls: 'coin',   owner: 'Yuvan', account: 'Physical', name: 'Gold coins',   qty: 124,  unit: 'g', price: 14291, cost: 868000, since: '2020-01-01' },
+  { id: 'coin-ag',    cls: 'coin',   owner: 'Yuvan', account: 'Physical', name: 'Silver coins', qty: 1500, unit: 'g', price: 220,   cost: 140000, since: '2021-01-01' },
 ];
 
 export const SNAPSHOTS = [
@@ -108,6 +108,7 @@ export const SNAPSHOTS = [
   { date: '2025-12-13', value: 67974466 },
   { date: '2026-09-04', value: 70118797 },
   { date: '2026-10-15', value: 69599403 },
+  { date: '2026-10-27', value: 67691585 },
 ];
 
 // From CAS statements (Yuvan 18-Aug-2026, Ramyaa 19-Mar-2026).
