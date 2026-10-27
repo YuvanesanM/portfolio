@@ -5,6 +5,7 @@ import { html, raw, fmt, fmtDate, pct, signed, sum, groupBy, $, $$ } from '../ut
 import { pageHead, classBadge, icon, kpi, empty } from '../ui.js';
 import { toast } from '../modal.js';
 import { getTargets, setTargets } from './rebalance.js';
+import { BUNDLED_ADVICE } from '../advice.js';
 
 const CONTEXT_KEY = 'portfolio_advisor_context';
 const ADVICE_KEY = 'portfolio_advisor_last';
@@ -58,7 +59,7 @@ export function render(root) {
           <textarea id="advContext" class="input area" rows="7" placeholder="e.g. Retire in 12 years. Moderate risk. Need ₹20 L for a house deposit in 2027. Prefer to keep SGBs to maturity. Monthly SIP capacity ₹1 L.">${context}</textarea></div>
         <div style="display:flex;gap:8px;align-items:center;margin-top:14px;flex-wrap:wrap">
           <button class="btn btn-primary" id="advRun" ${state.offline ? 'disabled' : ''}>${icon('sparkle')}${last ? 'Re-analyse portfolio' : 'Analyse portfolio'}</button>
-          ${last ? html`<button class="btn btn-ghost" id="advClear">Clear</button>` : ''}
+          ${loadLocal() ? html`<button class="btn btn-ghost" id="advClear">Clear</button>` : ''}
         </div>
         <div class="note">Sends a numeric brief (class weights, top holdings, MF mix, SGB dates, history) to your proxy, which calls Claude. No account numbers or notes are included. Each run costs a few rupees of API usage.${state.offline ? ' Unavailable while the data server is unreachable.' : ''}</div>
       </div>
@@ -76,9 +77,10 @@ export function render(root) {
   $('#advClear', root)?.addEventListener('click', () => { pref.del(ADVICE_KEY); render(root_); });
 }
 
-function loadLast() {
+function loadLocal() {
   try { const v = JSON.parse(pref.get(ADVICE_KEY) || 'null'); return v && v.advice ? v : null; } catch { return null; }
 }
+const loadLast = () => loadLocal() || BUNDLED_ADVICE;
 
 async function run() {
   if (busy) return;
@@ -128,7 +130,7 @@ function renderAdvice(rec) {
   return html`
     ${stale ? html`<div class="alert warn">${icon('alert')}<div><b>Portfolio has changed since this analysis</b> (it was based on ${fmt(rec.total)} as of ${fmtDate(rec.asOf)}). Re-analyse for current figures.</div></div>` : ''}
     <div class="card" style="margin-bottom:var(--gap)">
-      <div class="card-head"><h3>Assessment</h3><span class="muted">${new Date(rec.generatedAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} · ${rec.model}${rec.usage ? ` · ${rec.usage.input_tokens + rec.usage.output_tokens} tokens` : ''}</span></div>
+      <div class="card-head"><h3>Assessment</h3><span class="muted">${rec.source === 'bundled' ? 'Bundled analysis · ' : ''}${new Date(rec.generatedAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} · ${rec.model}${rec.usage ? ` · ${rec.usage.input_tokens + rec.usage.output_tokens} tokens` : ''}</span></div>
       <div style="display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap"><span class="badge gold" style="text-transform:capitalize">${a.stance} posture</span></div>
       <p style="margin-top:10px;font-size:14px;line-height:1.6">${a.summary}</p>
     </div>
