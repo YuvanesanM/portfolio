@@ -12,6 +12,8 @@ export const state = {
   snapshots: [],
   notes: {},
   overrides: {},      // id → { price?, value?, qty?, asOf }
+  additions: {},      // id → holding added in the app (same shape as a data row)
+  removed: [],        // ids of data rows hidden in the app
   remote: null,       // raw remote file (null when offline)
   offline: false,
 };
@@ -47,7 +49,8 @@ function materialize(src, override) {
 }
 
 export function recompute() {
-  state.holdings = HOLDINGS.map(h => materialize(h, state.overrides[h.id]));
+  const base = [...HOLDINGS.filter(h => !state.removed.includes(h.id)), ...Object.values(state.additions).map(h => ({ ...h, added: true }))];
+  state.holdings = base.map(h => materialize(h, state.overrides[h.id]));
   state.total = sum(state.holdings, h => h.value);
   state.cost  = sum(state.holdings.filter(h => h.value > 0), h => h.cost);
   const groups = groupBy(state.holdings, h => h.cls);
@@ -75,6 +78,9 @@ export function hydrate(remote) {
   state.offline = !remote;
   state.notes = { ...(remote?.notes || {}) };
   state.overrides = remote?.version >= 2 ? { ...(remote.overrides || {}) } : {};
+  state.additions = remote?.version >= 2 && remote.additions && typeof remote.additions === 'object'
+    ? Object.fromEntries(Object.entries(remote.additions).filter(([id, h]) => h && h.id === id && ASSET_CLASSES[h.cls])) : {};
+  state.removed = remote?.version >= 2 && Array.isArray(remote.removed) ? remote.removed.filter(x => typeof x === 'string') : [];
   state.snapshots = mergeSnapshots(remote?.snapshots);
   recompute();
 }
@@ -110,6 +116,8 @@ export function savePayload(asOf) {
     version: 2,
     asOf,
     overrides: state.overrides,
+    additions: state.additions,
+    removed: state.removed,
     notes: state.notes,
     snapshots: state.snapshots,
     // Materialized copy for readers of the raw file; the app never reads it back.
