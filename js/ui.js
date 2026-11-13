@@ -79,12 +79,6 @@ export function legend(items, { total, action } = {}) {
     <i class="dot" style="background:${x.color}"></i><span class="name">${x.name}</span><span class="pct">${pct(x.value / t)}</span><span class="val">${fmt(x.value)}</span></button>`)}</div>`;
 }
 
-export function donutCard(title, canvasId, centerTop, centerSub, extra) {
-  return html`<div class="card"><div class="card-head"><h3>${title}</h3>${extra || ''}</div>
-    <div class="chart donut donut-wrap"><canvas id="${canvasId}"></canvas>
-      <div class="donut-center"><b>${centerTop}</b><span>${centerSub}</span></div></div></div>`;
-}
-
 export const empty = (msg, title) => html`<div class="empty">${title ? html`<b>${title}</b>` : ''}${msg}</div>`;
 
 export function insightCard({ title, body, color, iconName, meta, href, hrefLabel }) {

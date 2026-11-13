@@ -2,6 +2,7 @@ import { state, activeHoldings } from './store.js';
 import { ASSET_CLASSES } from './data.js';
 import { html, fmt, fmtDate, fmtShort, pct, estimateXIRR, $ } from './util.js';
 import { icon } from './ui.js';
+import { resolveColor } from './charts.js';
 import { openModal, toast } from './modal.js';
 
 export function openShare() {
@@ -54,7 +55,7 @@ function drawCard(canvas) {
   const x0 = 36, y0 = 170, barW = (W - 72 - 5 * 16) / 6;
   top.forEach((c, i) => {
     const x = x0 + i * (barW + 16), h = Math.max(6, c.value / max * 110);
-    ctx.fillStyle = c.color; r(x, y0 + 110 - h, barW, h, 6); ctx.fill();
+    ctx.fillStyle = resolveColor(c.color); r(x, y0 + 110 - h, barW, h, 6); ctx.fill();
     ctx.fillStyle = '#e7eaf0'; ctx.font = '600 13px Inter, sans-serif'; ctx.fillText(fmtShort(c.value), x, y0 + 134);
     ctx.fillStyle = '#9aa4b2'; ctx.font = '400 11px Inter, sans-serif'; ctx.fillText(`${c.short} · ${pct(c.pct, 0)}`, x, y0 + 152);
   });

@@ -2,20 +2,20 @@
 // the private proxy (GET /data) and applied with applyData(), which rebinds the exports below.
 
 export const ASSET_CLASSES = {
-  mf:        { label: 'Mutual Funds',     short: 'MF',        color: '#3b82f6', icon: 'pie',      liquidity: 'liquid',   tax: 'equity'   },
-  fd:        { label: 'Fixed Deposits',   short: 'FD',        color: '#22c55e', icon: 'bank',     liquidity: 'liquid',   tax: 'slab'     },
-  sgb:       { label: 'Sovereign Gold',   short: 'SGB',       color: '#f59e0b', icon: 'sparkle',  liquidity: 'locked',   tax: 'sgb'      },
-  pms:       { label: 'PMS',              short: 'PMS',       color: '#8b5cf6', icon: 'briefcase',liquidity: 'locked',   tax: 'equity'   },
-  aif:       { label: 'AIF',              short: 'AIF',       color: '#f97316', icon: 'layers',   liquidity: 'locked',   tax: 'aif'      },
-  stocks:    { label: 'Stocks & ETFs',    short: 'Stocks',    color: '#14b8a6', icon: 'trend',    liquidity: 'semi',     tax: 'equity'   },
-  reit:      { label: 'REIT & InvIT',     short: 'REIT',      color: '#06b6d4', icon: 'building', liquidity: 'semi',     tax: 'equity'   },
-  unlisted:  { label: 'Unlisted Shares',  short: 'Unlisted',  color: '#d946ef', icon: 'unlock',   liquidity: 'semi',     tax: 'unlisted' },
-  coin:      { label: 'Gold & Silver',    short: 'Coins',     color: '#eab308', icon: 'coins',    liquidity: 'semi',     tax: 'metal'    },
-  ssy:       { label: 'SSY',              short: 'SSY',       color: '#f43f5e', icon: 'users',    liquidity: 'locked',   tax: 'free'     },
-  insurance: { label: 'Insurance',        short: 'Insurance', color: '#6366f1', icon: 'shield',   liquidity: 'locked',   tax: 'free'     },
-  nps:       { label: 'NPS',              short: 'NPS',       color: '#84cc16', icon: 'landmark', liquidity: 'locked',   tax: 'nps'      },
-  crypto:    { label: 'Crypto',           short: 'Crypto',    color: '#ec4899', icon: 'bitcoin',  liquidity: 'liquid',   tax: 'crypto'   },
-  savings:   { label: 'Savings',          short: 'Savings',   color: '#64748b', icon: 'wallet',   liquidity: 'liquid',   tax: 'slab'     },
+  mf:        { label: 'Mutual Funds',     short: 'MF',        color: 'var(--c-mf)', icon: 'pie',      liquidity: 'liquid',   tax: 'equity'   },
+  fd:        { label: 'Fixed Deposits',   short: 'FD',        color: 'var(--c-fd)', icon: 'bank',     liquidity: 'liquid',   tax: 'slab'     },
+  sgb:       { label: 'Sovereign Gold',   short: 'SGB',       color: 'var(--c-sgb)', icon: 'sparkle',  liquidity: 'locked',   tax: 'sgb'      },
+  pms:       { label: 'PMS',              short: 'PMS',       color: 'var(--c-pms)', icon: 'briefcase',liquidity: 'locked',   tax: 'equity'   },
+  aif:       { label: 'AIF',              short: 'AIF',       color: 'var(--c-aif)', icon: 'layers',   liquidity: 'locked',   tax: 'aif'      },
+  stocks:    { label: 'Stocks & ETFs',    short: 'Stocks',    color: 'var(--c-stocks)', icon: 'trend',    liquidity: 'semi',     tax: 'equity'   },
+  reit:      { label: 'REIT & InvIT',     short: 'REIT',      color: 'var(--c-reit)', icon: 'building', liquidity: 'semi',     tax: 'equity'   },
+  unlisted:  { label: 'Unlisted Shares',  short: 'Unlisted',  color: 'var(--c-unlisted)', icon: 'unlock',   liquidity: 'semi',     tax: 'unlisted' },
+  coin:      { label: 'Gold & Silver',    short: 'Coins',     color: 'var(--c-coin)', icon: 'coins',    liquidity: 'semi',     tax: 'metal'    },
+  ssy:       { label: 'SSY',              short: 'SSY',       color: 'var(--c-ssy)', icon: 'users',    liquidity: 'locked',   tax: 'free'     },
+  insurance: { label: 'Insurance',        short: 'Insurance', color: 'var(--c-insurance)', icon: 'shield',   liquidity: 'locked',   tax: 'free'     },
+  nps:       { label: 'NPS',              short: 'NPS',       color: 'var(--c-nps)', icon: 'landmark', liquidity: 'locked',   tax: 'nps'      },
+  crypto:    { label: 'Crypto',           short: 'Crypto',    color: 'var(--c-crypto)', icon: 'bitcoin',  liquidity: 'liquid',   tax: 'crypto'   },
+  savings:   { label: 'Savings',          short: 'Savings',   color: 'var(--c-savings)', icon: 'wallet',   liquidity: 'liquid',   tax: 'slab'     },
 };
 
 export const MF_HOUSE_COLORS = {

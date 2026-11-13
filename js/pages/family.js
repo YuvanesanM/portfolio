@@ -1,8 +1,8 @@
 import { state } from '../store.js';
 import { OWNERS, MF_SCHEMES } from '../data.js';
 import { html, fmt, pct, sum, groupBy } from '../util.js';
-import { stat, allocRows, donutCard, classBadge, ownerBadge, pageHead } from '../ui.js';
-import { doughnut } from '../charts.js';
+import { stat, allocRows, classBadge, ownerBadge, pageHead } from '../ui.js';
+import { segmented } from '../viz.js';
 
 export function render(root) {
   // Split the two MF rows into per-owner scheme totals so the family view matches CAS ownership.
@@ -19,7 +19,7 @@ export function render(root) {
       ${members.map(m => stat({ label: m.name, value: fmt(m.value), color: m.color, iconName: 'users', sub: `${pct(m.value / grand)} of family${m.note ? ` · ${m.note}` : ''}` }))}
     </div>
     <div class="grid cols-2">
-      ${donutCard('Family split', 'famDonut', fmt(grand), 'combined')}
+      <div class="card"><div class="card-head"><h3>Family split</h3><span class="muted">${fmt(grand)} combined</span></div>${segmented(members.map(m => ({ key: m.name, name: m.name, value: m.value, color: m.color })), { total: grand })}</div>
       <div class="card"><div class="card-head"><h3>By member</h3></div>${allocRows(members, { total: grand })}</div>
     </div>
     <div class="card"><div class="card-head"><h3>Holdings by owner</h3></div><div class="table-wrap"><table class="tbl">
@@ -30,5 +30,4 @@ export function render(root) {
       })}</tbody>
     </table></div></div>`;
 
-  doughnut(root.querySelector('#famDonut'), { labels: members.map(m => m.name), data: members.map(m => m.value), colors: members.map(m => m.color), total: grand, legend: true });
 }

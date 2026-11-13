@@ -1,8 +1,9 @@
 import { state, sgbHoldings } from '../store.js';
 import { ASSET_CLASSES, OWNERS, MF_SCHEMES } from '../data.js';
 import { html, fmt, fmtDate, pct, signed, signedPct, sum, daysBetween, todayISO, groupBy, $, $$ } from '../util.js';
-import { pageHead, stat, tile, classBadge, ownerBadge, gainText, allocRows, donutCard, seg, icon, kpi, empty } from '../ui.js';
-import { bars, doughnut } from '../charts.js';
+import { pageHead, stat, tile, classBadge, ownerBadge, gainText, allocRows, seg, icon, kpi, empty } from '../ui.js';
+import { bars } from '../charts.js';
+import { segmented } from '../viz.js';
 
 const prefs = { mode: 'value', sort: 'value' };
 let root_ = null;
@@ -71,24 +72,18 @@ function renderClass(root, key) {
         <tfoot><tr><td colspan="3">Total</td><td class="right">${cls.cost ? fmt(cls.cost) : '—'}</td><td class="right">${fmt(cls.value)}</td><td class="right">${cls.cost ? gainText(gain, cls.cost) : '—'}</td><td class="right">100%</td></tr></tfoot>
       </table></div>` : empty('No holdings recorded for this class.')}
     </div>`;
-  if (key === 'fd') mountFD(root, active);
 }
 
 function fdSection(fds) {
   const total = sum(fds, h => h.value);
   const banks = [...groupBy(fds, h => h.account)].map(([name, items]) => ({ name, value: sum(items, h => h.value) })).sort((a, b) => b.value - a.value);
   const owners = [...groupBy(fds, h => h.owner)].map(([name, items]) => ({ name, value: sum(items, h => h.value), color: OWNERS[name]?.color || '#999' })).sort((a, b) => b.value - a.value);
+  const palette = ['var(--c-fd)', 'var(--c-mf)', 'var(--c-pms)', 'var(--c-reit)', 'var(--c-aif)'];
   return html`<div class="grid cols-2">
-    ${donutCard('By bank', 'fdDonut', fmt(total), `${banks.length} banks`)}
+    <div class="card"><div class="card-head"><h3>By bank</h3><span class="muted">${banks.length} banks</span></div>${segmented(banks.map((b, i) => ({ key: b.name, name: b.name, value: b.value, color: palette[i % palette.length] })), { total })}</div>
     <div class="card"><div class="card-head"><h3>By holder</h3></div>${allocRows(owners, { total })}
       <div class="note">Maturity dates and interest rates are not recorded in the portfolio data, so no maturity ladder is shown.</div></div>
   </div>`;
-}
-function mountFD(root, fds) {
-  const total = sum(fds, h => h.value);
-  const banks = [...groupBy(fds, h => h.account)].map(([name, items]) => ({ name, value: sum(items, h => h.value) })).sort((a, b) => b.value - a.value);
-  const palette = ['#3dd68c', '#4c83ff', '#f5a524', '#9b7bff', '#2dd4a7'];
-  doughnut($('#fdDonut', root), { labels: banks.map(b => b.name), data: banks.map(b => b.value), colors: banks.map((_, i) => palette[i % palette.length]), total, legend: true });
 }
 
 function sgbSection() {

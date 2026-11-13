@@ -1,7 +1,9 @@
 import { state, activeHoldings, previousSnapshot } from '../store.js';
 import { html, fmt, fmtDate, fmtMonth, pct, signed, signedPct, sum, yearsSince, estimateXIRR, parseISO, todayISO, $ } from '../util.js';
 import { pageHead, kpi, classBadge, ownerBadge, gainText, seg, empty, icon } from '../ui.js';
+import { ASSET_CLASSES } from '../data.js';
 import { line, bars } from '../charts.js';
+import { dumbbell } from '../viz.js';
 
 const PERIODS = [['6m', '6M'], ['1y', '1Y'], ['2y', '2Y'], ['all', 'All']];
 let period = 'all', root_ = null;
@@ -46,6 +48,10 @@ export function render(root) {
         </div>
       </div>
       <div class="card"><div class="card-head"><h3>Gain by asset class</h3></div><div class="chart" style="height:220px"><canvas id="perfClass" role="img" aria-label="Unrealised gain by asset class"></canvas></div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:var(--gap)"><div class="card-head"><h3>Cost → value, largest positions</h3><span class="muted">grey dot is what you paid, coloured dot is today</span></div>
+      ${dumbbell([...items].sort((a, b) => b.value - a.value).slice(0, 15).map(h => ({ name: h.name, sub: ASSET_CLASSES[h.cls].short, from: h.cost, to: h.value })))}
     </div>
 
     <div class="alert info">${icon('info')}<div><b>Valuation change ≠ return.</b> The history above tracks portfolio value, which includes new money and withdrawals. The gains below compare current value to recorded purchase cost. XIRR is approximated from each holding's weighted holding period; SIPs and staggered purchases will differ. No benchmark comparison is shown because no benchmark series is stored.</div></div>

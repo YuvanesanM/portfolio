@@ -1,8 +1,9 @@
 import { state, mfTotals } from '../store.js';
 import { MF_SCHEMES, MF_HOUSE_COLORS, MF_CAT_COLORS, CAS_AS_OF } from '../data.js';
 import { html, fmt, fmtDate, pct, signed, signedPct, sum, groupBy, $ } from '../util.js';
-import { stat, kpi, allocRows, donutCard, ownerBadge, sortableTh, gainText, pageHead } from '../ui.js';
-import { doughnut, bars } from '../charts.js';
+import { stat, kpi, allocRows, ownerBadge, sortableTh, gainText, pageHead } from '../ui.js';
+import { bars } from '../charts.js';
+import { segmented } from '../viz.js';
 
 const filters = { house: 'All', owner: 'All', sort: { key: 'value', asc: false } };
 let currentRoot = null;
@@ -38,7 +39,7 @@ export function render(root) {
     </div>
     <div class="grid cols-3">
       <div class="card"><div class="card-head"><h3>By fund house</h3></div><div class="chart"><canvas id="mfHouses"></canvas></div></div>
-      ${donutCard('By category', 'mfCats', String(cats.length), 'categories')}
+      <div class="card"><div class="card-head"><h3>By category</h3><span class="muted">${cats.length} categories · top 5 + other</span></div>${segmented(cats.map(c => ({ key: c.name, name: c.name, value: c.value, color: c.color })), { total })}</div>
       <div class="card"><div class="card-head"><h3>Category split</h3></div>${allocRows(cats.slice(0, 8), { total })}</div>
     </div>
     <div class="card">
@@ -50,7 +51,6 @@ export function render(root) {
     </div>`;
 
   bars(root.querySelector('#mfHouses'), { labels: houses.map(h => h.name), data: houses.map(h => h.value), colors: houses.map(h => h.color), horizontal: true, tip: c => `${fmt(c.raw)} · ${pct(c.raw / total)}` });
-  doughnut(root.querySelector('#mfCats'), { labels: cats.map(c => c.name), data: cats.map(c => c.value), colors: cats.map(c => c.color), total });
   renderTable();
 }
 

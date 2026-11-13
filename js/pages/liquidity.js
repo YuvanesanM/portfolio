@@ -1,7 +1,7 @@
 import { state, liquidityDetail, sgbHoldings } from '../store.js';
 import { html, fmt, fmtDate, pct, sum, daysBetween, todayISO, $ } from '../util.js';
 import { pageHead, stat, classBadge, allocRows, icon } from '../ui.js';
-import { doughnut } from '../charts.js';
+import { segmented } from '../viz.js';
 
 export function render(root) {
   const buckets = liquidityDetail();
@@ -12,8 +12,8 @@ export function render(root) {
     <div class="stats">${buckets.map(b => stat({ label: b.label, value: fmt(b.value), color: b.color, iconName: 'droplet', sub: `${pct(b.pct)} · ${b.classes.map(c => c.short).join(', ') || 'none'}` }))}</div>
     <div class="grid cols-2-3">
       <div class="card"><div class="card-head"><h3>Split</h3></div>
-        <div class="chart donut donut-wrap"><canvas id="liqDonut" role="img" aria-label="Liquidity split"></canvas><div class="donut-center"><b>${fmt(state.total)}</b><span>net worth</span></div></div>
-        <div class="stack-bar" style="margin-top:14px">${buckets.map(b => html`<i style="width:${(b.pct * 100).toFixed(2)}%;background:${b.color}" title="${b.label} ${pct(b.pct)}"></i>`)}</div>
+        ${segmented(buckets.map(b => ({ key: b.key, name: b.label, value: b.value, color: b.color })), { total: state.total, sort: false })}
+        <div style="margin-top:14px">${allocRows(buckets.map(b => ({ key: b.key, name: b.label, value: b.value, color: b.color })), { total: state.total })}</div>
         <div class="note">Each asset class sits in exactly one bucket, so the three totals add up to net worth. The bucket is a property of the class (ASSET_CLASSES.liquidity), not of individual holdings.</div></div>
       <div class="card"><div class="card-head"><h3>What is in each bucket</h3></div>
         ${buckets.map(b => html`<div style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><b style="color:${b.color}">${b.label}</b><span class="muted small">${b.desc}</span></div>
@@ -34,7 +34,6 @@ export function render(root) {
         </div>
         <div class="note">${icon('info')} These are shown as unknown rather than guessed. Add a <code>maturity</code> field to a holding in the portfolio data to have it appear in the maturity table.</div></div>
     </div>`;
-  doughnut($('#liqDonut', root), { labels: buckets.map(b => b.label), data: buckets.map(b => b.value), colors: buckets.map(b => b.color), total: state.total, legend: true, cutout: '68%' });
 }
 
 export function onAction(name, arg) {

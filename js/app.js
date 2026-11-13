@@ -5,6 +5,7 @@ import { html, fmtDate, display, $, $$ } from './util.js';
 import { icon } from './ui.js';
 import { closeModal, modalOpen, toast } from './modal.js';
 import { destroyAll } from './charts.js';
+import { stagger } from './viz.js';
 import { openUpdate } from './update.js';
 import { openShare } from './export.js';
 import * as overview from './pages/overview.js';
@@ -80,6 +81,8 @@ function renderRoute() {
   openDrawer(false);
   const view = $('#view');
   PAGES[route.page].render(view, { sub: route.sub, query: route.query });
+  stagger(view);
+  view.classList.remove('enter'); void view.offsetWidth; view.classList.add('enter');
   $$('[data-page]').forEach(a => a.setAttribute('aria-current', a.dataset.page === route.page ? 'page' : 'false'));
   $('#pageTitle').textContent = TITLES[route.page];
   $('#greet').innerHTML = greeting();
@@ -214,8 +217,25 @@ async function onCredential(response) {
   }
 }
 
+function registerServiceWorker() {
+  if (!('serviceWorker' in navigator) || location.protocol !== 'https:') return;
+  navigator.serviceWorker.register('./sw.js').then(reg => {
+    reg.addEventListener('updatefound', () => {
+      const nw = reg.installing;
+      nw?.addEventListener('statechange', () => {
+        if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+          const el = $('#toast');
+          el.innerHTML = html`A new version is ready. <button class="btn small" data-action="reload" style="margin-left:8px">Reload</button>`;
+          el.hidden = false;
+        }
+      });
+    });
+  }).catch(() => {});
+}
+
 (function boot() {
   applyTheme(pref.get(PREF.theme) === 'light' ? 'light' : 'dark');
+  registerServiceWorker();
   display.unit = ['auto', 'lakh', 'crore', 'full'].includes(pref.get(PREF.unit)) ? pref.get(PREF.unit) : 'auto';
   display.mask = pref.get(PREF.mask) === '1';
   if (display.mask) { const b = $('[data-action="mask"]'); b.setAttribute('aria-pressed', 'true'); b.querySelector('use').setAttribute('href', '#i-eye-off'); }
